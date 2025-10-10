@@ -1,16 +1,26 @@
-import RaceDetails from '@/components/RaceDetails.vue'
-import Races from '@/components/Races.vue'
-import Tracks from '@/components/Tracks.vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import App from '@/App.vue';
+import { createRouter, createWebHistory } from 'vue-router';
 
-const routes = [
-  { path: '/', redirect: '/races' },
-  { path: '/tracks', component: Tracks },
-  { path: '/races', component: Races },
-  { path: '/races/:id', component: RaceDetails, props: true },
-]
-
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
-  routes,
-})
+  routes: [
+    {
+      path: '/',
+      component: App,
+      children: [
+        {
+          path: '/tracks',
+          name: 'tracks',
+          component: () => import('@/components/Tracks.vue'),
+        },
+        {
+          path: '/races',
+          name: 'races',
+          component: () => import('@/components/Races.vue'),
+        },
+      ],
+    },
+  ],
+});
+
+export default router;

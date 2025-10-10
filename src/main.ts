@@ -1,11 +1,13 @@
 import App from '@/App.vue';
-import router from '@/router';
 import { definePreset } from '@primeuix/themes';
-import Aura from '@primeuix/themes/aura';
+
 import { createPinia } from 'pinia';
-import PrimeVue from 'primevue/config';
 import { createApp } from 'vue';
 import './main.scss';
+
+import Aura from '@primeuix/themes/aura';
+import PrimeVue from 'primevue/config';
+import router from './router';
 
 const MyPreset = definePreset(Aura, {
   semantic: {
@@ -18,7 +20,7 @@ const MyPreset = definePreset(Aura, {
       500: '#0478b6',
       600: '#046da6',
       700: '#035581',
-      800: '#024264', // Ta couleur primaire
+      800: '#024264',
       900: '#02324c',
     },
   },
