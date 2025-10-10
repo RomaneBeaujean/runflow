@@ -8,6 +8,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Dialog: typeof import('primevue/dialog')['default']
+    FileUpload: typeof import('primevue/fileupload')['default']
+    InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('./src/components/Menu.vue')['default']
     RaceDetails: typeof import('./src/components/RaceDetails.vue')['default']
     Races: typeof import('./src/components/Races.vue')['default']

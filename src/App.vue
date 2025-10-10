@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import Menu from "@/components/Menu.vue";
+import Menu from '@/components/Menu.vue';
 </script>
 
 <style lang="scss">
@@ -17,5 +17,7 @@ import Menu from "@/components/Menu.vue";
   flex-direction: column;
   overflow: auto;
   padding: 16px;
+  justify-content: stretch;
+  align-items: stretch;
 }
 </style>
