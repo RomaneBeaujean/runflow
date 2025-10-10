@@ -8,7 +8,7 @@
       "dom.iterable",
       "ESNext"
     ],
-    "target": "es2018",
+    "target": "esnext",
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,

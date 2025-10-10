@@ -5,33 +5,33 @@ import Aura from '@primeuix/themes/aura';
 import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import { createApp } from 'vue';
-import "./main.scss";
+import './main.scss';
 
 const MyPreset = definePreset(Aura, {
-    semantic: {
-         primary: {
-            50: '#e6f2f8',
-            100: '#b1d5e8',
-            200: '#8cc1dd',
-            300: '#57a5ce',
-            400: '#3693c5',
-            500: '#0478b6',
-            600: '#046da6',
-            700: '#035581',
-            800: '#024264', // Ta couleur primaire
-            900: '#02324c',
-        },
-    }
+  semantic: {
+    primary: {
+      50: '#e6f2f8',
+      100: '#b1d5e8',
+      200: '#8cc1dd',
+      300: '#57a5ce',
+      400: '#3693c5',
+      500: '#0478b6',
+      600: '#046da6',
+      700: '#035581',
+      800: '#024264', // Ta couleur primaire
+      900: '#02324c',
+    },
+  },
 });
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(createPinia())
-app.use(router)
+app.use(createPinia());
+app.use(router);
 app.use(PrimeVue, {
- theme: {
+  theme: {
     preset: MyPreset,
   },
 });
 
-app.mount('#app')
+app.mount('#app');
