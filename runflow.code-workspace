@@ -1,0 +1,81 @@
+{
+  "folders": [
+    	{
+			"name": "Root",
+			"path": "."
+		},
+    {
+			"name": "Components",
+			"path": "src/components"
+		},
+    {
+			"name": "Stores",
+			"path": "src/stores"
+		},
+    {
+			"name": "Router",
+			"path": "src/router"
+		},
+  ],
+	"settings": {
+	  "files.eol": "\n",
+    "editor.tabSize": 2,
+    "git.autofetch": true,
+    "explorer.openEditors.sortOrder": "alphabetical",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "prettier.singleQuote": true,
+    "editor.formatOnSave": true,
+    "css.lint.duplicateProperties": "warning",
+    "eslint.enable": true,
+    "eslint.format.enable": true,
+    "stylelint.enable": true,
+    "css.validate": false,
+    "less.validate": false,
+    "scss.validate": false,
+    "stylelint.validate": [
+      "css",
+      "less",
+      "postcss",
+      "scss"
+    ],
+    "[vue]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[html]": {
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "vscode.json-language-features",
+    },
+    "[scss]": {
+      "editor.defaultFormatter": "stylelint.vscode-stylelint",
+    },
+    "[mdx]": {
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[markdown]": {
+      "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+	},
+	"extensions": {
+		"recommendations": [
+			"dbaeumer.vscode-eslint",
+			"stylelint.vscode-stylelint"
+		]
+	}
+}
