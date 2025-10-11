@@ -1,7 +1,9 @@
 // src/composables/useRace.ts
-import { GpxPoint } from '@/domain/entities/DistanceElevation';
 import { roundOneNumber } from '@/lib/utils';
-import type { Race, Split, Track } from '@runflow/shared';
+import { GpxPoint } from '@/types/DistanceElevation';
+import { Race } from '@/types/Race';
+import { Split } from '@/types/Split';
+import { Track } from '@/types/Track';
 import { computed, ref } from 'vue';
 import { useGpxParser } from './useGpxParser';
 import { useGpxSplits } from './useGpxSplits';

@@ -2,7 +2,8 @@ import {
   durationFromPaceAndDistance,
   minutesToFormattedDuration,
 } from '@/lib/time';
-import type { Split } from '@runflow/shared';
+import { roundOneNumber } from '@/lib/utils';
+import { Split } from '@/types/Split';
 import { useRace } from './useRace';
 
 const { points } = useRace();
@@ -63,6 +64,16 @@ export function useGpxMetrics() {
     return minutesToFormattedDuration(totalDuration);
   }
 
+  function getFormattedDurationFromSplit(split: Split): string {
+    return minutesToFormattedDuration(getDurationFromSplit(split));
+  }
+
+  function getDurationFromSplit(split: Split): number {
+    const distance = roundOneNumber(split.endDistance - split.startDistance);
+    const durationMinutes = durationFromPaceAndDistance(split.pace, distance);
+    return durationMinutes;
+  }
+
   return {
     getCumulElevationFromDistance,
     getPointFromDistance,
@@ -71,6 +82,8 @@ export function useGpxMetrics() {
     getMidPointFromSplit,
     getElevationFromSplit,
     getCumulDurationFromSplit,
+    getDurationFromSplit,
     getCumulElevationFromSplit,
+    getFormattedDurationFromSplit,
   };
 }

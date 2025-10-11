@@ -1,4 +1,5 @@
-import { GpxPoint } from '@/domain/entities/DistanceElevation';
+import { GpxPoint } from '@/types/DistanceElevation';
+import { Split } from '@/types/Split';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
 
@@ -24,7 +25,7 @@ export default function useRaceChartInteraction({
   const onChartHover = (event: any, chartInstance: any) => {
     const targetDistance = getTargetDistance(event, chartInstance);
     const targetSplit = splits.value.find(
-      (s) =>
+      (s: Split) =>
         targetDistance >= s.startDistance && targetDistance <= s.endDistance
     );
     if (!targetSplit) return;

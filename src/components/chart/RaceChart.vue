@@ -1,40 +1,42 @@
 <template>
-  <VChart
-    v-if="race"
-    autoresize
-    ref="chartComponent"
-    style="width: 100%; height: 400px; position: relative"
-    :option="chartOptions"
-    @zr:click="(e) => onChartClick(e, chartInstance)"
-    @zr:mouseover="(e) => onChartHover(e, chartInstance)"
-    @zr:globalout="onChartLeave"
-  />
+  <div style="position: relative">
+    <VChart
+      v-if="race"
+      autoresize
+      ref="chartComponent"
+      style="width: 100%; height: 400px; position: relative"
+      :option="chartOptions"
+      @zr:click="(e) => onChartClick(e, chartInstance)"
+      @zr:mouseover="(e) => onChartHover(e, chartInstance)"
+      @zr:globalout="onChartLeave"
+    />
 
-  <ClickedPointTooltip
-    :position="clickTooltipPosition"
-    :addSeparator="() => addSeparator(clickedPoint.distance)"
-    :closeTooltip="closeTooltip"
-  />
+    <ClickedPointTooltip
+      :position="clickTooltipPosition"
+      :addSeparator="() => addSeparator(clickedPoint.distance)"
+      :closeTooltip="closeTooltip"
+    />
 
-  <ClickedSeparatorTooltip
-    :position="clickedSeparatorPosition"
-    :delete="() => deleteSeparator(clickedSeparator)"
-  />
+    <ClickedSeparatorTooltip
+      :position="clickedSeparatorPosition"
+      :delete="() => deleteSeparator(clickedSeparator)"
+    />
 
-  <HoveredSegmentTooltip
-    :position="hoveredSplitTooltipPosition"
-    :split="hoveredSplit"
-  />
+    <HoveredSegmentTooltip
+      :position="hoveredSplitTooltipPosition"
+      :split="hoveredSplit"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { GpxPoint } from '@/domain/entities/DistanceElevation';
-import { Position } from '@/domain/entities/Position';
 import { useEcharts } from '@/composables/useEcharts';
 import { useRace } from '@/composables/useRace';
 import useRaceChartData from '@/composables/useRaceChartData';
 import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
-import { Split } from '@runflow/shared';
+import { GpxPoint } from '@/types/DistanceElevation';
+import { Position } from '@/types/Position';
+import { Split } from '@/types/Split';
 import { onMounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
 import ClickedPointTooltip from './ClickedPointTooltip.vue';

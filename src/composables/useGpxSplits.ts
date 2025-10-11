@@ -1,4 +1,4 @@
-import type { Split } from '@runflow/shared';
+import { Split } from '@/types/Split';
 
 export function useGpxSplits() {
   function recomputeSplits({ totalDistance, separators, oldSplits }) {

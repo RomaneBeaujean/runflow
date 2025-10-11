@@ -1,8 +1,7 @@
-// src/stores/RacesStore.ts
 import type { Race } from '@/types/Race';
 import Dexie from 'dexie';
 import { nanoid } from 'nanoid';
-import { reactive } from 'vue';
+import { reactive, toRaw } from 'vue';
 
 interface State {
   races: Race[];
@@ -50,7 +49,9 @@ export class RacesStore {
       createdAt: new Date().toISOString(),
     };
 
-    await db.races.add(race);
+    // ✅ Déréactiver avant enregistrement (sécurité)
+    const cleanRace = JSON.parse(JSON.stringify(toRaw(race)));
+    await db.races.add(cleanRace);
     await this.init();
   }
 
@@ -58,9 +59,16 @@ export class RacesStore {
     const existing = await db.races.get(id);
     if (!existing) return;
 
+    // ✅ Fusionner et nettoyer avant put
     const newRace = { ...existing, ...updated };
-    await db.races.put(newRace);
-    await this.init();
+    const cleanRace = JSON.parse(JSON.stringify(toRaw(newRace)));
+
+    try {
+      await db.races.put(cleanRace);
+      await this.init();
+    } catch (err) {
+      console.error('❌ Dexie updateRace error', err, cleanRace);
+    }
   }
 
   async deleteRace(id: string) {

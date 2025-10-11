@@ -1,51 +1,44 @@
 <template>
   <div
     v-if="position"
-    :style="{
-      position: 'absolute',
-      left: position.left,
-      top: position.top,
-    }"
+    :style="{ position: 'absolute', left: position.left, top: position.top }"
     :key="position.left"
   >
-    <swm-icon
-      name="location-crosshairs"
-      size="xsmall"
-      class="swm-text-primary-700"
+    <div style="transform: translate(-50%, -50%)">
+      <i class="pi pi-map-marker text-primary text-lg"></i>
+      <div ref="anchor" style="transform: translate(-14px)"></div>
+    </div>
+
+    <!-- Popover -->
+    <Popover
+      ref="popoverRef"
+      class="bg-white border border-gray-200 shadow-lg rounded-lg p-1 min-w-[200px]"
+      :dismissable="false"
     >
-      <swm-tooltip size="large" variant="manual" opened>
-        <div slot="content">
-          <swm-button
-            type="text"
-            size="small"
-            fullwidth
-            @click="onAddSeparator"
-          >
-            <button type="button">
-              <swm-icon slot="left" name="plus"></swm-icon>
-              <span slot="label">Ajouter un séparateur</span>
-            </button>
-          </swm-button>
-          <swm-button
-            type="text"
-            variant="secondary"
-            fullwidth
-            size="small"
-            class="swm-margin-top-50"
-            @click="onClose"
-          >
-            <button type="button">
-              <span slot="label">Fermer</span>
-            </button>
-          </swm-button>
-        </div>
-      </swm-tooltip>
-    </swm-icon>
+      <div class="flex flex-col gap-1">
+        <Button
+          label="Ajouter un séparateur"
+          icon="pi pi-plus"
+          size="small"
+          class="p-button-text w-full justify-start hover:bg-gray-100"
+          @click="onAddSeparator"
+        />
+        <Button
+          label="Fermer"
+          size="small"
+          class="p-button-text p-button-secondary w-full justify-start hover:bg-gray-100"
+          @click="onClosePopover"
+        />
+      </div>
+    </Popover>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Position } from '@/domain/entities/Position';
+import { Position } from '@/types/Position';
+import Button from 'primevue/button';
+import Popover from 'primevue/popover';
+import { nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
   position: Position | null;
@@ -53,13 +46,41 @@ const props = defineProps<{
   closeTooltip: () => void;
 }>();
 
+const popoverRef = ref<InstanceType<typeof Popover> | null>(null);
+const anchor = ref<HTMLElement | null>(null);
+
+// Ouvrir la popover dès que position est définie
+const openPopover = () => {
+  if (popoverRef.value && anchor.value) {
+    const event = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+    });
+    Object.defineProperty(event, 'currentTarget', { value: anchor.value });
+    popoverRef.value.show(event);
+  }
+};
+
+watch(
+  () => props.position,
+  async (pos) => {
+    if (pos) {
+      await nextTick();
+      openPopover();
+    }
+  },
+  { immediate: true }
+);
+
+// Actions des boutons
 const onAddSeparator = () => {
   props.addSeparator();
+  popoverRef.value?.hide();
 };
 
-const onClose = () => {
+const onClosePopover = () => {
   props.closeTooltip();
+  popoverRef.value?.hide();
 };
 </script>
-
-<style scoped></style>

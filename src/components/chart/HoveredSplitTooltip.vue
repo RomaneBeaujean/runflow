@@ -5,52 +5,49 @@
       position: 'absolute',
       left: position.left,
       top: '20px',
-      transform: 'translate(-50%,-50%)',
+      transform: 'translate(-50%, -50%)',
     }"
     :key="split.startDistance"
   >
-    <div
-      style="
-        min-width: 100px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      "
-    >
-      <swm-tags>
-        <swm-tag color="pink">
-          <swm-icon slot="left" name="arrows-left-right"></swm-icon>
-          <span slot="label">{{ distance }} km</span>
-        </swm-tag>
-        <swm-tag color="orange">
-          <swm-icon slot="left" name="chart-line"></swm-icon>
-          <span slot="label">{{ elevation }} d+ </span>
-        </swm-tag>
-      </swm-tags>
+    <div class="min-w-[100px] flex justify-center items-center gap-2">
+      <!-- Tag Distance -->
+      <div
+        class="flex items-center gap-1 bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-medium shadow-sm"
+      >
+        <i class="pi pi-arrows-h text-pink-600"></i>
+        <span>{{ distance }} km</span>
+      </div>
+
+      <!-- Tag D+ -->
+      <div
+        class="flex items-center gap-1 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium shadow-sm"
+      >
+        <i class="pi pi-chart-line text-orange-600"></i>
+        <span>{{ elevation }} d+</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Position } from '@/domain/entities/Position';
-import { roundOneNumber } from '@/lib/utils';
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
-import { Split } from '@runflow/shared';
+import { roundOneNumber } from '@/lib/utils';
+import { Position } from '@/types/Position';
+import { Split } from '@/types/Split';
 import { computed } from 'vue';
 
 const props = defineProps<{
   position: Position | null;
   split: Split | null;
 }>();
+
 const { getElevationFromSplit } = useGpxMetrics();
 
 const distance = computed(() => {
-  return roundOneNumber(props.split.endDistance - props.split.startDistance);
+  return roundOneNumber(props.split!.endDistance - props.split!.startDistance);
 });
 
 const elevation = computed(() => {
-  return getElevationFromSplit(props.split);
+  return getElevationFromSplit(props.split!);
 });
 </script>
-
-<style scoped></style>

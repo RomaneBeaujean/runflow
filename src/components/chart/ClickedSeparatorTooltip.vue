@@ -5,34 +5,37 @@
       position: 'absolute',
       left: position.left,
       top: position.top,
+      transform: 'translate(-50%, -50%)',
     }"
-    :key="position.left"
   >
-    <div class="separator-tooltip-target">
-      <swm-tooltip size="large" variant="manual" opened>
-        <div slot="content">
-          <swm-action @swmactionclick="props.delete">
-            <swm-icon name="trash"></swm-icon>
-          </swm-action>
-        </div>
-      </swm-tooltip>
+    <div class="mt-12 bg-white rounded-md">
+      <Button
+        icon="pi pi-trash"
+        label="Supprimer"
+        class="w-full"
+        size="small"
+        severity="danger"
+        text
+        @click="props.delete"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Position } from '@/domain/entities/Position';
+import { Position } from '@/types/Position';
+import { Button } from 'primevue';
+import { onMounted, ref } from 'vue';
 
 const props = defineProps<{
   position: Position | null;
   delete: () => void;
 }>();
+
+const target = ref<HTMLElement | null>(null);
+onMounted(() => {
+  if (!target.value) return;
+});
 </script>
 
-<style scoped>
-.separator-tooltip-target {
-  width: 15px;
-  height: 15px;
-  background-color: transparent;
-}
-</style>
+<style scoped></style>

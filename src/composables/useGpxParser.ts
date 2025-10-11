@@ -1,5 +1,5 @@
-import { GpxPoint } from '@/domain/entities/DistanceElevation';
 import { roundOneNumber } from '@/lib/utils';
+import { GpxPoint } from '@/types/DistanceElevation';
 import GpxParser, { Point } from 'gpxparser';
 
 export function useGpxParser(xml: string) {
