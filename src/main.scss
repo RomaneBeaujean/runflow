@@ -1,10 +1,10 @@
+:root {
+  font-family: 'Open Sans', sans-serif;
+} 
+ 
 body {
   padding: 0;
   margin: 0;
-}
-
-:root {
-  font-family: 'Open Sans', sans-serif;
 }
 
 #app {
@@ -12,5 +12,4 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  font-size: 14px;
 }

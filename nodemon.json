@@ -1,0 +1,9 @@
+{
+  "watch": [
+    "backend-mock/server.js"
+  ],
+  "ignore": [
+    "backend-mock/database/**/*.json",
+    "node_modules"
+  ]
+}

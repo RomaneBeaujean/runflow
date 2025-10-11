@@ -1,13 +1,14 @@
-import App from '@/App.vue';
+import '@/main.scss';
+import 'primeicons/primeicons.css';
+
+import router from '@/router/router';
+import '@/style.css';
 import { definePreset } from '@primeuix/themes';
-
-import { createPinia } from 'pinia';
-import { createApp } from 'vue';
-import './main.scss';
-
 import Aura from '@primeuix/themes/aura';
 import PrimeVue from 'primevue/config';
-import router from './router';
+import { createApp } from 'vue';
+import App from './App.vue';
+import { AppLoader } from './stores/AppLoader';
 
 const MyPreset = definePreset(Aura, {
   semantic: {
@@ -28,12 +29,16 @@ const MyPreset = definePreset(Aura, {
 
 const app = createApp(App);
 
-app.use(createPinia());
-app.use(router);
 app.use(PrimeVue, {
   theme: {
     preset: MyPreset,
   },
 });
+app.use(router);
 
-app.mount('#app');
+const loader = new AppLoader();
+
+(async () => {
+  await loader.init(app);
+  app.mount('#app');
+})();

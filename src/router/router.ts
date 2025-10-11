@@ -1,11 +1,15 @@
-import RaceDetails from '@/components/RaceDetails.vue';
-import Races from '@/components/Races.vue';
-import Tracks from '@/components/Tracks.vue';
+import Race from '@/views/Race.vue';
+import Races from '@/views/Races.vue';
+import Tracks from '@/views/Tracks.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    {
+      path: '/',
+      redirect: '/tracks',
+    },
     {
       path: '/tracks',
       name: 'tracks',
@@ -16,7 +20,7 @@ const router = createRouter({
       name: 'races',
       component: Races,
     },
-    { path: '/races/:id', component: RaceDetails, props: true },
+    { path: '/races/:id', component: Race, props: true },
   ],
 });
 
