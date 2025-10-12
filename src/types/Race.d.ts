@@ -1,3 +1,4 @@
+import { Separator } from './Separator';
 import { Split } from './Split';
 
 export interface Race {
@@ -6,4 +7,5 @@ export interface Race {
   createdAt: string;
   trackId: string;
   splits: Split[];
+  separators: Separator[];
 }

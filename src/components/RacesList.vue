@@ -9,9 +9,11 @@
       responsiveLayout="scroll"
       emptyMessage="Aucun plan de course pour le moment."
       rowHover
+      @row-click="onRowClick"
+      :rowClass="() => 'cursor-pointer'"
     >
       <!-- Nom du plan -->
-      <Column field="name" header="Nom du plan" :sortable="true">
+      <Column header="Nom du plan" :sortable="true">
         <template #body="{ data }">
           <span
             class="truncate text-gray-800 font-medium cursor-pointer"
@@ -22,8 +24,29 @@
         </template>
       </Column>
 
+      <!-- 
+      <Column>
+        <template #body="{ data }">
+          <Tag
+            severity="info"
+            :value="getRaceTotalDistance(data.trackId)"
+            class="mr-3"
+          ></Tag>
+          <Tag
+            severity="warn"
+            :value="getRaceTotalElevation(data.trackId)"
+          ></Tag>
+        </template>
+      </Column> -->
+
+      <Column header="Date de création" :sortable="true">
+        <template #body="{ data }">
+          {{ data.createdAt }}
+        </template>
+      </Column>
+
       <!-- Actions -->
-      <Column header="Actions" style="width: 100px; text-align: center">
+      <Column style="width: 100px; text-align: center">
         <template #body="{ data }">
           <Button
             icon="pi pi-trash"
@@ -39,20 +62,40 @@
 </template>
 
 <script setup lang="ts">
+import { useGpxParser } from '@/composables/useGpxParser';
 import { useInjection } from '@/lib/useInjection';
+import { roundOneNumber } from '@/lib/utils';
 import type { AppStores } from '@/stores/AppLoader';
-import { Button, Column, DataTable } from 'primevue';
+import { Column, DataTable, DataTableRowClickEvent } from 'primevue';
 import { useRouter } from 'vue-router';
 
 const stores = useInjection<AppStores>('stores');
 const router = useRouter();
+const { deleteRace } = stores.races;
+
+const getRaceTotalDistance = (id: string) => {
+  const track = stores.tracks.getTrack(id);
+  const { gpxtotalDistance } = useGpxParser(track.gpxContent);
+  return roundOneNumber(gpxtotalDistance) + ' km';
+};
+
+const getRaceTotalElevation = (id: string) => {
+  const track = stores.tracks.getTrack(id);
+  const { gpxtotalElevation } = useGpxParser(track.gpxContent);
+  return roundOneNumber(gpxtotalElevation) + ' d+';
+};
+
+function onRowClick(event: DataTableRowClickEvent<any>) {
+  const id = event.data.id;
+  router.push(`/races/${id}`);
+}
 
 function goToCourse(id: string) {
   router.push(`/races/${id}`);
 }
 
 function deleteCourse(id: string) {
-  console.log('Supprimer le plan :', id);
+  deleteRace(id);
 }
 </script>
 

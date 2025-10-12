@@ -1,11 +1,7 @@
-import type { Race } from '@/types/Race';
+import { Race } from '@/types/entities/Race';
 import Dexie from 'dexie';
 import { nanoid } from 'nanoid';
 import { reactive, toRaw } from 'vue';
-
-interface State {
-  races: Race[];
-}
 
 // --- Dexie DB ---
 class RacesDB extends Dexie {
@@ -23,7 +19,7 @@ class RacesDB extends Dexie {
 const db = new RacesDB();
 
 export class RacesStore {
-  protected state = reactive<State>({
+  protected state = reactive<{ races: Race[] }>({
     races: [],
   });
 
@@ -32,7 +28,8 @@ export class RacesStore {
   }
 
   async init() {
-    this.state.races = await db.races.toArray();
+    const rawRaces = await db.races.toArray();
+    this.state.races = rawRaces.map((r) => new Race(r));
   }
 
   getRace(id: string | null): Race | null {
@@ -46,10 +43,10 @@ export class RacesStore {
       name,
       trackId,
       splits: [],
+      separators: [],
       createdAt: new Date().toISOString(),
     };
 
-    // ✅ Déréactiver avant enregistrement (sécurité)
     const cleanRace = JSON.parse(JSON.stringify(toRaw(race)));
     await db.races.add(cleanRace);
     await this.init();
@@ -59,7 +56,6 @@ export class RacesStore {
     const existing = await db.races.get(id);
     if (!existing) return;
 
-    // ✅ Fusionner et nettoyer avant put
     const newRace = { ...existing, ...updated };
     const cleanRace = JSON.parse(JSON.stringify(toRaw(newRace)));
 

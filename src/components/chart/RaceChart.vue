@@ -13,13 +13,13 @@
 
     <ClickedPointTooltip
       :position="clickTooltipPosition"
-      :addSeparator="() => addSeparator(clickedPoint.distance)"
+      :addSeparator="addSeparatorOnClickedPoint"
       :closeTooltip="closeTooltip"
     />
 
     <ClickedSeparatorTooltip
       :position="clickedSeparatorPosition"
-      :delete="() => deleteSeparator(clickedSeparator)"
+      :delete="() => deleteSeparator(clickedSeparator.distance)"
     />
 
     <HoveredSegmentTooltip
@@ -36,6 +36,7 @@ import useRaceChartData from '@/composables/useRaceChartData';
 import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
 import { GpxPoint } from '@/types/DistanceElevation';
 import { Position } from '@/types/Position';
+import { Separator, SeparatorType } from '@/types/Separator';
 import { Split } from '@/types/Split';
 import { onMounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
@@ -47,7 +48,7 @@ const hoveredSplit = ref<Split | null>(null);
 const hoveredSplitTooltipPosition = ref<Position | null>(null);
 const clickedPoint = ref<GpxPoint | null>(null);
 const clickTooltipPosition = ref<Position | null>(null);
-const clickedSeparator = ref<number | null>(null);
+const clickedSeparator = ref<Separator | null>(null);
 const clickedSeparatorPosition = ref<Position | null>(null);
 
 const { race, splits, addSeparator, deleteSeparator } = useRace();
@@ -68,6 +69,11 @@ const { chartOptions, updateChartSeries } = useRaceChartData({
   clickedSeparator,
   clickedPoint,
 });
+
+const addSeparatorOnClickedPoint = (type: SeparatorType) => {
+  addSeparator({ distance: clickedPoint.value.distance, type });
+  closeTooltip();
+};
 
 onMounted(() => {
   updateChartSeries();

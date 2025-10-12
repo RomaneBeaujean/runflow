@@ -6,7 +6,7 @@ import { roundOneNumber } from '@/lib/utils';
 import { Split } from '@/types/Split';
 import { useRace } from './useRace';
 
-const { points } = useRace();
+const { points, separators } = useRace();
 
 export function useGpxMetrics() {
   function getCumulElevationFromDistance(distance: number) {
@@ -50,11 +50,31 @@ export function useGpxMetrics() {
     return totalElevation;
   }
 
+  function getCumulDurationToSeparator(
+    splits: Split[],
+    separator: number
+  ): string {
+    const relevantSplits = splits.filter((s) => s.endDistance <= separator);
+    const totalDuration = relevantSplits.reduce((acc: number, curr: Split) => {
+      const splitDistance = roundOneNumber(
+        curr.endDistance - curr.startDistance
+      );
+      const splitDuration = durationFromPaceAndDistance(
+        curr.pace,
+        splitDistance
+      );
+      return (acc += splitDuration);
+    }, 0);
+    return minutesToFormattedDuration(totalDuration);
+  }
+
   function getCumulDurationFromSplit(splits: Split[], split: Split): string {
     const endDistance = split.endDistance;
     const relevantSplits = splits.filter((s) => s.endDistance <= endDistance);
     const totalDuration = relevantSplits.reduce((acc: number, curr: Split) => {
-      const splitDistance = Math.round(curr.endDistance - curr.startDistance);
+      const splitDistance = roundOneNumber(
+        curr.endDistance - curr.startDistance
+      );
       const splitDuration = durationFromPaceAndDistance(
         curr.pace,
         splitDistance
@@ -85,5 +105,6 @@ export function useGpxMetrics() {
     getDurationFromSplit,
     getCumulElevationFromSplit,
     getFormattedDurationFromSplit,
+    getCumulDurationToSeparator,
   };
 }

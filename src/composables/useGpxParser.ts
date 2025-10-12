@@ -7,9 +7,11 @@ export function useGpxParser(xml: string) {
   gpxParser.parse(xml);
   const gpxpoints = extractPoints();
   const gpxtotalDistance = gpxParser.tracks[0].distance.total / 1000;
+  const gpxtotalElevation =
+    gpxpoints[gpxpoints.length - 1]?.cumulElevation || 0;
 
   function extractPoints(): GpxPoint[] {
-    const distanceCumul = gpxParser.tracks[0].distance.cumul;
+    const distanceCumul = gpxParser.tracks[0]?.distance.cumul;
     let cumulElevation = 0;
 
     return gpxParser.tracks[0].points.map((point: Point, index) => {
@@ -29,5 +31,5 @@ export function useGpxParser(xml: string) {
     });
   }
 
-  return { gpxpoints, gpxtotalDistance };
+  return { gpxpoints, gpxtotalDistance, gpxtotalElevation };
 }

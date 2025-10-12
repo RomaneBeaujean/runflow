@@ -20,7 +20,7 @@ import { ref } from 'vue';
 
 // items de navigation
 const items = [
-  { label: 'Parcours', path: 'tracks', illustration: 'pi pi-map' },
+  { label: 'Parcours GPX', path: 'tracks', illustration: 'pi pi-map' },
   { label: 'Plans de course', path: 'races', illustration: 'pi pi-list' },
 ];
 

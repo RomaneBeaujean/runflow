@@ -1,4 +1,5 @@
 import { GpxPoint } from '@/types/DistanceElevation';
+import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
@@ -48,7 +49,7 @@ export default function useRaceChartInteraction({
     if (event.target?.name === 'line') {
       const closest = getClosestSeparator(targetDistance);
       clickedSeparator.value = closest;
-      const [px, py] = getPositionFromDistance(chartInstance, closest);
+      const [px, py] = getPositionFromDistance(chartInstance, closest.distance);
       clickedSeparatorPosition.value = { left: `${px}px`, top: `${py}px` };
     } else {
       const closest = getClosestGpxPoint(targetDistance);
@@ -112,9 +113,12 @@ export default function useRaceChartInteraction({
     );
   }
 
-  function getClosestSeparator(targetDistance: any) {
-    return separators.value.reduce((prev: any, curr: any) =>
-      Math.abs(curr - targetDistance) < Math.abs(prev - targetDistance)
+  function getClosestSeparator(targetDistance: number): Separator | null {
+    if (separators.value.length === 0) return null;
+
+    return separators.value.reduce((prev, curr) =>
+      Math.abs(curr.distance - targetDistance) <
+      Math.abs(prev.distance - targetDistance)
         ? curr
         : prev
     );

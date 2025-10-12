@@ -1,17 +1,20 @@
 // src/composables/useRace.ts
 import { roundOneNumber } from '@/lib/utils';
 import { GpxPoint } from '@/types/DistanceElevation';
-import { Race } from '@/types/Race';
+import { Race } from '@/types/entities/Race';
+import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
 import { Track } from '@/types/Track';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useGpxParser } from './useGpxParser';
 import { useGpxSplits } from './useGpxSplits';
 
 const race = ref<Race | null>(null);
 const splits = ref<Split[]>([]);
+const separators = ref<Separator[]>([]);
 const points = ref<GpxPoint[]>([]);
 const totalDistance = ref<number>(null);
+const initialized = ref(false);
 const { recomputeSplits } = useGpxSplits();
 
 export function useRace() {
@@ -20,15 +23,22 @@ export function useRace() {
     const { gpxpoints, gpxtotalDistance } = useGpxParser(t.gpxContent);
     points.value = gpxpoints;
     totalDistance.value = roundOneNumber(gpxtotalDistance);
+    separators.value = r.separators || [];
     splits.value = recomputeSplits({
       totalDistance: totalDistance.value,
-      separators: race.value.splits
-        .map((s) => s.startDistance)
+      separators: (r.separators || [])
+        .map((s) => s.distance)
         .filter((s) => s !== 0),
       oldSplits:
         race.value.splits?.length > 0 ? race.value.splits : initialSplits(),
     });
+
+    initialized.value = true;
   };
+
+  const separatorsDistances = computed(() => {
+    return separators.value.map((el) => el.distance);
+  });
 
   const initialSplits = () => {
     return recomputeSplits({
@@ -38,23 +48,23 @@ export function useRace() {
     });
   };
 
-  const separators = computed(() => {
-    return splits.value.map((s) => s.startDistance).filter((s) => s !== 0);
-  });
-
-  const addSeparator = (d: number) => {
-    const distance = roundOneNumber(d);
-    splits.value = generateSplits(addDistanceToSeparators(distance));
+  const addSeparator = (separator: Separator) => {
+    const distance = roundOneNumber(separator.distance);
+    separators.value = addDistanceToSeparators({
+      type: separator.type,
+      distance,
+    });
   };
 
-  const updateSeparator = (oldValue: number, newValue: number) => {
-    splits.value = generateSplits(
-      updateDistanceToSeparators(separators, oldValue, newValue)
+  const updateSeparator = (oldValue: number, newValue: Separator) => {
+    const oldSeparator = separators.value.find(
+      (el) => el.distance === oldValue
     );
+    separators.value = updateDistanceToSeparators(oldSeparator, newValue);
   };
 
   const deleteSeparator = (d: number) => {
-    splits.value = generateSplits(deleteDistanceToSeparators(d));
+    separators.value = deleteDistanceToSeparators(d);
   };
 
   const updateSplitPace = (split: Split, newPace: string) => {
@@ -69,6 +79,15 @@ export function useRace() {
     });
   };
 
+  watch(
+    () => separators,
+    () => {
+      if (!initialized.value) return;
+      splits.value = generateSplits();
+    },
+    { deep: true }
+  );
+
   return {
     race,
     splits,
@@ -82,29 +101,36 @@ export function useRace() {
     initRace,
   };
 
-  function generateSplits(newSeparators: number[]) {
+  function generateSplits() {
     return recomputeSplits({
-      separators: newSeparators,
+      separators: separatorsDistances.value,
       oldSplits: splits.value,
       totalDistance: totalDistance.value,
     });
   }
 
   function deleteDistanceToSeparators(d: number) {
-    return [...separators.value].filter((el) => el !== d);
+    return [...separators.value].filter((el: Separator) => el.distance !== d);
   }
 
-  function addDistanceToSeparators(distance: number) {
-    return [...separators.value, distance].sort((a, b) => a - b);
+  function addDistanceToSeparators(newSeparator: Separator) {
+    return [...separators.value, newSeparator].sort(
+      (a: Separator, b: Separator) => a.distance - b.distance
+    );
   }
-}
-function updateDistanceToSeparators(
-  separators,
-  oldValue: number,
-  newValue: number
-) {
-  const newSeparators = [...separators.value].filter((el) => el !== oldValue);
 
-  const withNewValue = [...newSeparators, newValue].sort((a, b) => a - b);
-  return withNewValue;
+  function updateDistanceToSeparators(
+    oldValue: Separator,
+    newValue: Separator
+  ): Separator[] {
+    const newSeparators = [...separators.value].filter(
+      (el) => el.distance !== oldValue.distance
+    );
+
+    const withNewValue = [...newSeparators, newValue].sort(
+      (a: Separator, b: Separator) => a.distance - b.distance
+    );
+
+    return withNewValue;
+  }
 }

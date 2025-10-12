@@ -1,4 +1,5 @@
 import { roundOneNumber } from '@/lib/utils';
+import { Separator } from '@/types/Separator';
 import { computed, ref } from 'vue';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
@@ -43,6 +44,15 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
     });
   });
 
+  const color = (sep: Separator): { color: string; bg: string } => {
+    const color =
+      sep.distance === clickedSeparator.value
+        ? { color: '#F59E1D', bg: '#FEF3C7' } // jaune si sélectionné
+        : sep.type === 'refuel'
+          ? { color: '#C026D3', bg: '#F5D0FE' } // rose si refuel
+          : { color: '#035581', bg: '#B1D5E8' }; // bleu sinon
+    return color;
+  };
   const separatorsSeries = computed(() => {
     return {
       id: 'separators',
@@ -63,13 +73,16 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
           borderRadius: 4,
           formatter: (params: any) => `${params.value}`,
         },
-        data: separators.value.map((distance) => {
+        data: separators.value.map((sep: Separator) => {
           return {
-            xAxis: distance,
+            xAxis: sep.distance,
+            label: {
+              color: color(sep).color,
+              backgroundColor: color(sep).bg,
+            },
             lineStyle: {
-              color:
-                distance === clickedSeparator.value ? '#B63C47' : '#035581',
-              width: distance === clickedSeparator.value ? 3 : 1,
+              color: color(sep).color,
+              width: sep.distance === clickedSeparator.value ? 3 : 1,
             },
           };
         }),

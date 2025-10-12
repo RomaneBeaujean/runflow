@@ -19,10 +19,10 @@ import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update']);
 
-const props = defineProps<{ split: Split }>();
+const props = defineProps<{ split: Split; value: number }>();
 const { totalDistance } = useRace();
 
-const separator = ref<number>(props.split.startDistance);
+const separator = ref<number>(props.value);
 
 watch(separator, () => {
   emit('update', {
