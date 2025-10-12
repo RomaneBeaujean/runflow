@@ -57,10 +57,10 @@ export class RacesStore {
     if (!existing) return;
 
     const newRace = { ...existing, ...updated };
-    const cleanRace = JSON.parse(JSON.stringify(toRaw(newRace)));
+    const cleanRace = JSON.parse(JSON.stringify(toRaw(newRace))); // sérialise tout proprement
 
     try {
-      await db.races.put(cleanRace);
+      await db.races.update(id, cleanRace);
       await this.init();
     } catch (err) {
       console.error('❌ Dexie updateRace error', err, cleanRace);

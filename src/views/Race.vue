@@ -57,25 +57,12 @@ watch(
 );
 
 watch(
-  () => splits,
+  [splits, separators],
   () => {
-    if (race.value.splits !== splits.value) {
-      stores.races.updateRace(race.value.id, {
-        splits: splits.value,
-      });
-    }
-  },
-  { deep: true }
-);
-
-watch(
-  () => separators,
-  () => {
-    if (race.value.separators !== separators.value) {
-      stores.races.updateRace(race.value.id, {
-        separators: separators.value,
-      });
-    }
+    stores.races.updateRace(race.value.id, {
+      separators: separators.value,
+      splits: splits.value,
+    });
   },
   { deep: true }
 );

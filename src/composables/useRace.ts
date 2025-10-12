@@ -14,26 +14,24 @@ const splits = ref<Split[]>([]);
 const separators = ref<Separator[]>([]);
 const points = ref<GpxPoint[]>([]);
 const totalDistance = ref<number>(null);
-const initialized = ref(false);
 const { recomputeSplits } = useGpxSplits();
 
 export function useRace() {
   const initRace = (r: Race, t: Track) => {
     race.value = r;
+
     const { gpxpoints, gpxtotalDistance } = useGpxParser(t.gpxContent);
     points.value = gpxpoints;
     totalDistance.value = roundOneNumber(gpxtotalDistance);
-    separators.value = r.separators || [];
-    splits.value = recomputeSplits({
-      totalDistance: totalDistance.value,
-      separators: (r.separators || [])
-        .map((s) => s.distance)
-        .filter((s) => s !== 0),
-      oldSplits:
-        race.value.splits?.length > 0 ? race.value.splits : initialSplits(),
-    });
 
-    initialized.value = true;
+    separators.value = r.separators || [];
+
+    addEndSeparator();
+
+    splits.value = recomputeSplits({
+      separators: separatorsDistances.value,
+      oldSplits: r.splits?.length > 0 ? r.splits : initialSplits(),
+    });
   };
 
   const separatorsDistances = computed(() => {
@@ -42,29 +40,37 @@ export function useRace() {
 
   const initialSplits = () => {
     return recomputeSplits({
-      totalDistance,
       separators: [],
       oldSplits: [],
     });
   };
 
-  const addSeparator = (separator: Separator) => {
-    const distance = roundOneNumber(separator.distance);
-    separators.value = addDistanceToSeparators({
-      type: separator.type,
-      distance,
-    });
+  const addEndSeparator = () => {
+    if (
+      separators.value.findIndex((el) => el.distance === totalDistance.value) <
+      0
+    ) {
+      const separator: Separator = {
+        distance: totalDistance.value,
+        refuel: false,
+        stopDuration: 0,
+        timeBarrier: null,
+      };
+      separators.value = addNewSeparator(separator);
+    }
   };
 
-  const updateSeparator = (oldValue: number, newValue: Separator) => {
-    const oldSeparator = separators.value.find(
-      (el) => el.distance === oldValue
-    );
-    separators.value = updateDistanceToSeparators(oldSeparator, newValue);
+  const addSeparator = (separator: Separator) => {
+    const distance = roundOneNumber(separator.distance);
+    separators.value = addNewSeparator({ ...separator, distance });
+  };
+
+  const updateSeparator = (oldValue: Separator, newValue: Separator) => {
+    separators.value = updateSeparatorDistance(oldValue, newValue);
   };
 
   const deleteSeparator = (d: number) => {
-    separators.value = deleteDistanceToSeparators(d);
+    separators.value = deleteSeparatorByDistance(d);
   };
 
   const updateSplitPace = (split: Split, newPace: string) => {
@@ -82,7 +88,6 @@ export function useRace() {
   watch(
     () => separators,
     () => {
-      if (!initialized.value) return;
       splits.value = generateSplits();
     },
     { deep: true }
@@ -105,21 +110,20 @@ export function useRace() {
     return recomputeSplits({
       separators: separatorsDistances.value,
       oldSplits: splits.value,
-      totalDistance: totalDistance.value,
     });
   }
 
-  function deleteDistanceToSeparators(d: number) {
+  function deleteSeparatorByDistance(d: number) {
     return [...separators.value].filter((el: Separator) => el.distance !== d);
   }
 
-  function addDistanceToSeparators(newSeparator: Separator) {
+  function addNewSeparator(newSeparator: Separator) {
     return [...separators.value, newSeparator].sort(
       (a: Separator, b: Separator) => a.distance - b.distance
     );
   }
 
-  function updateDistanceToSeparators(
+  function updateSeparatorDistance(
     oldValue: Separator,
     newValue: Separator
   ): Separator[] {

@@ -21,14 +21,14 @@
           icon="pi pi-plus"
           size="small"
           class="p-button-text w-full justify-start hover:bg-gray-100"
-          @click="() => handleClick('default')"
+          @click="() => handleClick(false)"
         />
         <Button
           label="Ajouter un ravitaillement"
           icon="pi pi-plus"
           size="small"
           class="p-button-text w-full justify-start hover:bg-gray-100"
-          @click="() => handleClick('refuel')"
+          @click="() => handleClick(true)"
         />
         <Button
           label="Fermer"
@@ -43,14 +43,13 @@
 
 <script setup lang="ts">
 import { Position } from '@/types/Position';
-import { SeparatorType } from '@/types/Separator';
 import Button from 'primevue/button';
 import Popover from 'primevue/popover';
 import { nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
   position: Position | null;
-  addSeparator: (type: SeparatorType) => void;
+  addSeparator: (refuel: boolean) => void;
   closeTooltip: () => void;
 }>();
 
@@ -81,8 +80,8 @@ watch(
   { immediate: true }
 );
 
-const handleClick = (type: SeparatorType) => {
-  props.addSeparator(type);
+const handleClick = (refuel: boolean) => {
+  props.addSeparator(refuel);
   popoverRef.value?.hide();
 };
 

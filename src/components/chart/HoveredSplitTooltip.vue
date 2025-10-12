@@ -41,13 +41,13 @@ const props = defineProps<{
   split: Split | null;
 }>();
 
-const { getElevationFromSplit } = useGpxMetrics();
+const { getSplitElevation } = useGpxMetrics();
 
 const distance = computed(() => {
   return roundOneNumber(props.split!.endDistance - props.split!.startDistance);
 });
 
 const elevation = computed(() => {
-  return getElevationFromSplit(props.split!);
+  return getSplitElevation(props.split!);
 });
 </script>

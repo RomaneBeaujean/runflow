@@ -1,6 +1,6 @@
-export type SeparatorType = 'default' | 'refuel';
-
 export interface Separator {
-  type: SeparatorType;
+  refuel: boolean;
   distance: number;
+  stopDuration: number;
+  timeBarrier: number;
 }

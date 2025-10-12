@@ -36,7 +36,7 @@ import useRaceChartData from '@/composables/useRaceChartData';
 import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
 import { GpxPoint } from '@/types/DistanceElevation';
 import { Position } from '@/types/Position';
-import { Separator, SeparatorType } from '@/types/Separator';
+import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
 import { onMounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
@@ -70,8 +70,14 @@ const { chartOptions, updateChartSeries } = useRaceChartData({
   clickedPoint,
 });
 
-const addSeparatorOnClickedPoint = (type: SeparatorType) => {
-  addSeparator({ distance: clickedPoint.value.distance, type });
+const addSeparatorOnClickedPoint = (refuel: boolean) => {
+  const separator: Separator = {
+    distance: clickedPoint.value.distance,
+    refuel,
+    stopDuration: null,
+    timeBarrier: null,
+  };
+  addSeparator(separator);
   closeTooltip();
 };
 

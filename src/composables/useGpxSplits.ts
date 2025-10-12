@@ -1,11 +1,10 @@
 import { Split } from '@/types/Split';
 
 export function useGpxSplits() {
-  function recomputeSplits({ totalDistance, separators, oldSplits }) {
-    const allSeparators = [...separators, totalDistance];
+  function recomputeSplits({ separators, oldSplits }) {
     const splits: Split[] = [];
 
-    allSeparators.forEach((currentDistance, index) => {
+    separators.forEach((currentDistance, index) => {
       const startDistance = index === 0 ? 0 : splits[index - 1].endDistance;
       const endDistance = currentDistance;
       const oldSplit = oldSplits.find(

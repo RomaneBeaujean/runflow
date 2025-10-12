@@ -15,23 +15,19 @@ import {
   minutesToFormattedDuration,
   paceFromMinutesAndDistance,
 } from '@/lib/time';
-import { roundOneNumber } from '@/lib/utils';
-import { Split } from '@/types/Split';
 import { InputMask } from 'primevue';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update']);
 
-const props = defineProps<{ split: Split }>();
+const props = defineProps<{ pace: string; distance: number }>();
 
-const distance = computed(() => {
-  return roundOneNumber(props.split.endDistance - props.split.startDistance);
-});
+const currentPace = ref<string>(props.pace);
 
-const currentPace = ref<string>(props.split.pace);
 const currentDurationMinutes = ref<number>(
-  durationFromPaceAndDistance(props.split.pace, distance.value)
+  durationFromPaceAndDistance(props.pace, props.distance)
 );
+
 const currentDuration = ref<string>(
   minutesToFormattedDuration(currentDurationMinutes.value)
 );
@@ -42,7 +38,7 @@ watch(
     if (!newPace?.match(/^\d{1,2}:\d{2}$/) || newPace === oldPace) return;
     const newDurationMinutes = durationFromPaceAndDistance(
       newPace,
-      distance.value
+      props.distance
     );
 
     if (newDurationMinutes !== currentDurationMinutes.value) {
@@ -60,7 +56,7 @@ watch(
       newDuration === oldDuration
     )
       return;
-    const newPace = paceFromMinutesAndDistance(newDuration, distance.value);
+    const newPace = paceFromMinutesAndDistance(newDuration, props.distance);
     const oldPace = currentPace.value;
 
     if (!oldPace.match(newPace)) {
@@ -87,7 +83,6 @@ watch(
 
 watch([currentPace, currentDuration], () => {
   emit('update', {
-    ...props.split,
     pace: currentPace.value,
   });
 });

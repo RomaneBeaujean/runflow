@@ -4,10 +4,14 @@ import { computed, ref } from 'vue';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
 
-const { getPointsFromSplit, getCumulElevationFromDistance } = useGpxMetrics();
+const { getPointsFromSplit, getCumulElevationToDistance } = useGpxMetrics();
 const { points, splits, separators, totalDistance } = useRace();
 
 export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
+  const chartSeparators = computed(() => {
+    return separators.value.filter((s) => s.distance !== totalDistance.value);
+  });
+
   const series = computed(() => {
     if (splits.value?.length < 1) {
       const data = points.value.map((p) => [p.distance, p.elevation]);
@@ -48,11 +52,12 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
     const color =
       sep.distance === clickedSeparator.value
         ? { color: '#F59E1D', bg: '#FEF3C7' } // jaune si sélectionné
-        : sep.type === 'refuel'
+        : sep.refuel
           ? { color: '#C026D3', bg: '#F5D0FE' } // rose si refuel
           : { color: '#035581', bg: '#B1D5E8' }; // bleu sinon
     return color;
   };
+
   const separatorsSeries = computed(() => {
     return {
       id: 'separators',
@@ -73,7 +78,7 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
           borderRadius: 4,
           formatter: (params: any) => `${params.value}`,
         },
-        data: separators.value.map((sep: Separator) => {
+        data: chartSeparators.value.map((sep: Separator) => {
           return {
             xAxis: sep.distance,
             label: {
@@ -103,7 +108,7 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
           color: '#fff',
           formatter: (params: any) => {
             const distance = params.value;
-            const denivTotal = getCumulElevationFromDistance(distance) || 0;
+            const denivTotal = getCumulElevationToDistance(distance) || 0;
             return `${distance} km - ${denivTotal}m d+`;
           },
         },

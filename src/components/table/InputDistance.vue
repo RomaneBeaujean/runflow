@@ -1,6 +1,6 @@
 <template>
   <InputNumber
-    v-model="separator"
+    v-model="distance"
     mode="decimal"
     showButtons
     :min="0"
@@ -8,26 +8,23 @@
     :step="0.1"
     class="w-full"
     size="small"
-    :disabled="props.split.startDistance === 0"
   />
 </template>
 <script lang="ts" setup>
 import { useRace } from '@/composables/useRace';
-import { Split } from '@/types/Split';
 import { InputNumber } from 'primevue';
 import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update']);
 
-const props = defineProps<{ split: Split; value: number }>();
+const props = defineProps<{ distance: number }>();
 const { totalDistance } = useRace();
 
-const separator = ref<number>(props.value);
+const distance = ref<number>(props.distance);
 
-watch(separator, () => {
+watch(distance, () => {
   emit('update', {
-    ...props.split,
-    startDistance: separator.value,
+    distance: distance.value,
   });
 });
 </script>
