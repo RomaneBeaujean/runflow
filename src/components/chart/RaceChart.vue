@@ -34,23 +34,22 @@ import { useEcharts } from '@/composables/useEcharts';
 import { useRace } from '@/composables/useRace';
 import useRaceChartData from '@/composables/useRaceChartData';
 import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
-import { GpxPoint } from '@/types/DistanceElevation';
+import useRaceChartMouse from '@/composables/useRaceChartMouse';
+import { GpxPoint } from '@/types/GpxPoint';
 import { Position } from '@/types/Position';
 import { Separator } from '@/types/Separator';
-import { Split } from '@/types/Split';
 import { onMounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
 import ClickedPointTooltip from './ClickedPointTooltip.vue';
 import ClickedSeparatorTooltip from './ClickedSeparatorTooltip.vue';
 import HoveredSegmentTooltip from './HoveredSplitTooltip.vue';
 
-const hoveredSplit = ref<Split | null>(null);
 const hoveredSplitTooltipPosition = ref<Position | null>(null);
 const clickedPoint = ref<GpxPoint | null>(null);
 const clickTooltipPosition = ref<Position | null>(null);
 const clickedSeparator = ref<Separator | null>(null);
 const clickedSeparatorPosition = ref<Position | null>(null);
-
+const { hoveredSplit } = useRaceChartMouse();
 const { race, splits, addSeparator, deleteSeparator } = useRace();
 
 const { onChartHover, onChartClick, onChartLeave, closeTooltip } =

@@ -15,6 +15,11 @@ export function useGpxMetrics() {
     return point?.cumulElevation ?? 0;
   }
 
+  function getCumulNegativeElevationToDistance(distance: number) {
+    const point = points.value.find((el) => el.distance === distance);
+    return point?.cumulNegativeElevation ?? 0;
+  }
+
   function getPointFromDistance(distance: number) {
     return points.value.find((el) => el.distance >= distance);
   }
@@ -40,6 +45,14 @@ export function useGpxMetrics() {
     const start = getPointFromDistance(split.startDistance);
     const end = getPointFromDistance(split.endDistance);
     return (end?.cumulElevation ?? 0) - (start?.cumulElevation ?? 0);
+  }
+
+  function getSplitNegativeElevation(split: Split) {
+    const start = getPointFromDistance(split.startDistance);
+    const end = getPointFromDistance(split.endDistance);
+    return (
+      (end?.cumulNegativeElevation ?? 0) - (start?.cumulNegativeElevation ?? 0)
+    );
   }
 
   function getCumulDurationToDistance(distance: number): number {
@@ -98,6 +111,8 @@ export function useGpxMetrics() {
     getMidPointFromSplit,
     getSplitElevation,
     getSplitDuration,
+    getSplitNegativeElevation,
+    getCumulNegativeElevationToDistance,
     getFormattedDurationFromSplit,
     getCumulElevationToDistance,
     getCumulDurationToDistance,

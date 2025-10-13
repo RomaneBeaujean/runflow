@@ -24,7 +24,6 @@
         </template>
       </Column>
 
-      <!-- 
       <Column>
         <template #body="{ data }">
           <Tag
@@ -37,7 +36,7 @@
             :value="getRaceTotalElevation(data.trackId)"
           ></Tag>
         </template>
-      </Column> -->
+      </Column>
 
       <Column header="Date de création" :sortable="true">
         <template #body="{ data }">
@@ -66,7 +65,13 @@ import { useGpxParser } from '@/composables/useGpxParser';
 import { useInjection } from '@/lib/useInjection';
 import { roundOneNumber } from '@/lib/utils';
 import type { AppStores } from '@/stores/AppLoader';
-import { Column, DataTable, DataTableRowClickEvent } from 'primevue';
+import {
+  Button,
+  Column,
+  DataTable,
+  DataTableRowClickEvent,
+  Tag,
+} from 'primevue';
 import { useRouter } from 'vue-router';
 
 const stores = useInjection<AppStores>('stores');

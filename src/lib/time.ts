@@ -101,3 +101,37 @@ export function formattedDurationToMinutes(duration: string): number {
 
   return h * 60 + m;
 }
+
+/**
+ * Convertit un nombre de minutes en une Date avec cette heure.
+ * Exemple : 510 → aujourd'hui à 08h30
+ */
+export const minutesToDate = (minutes: number): Date => {
+  const date = new Date(0);
+  date.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+  return date;
+};
+
+export const dateToFormattedTime = (date: Date): string => {
+  return date.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+export const dateToMinutes = (date: Date | null, start?: Date): number => {
+  if (!date) return 0;
+  if (start) {
+    return Math.round((date.getTime() - start.getTime()) / 60000);
+  }
+  return date.getHours() * 60 + date.getMinutes();
+};
+
+export function parseDate(
+  value: string | Date | null | undefined
+): Date | null {
+  if (!value) return null;
+  if (typeof value === 'string') return new Date(value);
+  if (value instanceof Date) return value;
+  return null;
+}

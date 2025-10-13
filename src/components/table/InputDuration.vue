@@ -3,6 +3,8 @@
     v-model="currentDurationFormatted"
     mask="99h99"
     placeholder="hh:mm"
+    style="max-width: 100px"
+    size="small"
   />
 </template>
 
@@ -39,4 +41,8 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(input) {
+  max-width: 100%;
+}
+</style>

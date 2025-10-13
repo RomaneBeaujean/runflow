@@ -44,6 +44,7 @@ export class RacesStore {
       trackId,
       splits: [],
       separators: [],
+      startTime: null,
       createdAt: new Date().toISOString(),
     };
 

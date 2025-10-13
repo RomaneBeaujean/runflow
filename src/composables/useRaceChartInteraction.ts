@@ -1,4 +1,4 @@
-import { GpxPoint } from '@/types/DistanceElevation';
+import { GpxPoint } from '@/types/GpxPoint';
 import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
 import { useGpxMetrics } from './useGpxMetrics';

@@ -3,7 +3,11 @@
     v-model="currentDurationMinutes"
     :step="1"
     :min="0"
-    placeholder="minutes"
+    placeholder="min"
+    class="w-auto"
+    style="max-width: 100px"
+    size="small"
+    showButtons
   />
 </template>
 
@@ -24,4 +28,8 @@ watch(currentDurationMinutes, () => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(input) {
+  max-width: 100%;
+}
+</style>

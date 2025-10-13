@@ -8,4 +8,5 @@ export interface Race {
   trackId: string;
   splits: Split[];
   separators: Separator[];
+  startTime: Date | null;
 }

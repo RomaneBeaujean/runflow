@@ -1,7 +1,7 @@
 // src/composables/useRace.ts
 import { roundOneNumber } from '@/lib/utils';
-import { GpxPoint } from '@/types/DistanceElevation';
 import { Race } from '@/types/entities/Race';
+import { GpxPoint } from '@/types/GpxPoint';
 import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
 import { Track } from '@/types/Track';
@@ -9,6 +9,7 @@ import { computed, ref, watch } from 'vue';
 import { useGpxParser } from './useGpxParser';
 import { useGpxSplits } from './useGpxSplits';
 
+const startTime = ref<Date | null>(null);
 const race = ref<Race | null>(null);
 const splits = ref<Split[]>([]);
 const separators = ref<Separator[]>([]);
@@ -25,6 +26,7 @@ export function useRace() {
     totalDistance.value = roundOneNumber(gpxtotalDistance);
 
     separators.value = r.separators || [];
+    startTime.value = r.startTime || null;
 
     addEndSeparator();
 
@@ -60,13 +62,25 @@ export function useRace() {
     }
   };
 
+  const updateRaceStartTime = (newStartTime: Date) => {
+    startTime.value = newStartTime;
+  };
+
   const addSeparator = (separator: Separator) => {
     const distance = roundOneNumber(separator.distance);
     separators.value = addNewSeparator({ ...separator, distance });
   };
 
   const updateSeparator = (oldValue: Separator, newValue: Separator) => {
-    separators.value = updateSeparatorDistance(oldValue, newValue);
+    const withoutOldValue = [...separators.value].filter(
+      (el) => el.distance !== oldValue.distance
+    );
+
+    const withNewValue = [...withoutOldValue, newValue].sort(
+      (a: Separator, b: Separator) => a.distance - b.distance
+    );
+
+    separators.value = withNewValue;
   };
 
   const deleteSeparator = (d: number) => {
@@ -97,12 +111,14 @@ export function useRace() {
     race,
     splits,
     points,
+    startTime,
     separators,
     totalDistance,
     addSeparator,
     deleteSeparator,
     updateSeparator,
     updateSplitPace,
+    updateRaceStartTime,
     initRace,
   };
 
@@ -121,20 +137,5 @@ export function useRace() {
     return [...separators.value, newSeparator].sort(
       (a: Separator, b: Separator) => a.distance - b.distance
     );
-  }
-
-  function updateSeparatorDistance(
-    oldValue: Separator,
-    newValue: Separator
-  ): Separator[] {
-    const newSeparators = [...separators.value].filter(
-      (el) => el.distance !== oldValue.distance
-    );
-
-    const withNewValue = [...newSeparators, newValue].sort(
-      (a: Separator, b: Separator) => a.distance - b.distance
-    );
-
-    return withNewValue;
   }
 }

@@ -33,7 +33,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 
 const props = defineProps<{ id: string }>();
 const stores = useInjection<AppStores>('stores');
-const { splits, separators, race, initRace } = useRace();
+const { splits, separators, race, startTime, initRace } = useRace();
 
 const items = ref<MenuItem[]>([]);
 
@@ -57,11 +57,12 @@ watch(
 );
 
 watch(
-  [splits, separators],
+  [splits, separators, startTime],
   () => {
     stores.races.updateRace(race.value.id, {
       separators: separators.value,
       splits: splits.value,
+      startTime: startTime.value,
     });
   },
   { deep: true }

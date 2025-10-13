@@ -4,11 +4,15 @@
     :value="rowItems"
     dataKey="id"
     editMode="row"
+    selectionMode="single"
     v-model:editingRows="editingRows"
     @row-edit-save="onRowEditSave"
     responsiveLayout="scroll"
     rowHover
     class="w-full"
+    :rowClass="getRowClass"
+    scrollable
+    scrollHeight="600px"
   >
     <Column header="Distance">
       <template #body="{ data }">
@@ -39,41 +43,89 @@
       </template>
     </Column>
 
-    <Column header="Dénivelé cumulé (m)">
+    <Column header="D+ cumulé">
       <template #body="{ data }">
-        <span>
-          {{ data.cumulElevation }}
-        </span>
+        <Tag
+          v-if="data.distance !== 0"
+          :value="'+ ' + data.cumulElevation + ' m'"
+          style="background-color: #e0cebe; color: #713f12"
+          class="inline-block mb-2"
+        />
       </template>
     </Column>
 
-    <Column header="Longueur du split (km)">
+    <Column header="D- cumulé">
       <template #body="{ data }">
-        <span>
-          {{ data.splitDistance }}
-        </span>
+        <Tag
+          v-if="data.distance !== 0"
+          :value="'- ' + data.cumulNegativeElevation + ' m'"
+          style="background-color: #e0cebe; color: #713f12"
+          class="inline-block mb-2"
+        />
       </template>
     </Column>
 
-    <Column header="Dénivelé du split (m)">
+    <Column
+      header="Longueur du split"
+      headerStyle="border-left: 1px solid #e5e7eb;"
+      bodyStyle="border-left: 1px solid #e5e7eb;"
+    >
       <template #body="{ data }">
-        <span>
-          {{ data.splitElevation }}
-        </span>
+        <Tag
+          v-if="data.distance !== 0"
+          :value="data.splitDistance + ' km'"
+          style="background-color: #fffbeb; color: #713f12"
+          class="inline-block mb-2"
+        />
       </template>
     </Column>
 
-    <Column header="Allure du split (min/km) - Durée du split (h)">
+    <Column header="D+ split (m)">
+      <template #body="{ data }">
+        <Tag
+          v-if="data.distance !== 0"
+          :value="'+ ' + data.splitElevation + ' m'"
+          style="background-color: #fffbeb; color: #713f12"
+          class="inline-block mb-2"
+        />
+      </template>
+    </Column>
+
+    <Column header="D- split (m)">
+      <template #body="{ data }">
+        <Tag
+          v-if="data.distance !== 0"
+          :value="'- ' + data.splitNegativeElevation + ' m'"
+          style="background-color: #fffbeb; color: #713f12"
+          class="inline-block mb-2"
+        />
+      </template>
+    </Column>
+
+    <Column
+      header="Allure du split / Durée du split"
+      bodyStyle="border-right: 1px solid #e5e7eb;"
+      headerStyle="border-right: 1px solid #e5e7eb;"
+    >
       <template #body="{ data }">
         <div
           class="flex items-center space-x-2 w-full"
           v-if="data.distance !== 0"
         >
           <div class="flex-1 p-2 mr-8">
-            {{ data.splitPace || '—' }}
+            <Tag
+              style="background-color: #fffbeb; color: #713f12"
+              class="inline-block mb-2"
+            >
+              {{ data.splitPace }} <small>min/km</small></Tag
+            >
           </div>
           <div class="flex-1 p-2">
-            {{ minutesToFormattedDuration(data.splitDuration) || '—' }}
+            <Tag
+              :value="minutesToFormattedDuration(data.splitDuration)"
+              style="background-color: #fffbeb; color: #713f12"
+              class="inline-block mb-2"
+            />
           </div>
         </div>
       </template>
@@ -87,36 +139,82 @@
       </template>
     </Column>
 
-    <Column header="Temps d'arrêt">
+    <Column header="Temps d'arrêt" style="width: 150px">
       <template #body="{ data }">
-        <span v-if="data.refuel">
-          {{ minutesToFormattedDuration(data.stopDuration || 0) }}
-        </span>
+        <Tag
+          v-if="data.refuel"
+          severity="warn"
+          :value="data.stopDuration + ' minute(s)'"
+        />
       </template>
       <template #editor="{ data }">
         <InputRefuelStopDuration
           v-if="data.refuel"
           :duration="data.stopDuration || 0"
-          @update="({ duration }) => (data.duration = duration)"
+          @update="({ duration }) => (data.stopDuration = duration)"
         />
       </template>
     </Column>
 
-    <Column header="Durée totale">
+    <Column
+      header="Durée totale"
+      bodyStyle="border-right: 1px solid #e5e7eb;"
+      headerStyle="border-right: 1px solid #e5e7eb;"
+    >
       <template #body="{ data }">
-        <span>
+        <Tag severity="secondary" v-if="data.distance !== 0">
           {{ minutesToFormattedDuration(data.cumulDuration) }}
-        </span>
+        </Tag>
       </template>
     </Column>
 
-    <Column header="Barrière horraire">
+    <Column
+      header="Heure"
+      bodyStyle="border-right: 1px solid #e5e7eb;"
+      headerStyle="border-right: 1px solid #e5e7eb;"
+    >
       <template #body="{ data }">
-        <span v-if="data.timeBarrier">
-          <Tag :severity="isTimeBarrierOk(data) ? 'danger' : 'success'">
-            {{ minutesToFormattedDuration(data.timeBarrier) }}
+        <span v-if="data.time">
+          <Tag severity="info">
+            {{
+              data.time.toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            }}
           </Tag>
         </span>
+      </template>
+      <template #editor="{ data }">
+        <InputTime
+          v-if="data.distance === 0"
+          :time="data.time"
+          :reference="rowItems[0].time"
+          @update="({ time }) => (data.time = time)"
+        />
+      </template>
+    </Column>
+
+    <Column
+      header="Barrière horraire"
+      bodyStyle="border-right: 1px solid #e5e7eb;"
+      headerStyle="border-right: 1px solid #e5e7eb;"
+    >
+      <template #body="{ data }">
+        <div
+          v-if="data.timeBarrier"
+          class="flex flex-wrap justify-center gap-1"
+        >
+          <Tag :severity="isTimeBarrierOk(data) ? 'danger' : 'success'">
+            Durée: {{ minutesToFormattedDuration(data.timeBarrier) }}
+          </Tag>
+          <Tag
+            v-if="data.timeBarrierTime"
+            :severity="isTimeBarrierOk(data) ? 'danger' : 'success'"
+          >
+            <span>Heure: {{ dateToFormattedTime(data.timeBarrierTime) }} </span>
+          </Tag>
+        </div>
       </template>
       <template #editor="{ data }">
         <InputDuration
@@ -151,7 +249,12 @@
 <script setup lang="ts">
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
 import { useRace } from '@/composables/useRace';
-import { minutesToFormattedDuration } from '@/lib/time';
+import useRaceChartMouse from '@/composables/useRaceChartMouse';
+import {
+  dateToFormattedTime,
+  minutesToFormattedDuration,
+  parseDate,
+} from '@/lib/time';
 import { Separator } from '@/types/Separator';
 import { Button, Column, DataTable, Tag } from 'primevue';
 import { computed, ref } from 'vue';
@@ -159,24 +262,31 @@ import InputDistance from './InputDistance.vue';
 import InputDuration from './InputDuration.vue';
 import InputPaceDuration from './InputPaceDuration.vue';
 import InputRefuelStopDuration from './InputRefuelStopDuration.vue';
+import InputTime from './InputTime.vue';
 
 const {
   race,
   splits,
+  startTime,
   separators,
   totalDistance,
   deleteSeparator,
   updateSplitPace,
   updateSeparator,
+  updateRaceStartTime,
 } = useRace();
 
 const {
   getCumulElevationToDistance,
   getCumulDurationToDistance,
+  getCumulNegativeElevationToDistance,
   getSplitDistance,
+  getSplitNegativeElevation,
   getSplitDuration,
   getSplitElevation,
 } = useGpxMetrics();
+
+const { hoveredSplit } = useRaceChartMouse();
 
 const editingRows = ref<any[]>([]);
 
@@ -187,14 +297,28 @@ interface RowItem {
   distance: number;
   cumulElevation: number;
   cumulDuration: number;
+  cumulNegativeElevation: number;
 
   timeBarrier: number;
+  timeBarrierTime: Date;
 
   splitDistance: number;
   splitElevation: number;
   splitPace: string;
   splitDuration: number;
+  splitNegativeElevation: number;
+  highlighted: boolean;
+
+  time: Date | null;
 }
+
+const getRowClass = (rowData: RowItem) => {
+  // safety checks
+  const hovered = hoveredSplit.value;
+  if (!hovered) return '';
+  // compare numbers — ensure same type
+  return rowData.distance === hovered.startDistance ? 'highlight-row' : '';
+};
 
 const isTimeBarrierOk = (data: RowItem) => {
   const distance = data.distance;
@@ -211,10 +335,15 @@ const rowItems = computed((): RowItem[] => {
     timeBarrier: null,
     cumulDuration: 0,
     cumulElevation: 0,
+    cumulNegativeElevation: 0,
     splitDistance: 0,
     splitDuration: 0,
     splitElevation: 0,
+    splitNegativeElevation: 0,
     splitPace: null,
+    timeBarrierTime: null,
+    time: parseDate(startTime.value),
+    highlighted: hoveredSplit.value?.startDistance === 0 ? true : false,
   };
 
   const rows = separators.value.map((separator: Separator) => {
@@ -222,17 +351,39 @@ const rowItems = computed((): RowItem[] => {
       (s) => s.endDistance === separator.distance
     );
 
+    const isHighlighted =
+      hoveredSplit.value?.startDistance === split.startDistance;
+
+    const cumulDuration = getCumulDurationToDistance(separator.distance);
+
+    const time = firstRow.time
+      ? new Date(firstRow.time.getTime() + cumulDuration * 60 * 1000)
+      : null;
+
+    const timeBarrierTime =
+      firstRow.time && separator.timeBarrier
+        ? new Date(firstRow.time.getTime() + separator.timeBarrier * 60 * 1000)
+        : null;
+
     return {
       id: `row-${separator.distance}`,
       refuel: separator.refuel,
       distance: separator.distance,
       timeBarrier: separator.timeBarrier || null,
-      cumulDuration: getCumulDurationToDistance(separator.distance),
+      stopDuration: separator.stopDuration || 0,
+      cumulDuration,
       cumulElevation: getCumulElevationToDistance(separator.distance),
+      cumulNegativeElevation: getCumulNegativeElevationToDistance(
+        separator.distance
+      ),
       splitDistance: getSplitDistance(split),
       splitDuration: getSplitDuration(split),
       splitElevation: getSplitElevation(split),
+      splitNegativeElevation: getSplitNegativeElevation(split),
       splitPace: split.pace,
+      time,
+      timeBarrierTime,
+      highlighted: isHighlighted,
     };
   });
 
@@ -241,6 +392,7 @@ const rowItems = computed((): RowItem[] => {
 
 const onRowEditSave = (event: any) => {
   let { newData, index } = event;
+
   const oldData = rowItems.value[index];
   const oldSeparator = separators.value.find(
     (el) => el.distance === oldData.distance
@@ -253,6 +405,11 @@ const onRowEditSave = (event: any) => {
     timeBarrier: newData.timeBarrier,
   };
 
+  if (newData.distance === 0 && newData.time) {
+    updateRaceStartTime(newData.time);
+    return;
+  }
+
   if (JSON.stringify(newSeparator) !== JSON.stringify(oldSeparator)) {
     updateSeparator(oldSeparator, newSeparator);
   }
@@ -262,3 +419,10 @@ const onRowEditSave = (event: any) => {
   }
 };
 </script>
+
+<style>
+.p-datatable .p-datatable-tbody > tr:hover,
+.highlight-row {
+  background-color: #eff6ff !important;
+}
+</style>

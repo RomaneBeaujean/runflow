@@ -20,8 +20,8 @@ import { ref } from 'vue';
 
 // items de navigation
 const items = [
-  { label: 'Parcours GPX', path: 'tracks', illustration: 'pi pi-map' },
   { label: 'Plans de course', path: 'races', illustration: 'pi pi-list' },
+  { label: 'Parcours GPX', path: 'tracks', illustration: 'pi pi-map' },
 ];
 
 // active route = premier segment de l'URL

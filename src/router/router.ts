@@ -8,7 +8,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/tracks',
+      redirect: '/races',
     },
     {
       path: '/tracks',
@@ -21,6 +21,10 @@ const router = createRouter({
       component: Races,
     },
     { path: '/races/:id', component: Race, props: true },
+    {
+      path: '/:catchAll(.*)',
+      redirect: '/',
+    },
   ],
 });
 

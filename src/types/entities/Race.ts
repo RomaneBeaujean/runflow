@@ -8,6 +8,7 @@ export class Race {
   trackId: string;
   splits: Split[];
   separators: Separator[];
+  startTime: Date | null;
 
   constructor(data?: Partial<Race>) {
     this.id = data?.id ?? '';
@@ -16,5 +17,6 @@ export class Race {
     this.trackId = data?.trackId ?? '';
     this.splits = data?.splits ?? [];
     this.separators = data?.separators ?? [];
+    this.startTime = data.startTime ?? null;
   }
 }

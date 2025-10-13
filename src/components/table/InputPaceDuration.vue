@@ -1,11 +1,19 @@
 <template>
   <InputMask
     v-model="currentPace"
-    mask="99:99"
-    placeholder="mm:ss"
+    mask="99:99 (min/km)"
+    placeholder="(min/km)"
     class="mr-2"
+    size="small"
+    style="max-width: 120px"
   />
-  <InputMask v-model="currentDuration" mask="99h99" placeholder="hh:mm" />
+  <InputMask
+    v-model="currentDuration"
+    mask="99h99"
+    placeholder="__h__"
+    size="small"
+    style="max-width: 120px"
+  />
 </template>
 
 <script setup lang="ts">
@@ -35,9 +43,12 @@ const currentDuration = ref<string>(
 watch(
   () => currentPace.value,
   (newPace, oldPace) => {
-    if (!newPace?.match(/^\d{1,2}:\d{2}$/) || newPace === oldPace) return;
+    console.log(newPace);
+    if (!newPace?.match(/^\d{1,2}:\d{2}/) || newPace === oldPace) return;
+    const newPaceCleaned = newPace.slice(0, 5);
+
     const newDurationMinutes = durationFromPaceAndDistance(
-      newPace,
+      newPaceCleaned,
       props.distance
     );
 
@@ -83,9 +94,13 @@ watch(
 
 watch([currentPace, currentDuration], () => {
   emit('update', {
-    pace: currentPace.value,
+    pace: currentPace.value.slice(0, 5),
   });
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(input) {
+  max-width: 100%;
+}
+</style>
