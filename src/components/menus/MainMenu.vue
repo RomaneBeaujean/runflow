@@ -1,6 +1,8 @@
 <template>
   <Toolbar class="p-3">
     <template #start>
+      <img src="@/assets/logo.png" alt="Logo" class="h-10 mr-4" />
+
       <Button
         v-for="item in items"
         :label="item.label"
@@ -18,28 +20,19 @@ import router from '@/router/router';
 import { Button, Toolbar } from 'primevue';
 import { ref } from 'vue';
 
-// items de navigation
 const items = [
   { label: 'Plans de course', path: 'races', illustration: 'pi pi-map' },
 ];
 
-// active route = premier segment de l'URL
 const getInitialRoute = (): string => {
   const segments = window.location.pathname.split('/').filter(Boolean);
   return segments[0] || 'overview';
 };
 const activeRoute = ref(getInitialRoute());
-
-// check si un item est actif
 const isActive = (path: string) => activeRoute.value === path;
-
-// sélection d’un item
 const selectItem = (path: string) => {
   activeRoute.value = path;
-
-  // forcer le push absolu sur la route principale
   router.push({ path: `/${path}` }).catch((err) => {
-    // ignorer les erreurs de navigation redondante
     if (
       err.name !== 'NavigationDuplicated' &&
       !err.message.includes('Avoided redundant navigation')
