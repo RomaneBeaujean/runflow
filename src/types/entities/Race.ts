@@ -18,7 +18,7 @@ export class Race {
     this.gpxContent = data?.gpxContent ?? '';
     this.splits = data?.splits ?? [];
     this.separators = data?.separators ?? [];
-    this.startTime = data.startTime ?? null;
-    this.date = data.date ?? null;
+    this.startTime = data?.startTime ? new Date(data.startTime) : null;
+    this.date = data?.date ? new Date(data.date) : null;
   }
 }

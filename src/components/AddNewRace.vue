@@ -104,6 +104,7 @@ import {
   DatePicker,
   Dialog,
   FileUpload,
+  FileUploadSelectEvent,
   InputText,
   Tag,
 } from 'primevue';
@@ -118,7 +119,7 @@ const modalOpened = ref<boolean>(false);
 const raceDate = ref<Date | null>(null);
 const startTime = ref<Date | null>(null);
 
-const addFile = async (event) => {
+const addFile = async (event: FileUploadSelectEvent) => {
   const uploaded = event.files[0];
   if (!uploaded) return;
 

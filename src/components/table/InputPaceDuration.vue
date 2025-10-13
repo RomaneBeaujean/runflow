@@ -43,7 +43,6 @@ const currentDuration = ref<string>(
 watch(
   () => currentPace.value,
   (newPace, oldPace) => {
-    console.log(newPace);
     if (!newPace?.match(/^\d{1,2}:\d{2}/) || newPace === oldPace) return;
     const newPaceCleaned = newPace.slice(0, 5);
 

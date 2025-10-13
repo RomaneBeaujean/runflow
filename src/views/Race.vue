@@ -5,7 +5,7 @@
     <!-- Bloc info course -->
     <div class="flex items-center justify-between p-2">
       <!-- Affichage / Edition -->
-      <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div class="flex flex-1 flex-col sm:flex-row sm:items-center gap-4">
         <div>
           <template v-if="!editing">
             <span class="font-semibold text-lg">{{ race.name }}</span>
@@ -62,6 +62,13 @@
             @click="cancelEdit"
           />
         </div>
+
+        <Button
+          icon="pi pi-download"
+          label="Exporter"
+          class="p-button-rounded p-button-text"
+          @click="exportRace"
+        />
       </div>
     </div>
 
@@ -156,6 +163,27 @@ const formattedTime = computed(() =>
       })
     : '-'
 );
+
+const exportRace = () => {
+  const race = stores.races.getRace(props.id);
+  if (!race) return;
+
+  const json = JSON.stringify(race, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const safeName = (race.name || 'race')
+    .trim()
+    .replace(/\s+/g, '_')
+    .replace(/[^\w\-]/g, '');
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${safeName}.runflow.json`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+};
 
 onMounted(() => initRaceComposable());
 

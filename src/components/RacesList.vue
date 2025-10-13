@@ -13,7 +13,7 @@
       :rowClass="() => 'cursor-pointer'"
     >
       <!-- Nom du plan -->
-      <Column header="Nom du plan" :sortable="true">
+      <Column header="Nom du plan">
         <template #body="{ data }">
           <span
             class="truncate text-gray-800 font-medium cursor-pointer"
@@ -38,9 +38,9 @@
         </template>
       </Column>
 
-      <Column header="Date de création" :sortable="true">
+      <Column header="Date de création">
         <template #body="{ data }">
-          {{ data.createdAt }}
+          {{ new Date(data.createdAt).toLocaleDateString() }}
         </template>
       </Column>
 
