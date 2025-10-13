@@ -10,7 +10,7 @@ class RacesDB extends Dexie {
   constructor() {
     super('runflow-db');
     this.version(1).stores({
-      races: 'id,name,trackId,createdAt',
+      races: 'id,name,createdAt',
     });
     this.races = this.table('races');
   }
@@ -37,14 +37,15 @@ export class RacesStore {
     return this.state.races.find((r) => r.id === id) || null;
   }
 
-  async addRace({ name, trackId }: { name: string; trackId: string }) {
+  async addRace(r: Partial<Race>) {
     const race: Race = {
       id: nanoid(),
-      name,
-      trackId,
+      name: r.name,
+      gpxContent: r.gpxContent,
       splits: [],
       separators: [],
-      startTime: null,
+      date: r.date || null,
+      startTime: r.startTime || null,
       createdAt: new Date().toISOString(),
     };
 

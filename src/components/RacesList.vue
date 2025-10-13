@@ -28,12 +28,12 @@
         <template #body="{ data }">
           <Tag
             severity="info"
-            :value="getRaceTotalDistance(data.trackId)"
+            :value="getRaceTotalDistance(data.gpxContent)"
             class="mr-3"
           ></Tag>
           <Tag
             severity="warn"
-            :value="getRaceTotalElevation(data.trackId)"
+            :value="getRaceTotalElevation(data.gpxContent)"
           ></Tag>
         </template>
       </Column>
@@ -78,15 +78,13 @@ const stores = useInjection<AppStores>('stores');
 const router = useRouter();
 const { deleteRace } = stores.races;
 
-const getRaceTotalDistance = (id: string) => {
-  const track = stores.tracks.getTrack(id);
-  const { gpxtotalDistance } = useGpxParser(track.gpxContent);
+const getRaceTotalDistance = (gpxContent: string) => {
+  const { gpxtotalDistance } = useGpxParser(gpxContent);
   return roundOneNumber(gpxtotalDistance) + ' km';
 };
 
-const getRaceTotalElevation = (id: string) => {
-  const track = stores.tracks.getTrack(id);
-  const { gpxtotalElevation } = useGpxParser(track.gpxContent);
+const getRaceTotalElevation = (gpxContent: string) => {
+  const { gpxtotalElevation } = useGpxParser(gpxContent);
   return roundOneNumber(gpxtotalElevation) + ' d+';
 };
 

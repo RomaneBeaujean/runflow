@@ -12,23 +12,33 @@
       v-model:visible="modalOpened"
       modal
       header="Créer un nouveau plan de course"
-      class="min-w-[400px]"
+      :style="{ width: '50vw' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
     >
       <div class="flex flex-col gap-4">
         <!-- Sélection de la trace GPX -->
-        <div>
-          <label class="block mb-2 text-sm font-medium text-gray-700">
-            Choisissez la trace GPX
-          </label>
-          <Dropdown
-            v-model="selectedTrackId"
-            :options="trackOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Sélectionnez une trace"
-            class="w-full"
-            showClear
+        <div class="file-upload-holder flex flex-col gap-2">
+          <FileUpload
+            name="gpx"
+            accept=".gpx"
+            mode="basic"
+            :customUpload="true"
+            auto
+            chooseLabel="Choisir un fichier GPX"
+            @select="addFile"
           />
+          <div v-if="gpxFile">
+            <Tag severity="secondary">
+              {{ gpxFile.name }}
+              <button
+                type="button"
+                class="m-1 text-grey-600 hover:text-grey-900 font-bold cursor-pointer"
+                @click="gpxFile = null"
+              >
+                ×
+              </button>
+            </Tag>
+          </div>
         </div>
 
         <!-- Nom du plan -->
@@ -37,11 +47,37 @@
             Nom du plan de course
           </label>
           <InputText
-            v-model="newCourseName"
+            v-model="raceName"
             type="text"
             placeholder="Nom du plan de course"
             class="w-full"
           />
+        </div>
+
+        <!-- Date de la course (optionnelle) -->
+        <div class="flex gap-2">
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">
+              Date de la course
+            </label>
+            <DatePicker
+              v-model="raceDate"
+              locale="fr"
+              dateFormat="dd-mm-yy"
+              showIcon
+              placeholder="Choisir une date"
+              :showTime="false"
+            />
+          </div>
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">
+              Heure de départ
+            </label>
+            <InputTime
+              :time="startTime"
+              @update="({ time }) => (startTime = time)"
+            />
+          </div>
         </div>
 
         <!-- Boutons -->
@@ -51,7 +87,7 @@
             label="Créer"
             icon="pi pi-check"
             @click="createCourse"
-            :disabled="!selectedTrackId || !newCourseName"
+            :disabled="!gpxFile || !raceName"
           />
         </div>
       </div>
@@ -62,21 +98,38 @@
 <script setup lang="ts">
 import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
-import { Button, Dialog, Dropdown, InputText } from 'primevue';
-import { computed, ref } from 'vue';
+import { Race } from '@/types/entities/Race';
+import {
+  Button,
+  DatePicker,
+  Dialog,
+  FileUpload,
+  InputText,
+  Tag,
+} from 'primevue';
+import { ref } from 'vue';
+import InputTime from './table/InputTime.vue';
 
 const stores = useInjection<AppStores>('stores');
 
-const selectedTrackId = ref<string | null>(null);
-const newCourseName = ref<string | null>(null);
+const gpxFile = ref<{ content: string; name: string }>(null);
+const raceName = ref<string | null>(null);
 const modalOpened = ref<boolean>(false);
+const raceDate = ref<Date | null>(null);
+const startTime = ref<Date | null>(null);
 
-const trackOptions = computed(() =>
-  stores.tracks.tracks.map((t) => ({
-    label: t.name,
-    value: t.id,
-  }))
-);
+const addFile = async (event) => {
+  const uploaded = event.files[0];
+  if (!uploaded) return;
+
+  const content = await uploaded.text();
+  const name = uploaded.name;
+  gpxFile.value = { content, name };
+
+  if (raceName.value === '' || raceName.value === null) {
+    raceName.value = name;
+  }
+};
 
 function openModal() {
   modalOpened.value = true;
@@ -84,16 +137,25 @@ function openModal() {
 
 function closeModal() {
   modalOpened.value = false;
-  newCourseName.value = null;
-  selectedTrackId.value = null;
+  raceName.value = null;
+  gpxFile.value = null;
 }
 
 async function createCourse() {
-  if (!selectedTrackId.value || !newCourseName.value) return;
+  if (!gpxFile.value || !raceName.value) return;
+
+  const race: Partial<Race> = {
+    name: raceName.value,
+    gpxContent: gpxFile.value.content,
+    date: raceDate.value,
+    startTime: startTime.value,
+  };
 
   await stores.races.addRace({
-    name: newCourseName.value,
-    trackId: selectedTrackId.value,
+    name: raceName.value,
+    gpxContent: gpxFile.value.content,
+    date: raceDate.value,
+    startTime: startTime.value,
   });
 
   closeModal();

@@ -190,6 +190,7 @@
           v-if="data.distance === 0"
           :time="data.time"
           :reference="rowItems[0].time"
+          size="small"
           @update="({ time }) => (data.time = time)"
         />
       </template>
@@ -424,5 +425,8 @@ const onRowEditSave = (event: any) => {
 .p-datatable .p-datatable-tbody > tr:hover,
 .highlight-row {
   background-color: #eff6ff !important;
+}
+:deep(input) {
+  max-width: 100%;
 }
 </style>

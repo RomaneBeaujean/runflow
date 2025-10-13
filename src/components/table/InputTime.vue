@@ -3,8 +3,7 @@
     v-model="currentTimeFormatted"
     mask="99:99"
     placeholder="hh:mm"
-    style="max-width: 100px"
-    size="small"
+    :size="props.size"
   />
 </template>
 
@@ -15,6 +14,7 @@ import { ref, watch } from 'vue';
 const emit = defineEmits(['update']);
 const props = defineProps<{
   time: Date | null;
+  size?: string;
   reference?: Date; // date de référence pour transformer hh:mm en Date
 }>();
 
@@ -39,8 +39,4 @@ watch(currentTimeFormatted, (newValue) => {
 });
 </script>
 
-<style scoped lang="scss">
-:deep(input) {
-  max-width: 100%;
-}
-</style>
+<style scoped lang="scss"></style>

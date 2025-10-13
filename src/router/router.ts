@@ -1,6 +1,5 @@
 import Race from '@/views/Race.vue';
 import Races from '@/views/Races.vue';
-import Tracks from '@/views/Tracks.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -9,11 +8,6 @@ const router = createRouter({
     {
       path: '/',
       redirect: '/races',
-    },
-    {
-      path: '/tracks',
-      name: 'tracks',
-      component: Tracks,
     },
     {
       path: '/races',

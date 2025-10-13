@@ -4,7 +4,6 @@ import { Race } from '@/types/entities/Race';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
-import { Track } from '@/types/Track';
 import { computed, ref, watch } from 'vue';
 import { useGpxParser } from './useGpxParser';
 import { useGpxSplits } from './useGpxSplits';
@@ -18,10 +17,10 @@ const totalDistance = ref<number>(null);
 const { recomputeSplits } = useGpxSplits();
 
 export function useRace() {
-  const initRace = (r: Race, t: Track) => {
+  const initRace = (r: Race) => {
     race.value = r;
 
-    const { gpxpoints, gpxtotalDistance } = useGpxParser(t.gpxContent);
+    const { gpxpoints, gpxtotalDistance } = useGpxParser(r.gpxContent);
     points.value = gpxpoints;
     totalDistance.value = roundOneNumber(gpxtotalDistance);
 
