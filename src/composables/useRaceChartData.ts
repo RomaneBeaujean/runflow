@@ -114,6 +114,13 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
         },
       },
     },
+    grid: {
+      top: 24,
+      right: 24,
+      bottom: 24,
+      left: 24,
+      containLabel: true, // permet de ne pas couper les labels
+    },
     xAxis: {
       type: 'value',
       boundaryGap: false,

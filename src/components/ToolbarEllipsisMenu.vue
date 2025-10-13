@@ -24,7 +24,8 @@ const menu = ref(null);
 const items: MenuItem[] = [
   {
     label: 'Importer un fichier',
-    icon: 'pi pi-upload',
+    icon: 'pi pi-file',
+    class: 'text-sm',
     command: () => {
       const input = document.createElement('input');
       input.type = 'file';

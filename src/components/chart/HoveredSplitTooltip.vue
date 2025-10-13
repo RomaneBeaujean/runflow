@@ -1,53 +1,68 @@
 <template>
   <div
-    v-if="position && split"
+    v-if="hoveredSplitTooltipPosition"
     :style="{
       position: 'absolute',
-      left: position.left,
-      top: '20px',
+      left: hoveredSplitTooltipPosition.left,
+      top: '45px',
       transform: 'translate(-50%, -50%)',
     }"
-    :key="split.startDistance"
+    :key="hoveredSplit.startDistance"
   >
-    <div class="min-w-[100px] flex justify-center items-center gap-2">
-      <!-- Tag Distance -->
-      <div
-        class="flex items-center gap-1 bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-medium shadow-sm"
-      >
-        <i class="pi pi-arrows-h text-pink-600"></i>
-        <span>{{ distance }} km</span>
-      </div>
-
-      <!-- Tag D+ -->
-      <div
-        class="flex items-center gap-1 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium shadow-sm"
+    <div class="flex justify-center items-center gap-2">
+      <Tag
+        class="font-medium text-sm shadow-sm rounded-full"
+        style="background-color: #ffedd4"
       >
         <i class="pi pi-chart-line text-orange-600"></i>
-        <span>{{ elevation }} d+</span>
-      </div>
+        <span class="text-orange-800"
+          >{{ distance }} <small>km</small> / {{ elevation }}
+          <small>d+</small></span
+        >
+      </Tag>
+
+      <Tag
+        class="font-medium text-sm shadow-sm rounded-full"
+        style="background-color: #fce7f3"
+      >
+        <i class="pi pi-bolt text-violet-800"></i>
+        <span class="text-violet-800">
+          <span>{{ hoveredSplit.pace }} <small>min/km</small></span>
+        </span>
+      </Tag>
+      <Tag
+        class="font-medium text-sm shadow-sm rounded-full"
+        style="background-color: #f0fdf4"
+      >
+        <i class="pi pi-clock text-emerald-800"></i>
+        <span class="text-emerald-800">
+          <span>
+            {{ minutesToFormattedDuration(getSplitDuration(hoveredSplit)) }}
+          </span>
+        </span>
+      </Tag>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
+import useRaceHoveredSplit from '@/composables/useRaceHoveredSplit';
+import { minutesToFormattedDuration } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
-import { Position } from '@/types/Position';
-import { Split } from '@/types/Split';
+import { Tag } from 'primevue';
 import { computed } from 'vue';
 
-const props = defineProps<{
-  position: Position | null;
-  split: Split | null;
-}>();
-
-const { getSplitElevation } = useGpxMetrics();
+const { hoveredSplit, hoveredSplitTooltipPosition } = useRaceHoveredSplit();
+const { getSplitElevation, getSplitDuration } = useGpxMetrics();
 
 const distance = computed(() => {
-  return roundOneNumber(props.split!.endDistance - props.split!.startDistance);
+  return roundOneNumber(
+    hoveredSplit.value!.endDistance - hoveredSplit.value!.startDistance
+  );
 });
 
 const elevation = computed(() => {
-  return getSplitElevation(props.split!);
+  return getSplitElevation(hoveredSplit.value!);
 });
 </script>

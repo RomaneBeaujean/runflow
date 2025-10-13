@@ -1,9 +1,10 @@
 <template>
-  <div v-if="race">
-    <Breadcrumb :model="items" class="text-sm"> </Breadcrumb>
+  <div v-if="race" class="flex flex-col flex-1 max-h-[100%]">
+    <div class="flex flex-0">
+      <Breadcrumb :model="items" class="text-sm"> </Breadcrumb>
+    </div>
 
-    <!-- Bloc info course -->
-    <div class="flex items-center justify-between p-2">
+    <div class="flex flex-0 items-center justify-between p-2">
       <!-- Affichage / Edition -->
       <div class="flex flex-1 flex-col sm:flex-row sm:items-center gap-4">
         <div>
@@ -72,14 +73,17 @@
       </div>
     </div>
 
-    <div class="space-y-6">
-      <Fieldset legend="Profil de la course">
-        <RaceChart />
-      </Fieldset>
-
-      <Fieldset legend="Splits">
-        <RaceTable />
-      </Fieldset>
+    <div class="flex flex-col h-full flex-1">
+      <div>
+        <Fieldset legend="Profil de la course">
+          <RaceChart />
+        </Fieldset>
+      </div>
+      <div>
+        <Fieldset legend="Splits">
+          <RaceSplitsTable />
+        </Fieldset>
+      </div>
     </div>
   </div>
 
@@ -95,7 +99,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 
 import RaceChart from '@/components/chart/RaceChart.vue';
 import InputTime from '@/components/table/InputTime.vue';
-import RaceTable from '@/components/table/RaceSplitsTable.vue';
+import RaceSplitsTable from '@/components/table/RaceSplitsTable.vue';
 import { useRace } from '@/composables/useRace';
 import { Button, DatePicker, Fieldset, InputText } from 'primevue';
 import Breadcrumb from 'primevue/breadcrumb';

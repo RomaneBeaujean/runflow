@@ -12,7 +12,7 @@
     class="w-full"
     :rowClass="getRowClass"
     scrollable
-    scrollHeight="600px"
+    scrollHeight="100%"
   >
     <Column header="Distance">
       <template #body="{ data }">
@@ -250,7 +250,7 @@
 <script setup lang="ts">
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
 import { useRace } from '@/composables/useRace';
-import useRaceChartMouse from '@/composables/useRaceChartMouse';
+import useRaceHoveredSplit from '@/composables/useRaceHoveredSplit';
 import {
   dateToFormattedTime,
   minutesToFormattedDuration,
@@ -287,7 +287,7 @@ const {
   getSplitElevation,
 } = useGpxMetrics();
 
-const { hoveredSplit } = useRaceChartMouse();
+const { hoveredSplit } = useRaceHoveredSplit();
 
 const editingRows = ref<any[]>([]);
 
@@ -314,10 +314,8 @@ interface RowItem {
 }
 
 const getRowClass = (rowData: RowItem) => {
-  // safety checks
   const hovered = hoveredSplit.value;
   if (!hovered) return '';
-  // compare numbers — ensure same type
   return rowData.distance === hovered.startDistance ? 'highlight-row' : '';
 };
 
@@ -344,7 +342,7 @@ const rowItems = computed((): RowItem[] => {
     splitPace: null,
     timeBarrierTime: null,
     time: parseDate(startTime.value),
-    highlighted: hoveredSplit.value?.startDistance === 0 ? true : false,
+    highlighted: false,
   };
 
   const rows = separators.value.map((separator: Separator) => {
@@ -424,7 +422,7 @@ const onRowEditSave = (event: any) => {
 <style>
 .p-datatable .p-datatable-tbody > tr:hover,
 .highlight-row {
-  background-color: #eff6ff !important;
+  background-color: #ece6e4 !important;
 }
 :deep(input) {
   max-width: 100%;

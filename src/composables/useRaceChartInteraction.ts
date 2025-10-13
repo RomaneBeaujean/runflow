@@ -3,16 +3,17 @@ import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
+import useRaceHoveredSplit from './useRaceHoveredSplit';
 
 const { getMidPointFromSplit } = useGpxMetrics();
 const { points, separators, splits } = useRace();
+const { setHoveredSplit, setHoveredSplitTooltipPosition } =
+  useRaceHoveredSplit();
 
 export default function useRaceChartInteraction({
   clickedPoint,
   clickedSeparatorPosition,
-  hoveredSplitTooltipPosition,
   clickTooltipPosition,
-  hoveredSplit,
   clickedSeparator,
 }) {
   const getTargetDistance = (event: any, chartInstance: any) => {
@@ -25,18 +26,22 @@ export default function useRaceChartInteraction({
 
   const onChartHover = (event: any, chartInstance: any) => {
     const targetDistance = getTargetDistance(event, chartInstance);
+
     const targetSplit = splits.value.find(
       (s: Split) =>
         targetDistance >= s.startDistance && targetDistance <= s.endDistance
     );
     if (!targetSplit) return;
-    hoveredSplit.value = targetSplit;
+
+    setHoveredSplit(targetSplit);
+
     const midPoint = getMidPointFromSplit(targetSplit);
     const [px, py] = chartInstance.convertToPixel(
       { xAxisIndex: 0, yAxisIndex: 0 },
       [midPoint.distance, midPoint.elevation]
     );
-    hoveredSplitTooltipPosition.value = { left: `${px}px`, top: `${py}px` };
+
+    setHoveredSplitTooltipPosition({ left: `${px}px`, top: `${py}px` });
   };
 
   const onChartClick = (event: any, chartInstance: any) => {
@@ -60,8 +65,8 @@ export default function useRaceChartInteraction({
   };
 
   const onChartLeave = () => {
-    hoveredSplit.value = null;
-    hoveredSplitTooltipPosition.value = null;
+    setHoveredSplit(null);
+    setHoveredSplitTooltipPosition(null);
   };
 
   const closeTooltip = () => {
@@ -76,8 +81,6 @@ export default function useRaceChartInteraction({
     clickedSeparatorPosition,
     clickedPoint,
     clickTooltipPosition,
-    hoveredSplitTooltipPosition,
-    hoveredSplit,
     onChartHover,
     onChartClick,
     onChartLeave,

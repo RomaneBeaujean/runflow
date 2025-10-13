@@ -57,3 +57,8 @@ body {
 *::-webkit-scrollbar-thumb:hover {
   opacity: 1;
 }
+
+.p-tag, .p-tag .p-tag-value {
+  white-space: nowrap !important;
+  min-width: min-content !important;
+}
