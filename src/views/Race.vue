@@ -1,92 +1,15 @@
 <template>
-  <div v-if="race" class="flex flex-col flex-1 max-h-[100%]">
-    <div class="flex flex-0">
-      <Breadcrumb :model="items" class="text-sm"> </Breadcrumb>
+  <div v-if="race" id="race">
+    <div id="race-header" class="full-w">
+      <RaceHeader :race="race" />
     </div>
-
-    <div class="flex flex-0 items-center justify-between p-2">
-      <!-- Affichage / Edition -->
-      <div class="flex flex-1 flex-col sm:flex-row sm:items-center gap-4">
-        <div>
-          <template v-if="!editing">
-            <span class="font-semibold text-lg">{{ race.name }}</span>
-          </template>
-          <template v-else>
-            <InputText v-model="editableName" class="w-full sm:w-auto" />
-          </template>
-        </div>
-
-        <div>
-          <template v-if="!editing">
-            <span class="text-gray-600">{{ formattedDate }}</span>
-          </template>
-          <template v-else>
-            <DatePicker
-              v-model="editableDate"
-              locale="fr"
-              dateFormat="dd-mm-yy"
-              showIcon
-            />
-          </template>
-        </div>
-
-        <div>
-          <template v-if="!editing">
-            <span class="text-gray-600">{{ formattedTime }}</span>
-          </template>
-          <template v-else>
-            <InputTime
-              :time="editableTime"
-              @update="({ time }) => (editableTime = time)"
-            />
-          </template>
-        </div>
-      </div>
-
-      <!-- Bouton édition / validation -->
-      <div>
-        <Button
-          v-if="!editing"
-          icon="pi pi-pencil"
-          class="p-button-rounded p-button-text"
-          @click="startEditing"
-        />
-        <div v-else class="flex gap-2">
-          <Button
-            icon="pi pi-check"
-            class="p-button-rounded"
-            @click="saveEdit"
-          />
-          <Button
-            icon="pi pi-times"
-            class="p-button-rounded"
-            @click="cancelEdit"
-          />
-        </div>
-
-        <Button
-          icon="pi pi-download"
-          label="Exporter"
-          class="p-button-rounded p-button-text"
-          @click="exportRace"
-        />
-      </div>
+    <div id="chart">
+      <RaceChart />
     </div>
-
-    <div class="flex flex-col h-full flex-1">
-      <div>
-        <Fieldset legend="Profil de la course">
-          <RaceChart />
-        </Fieldset>
-      </div>
-      <div>
-        <Fieldset legend="Splits">
-          <RaceSplitsTable />
-        </Fieldset>
-      </div>
+    <div>
+      <RaceTable />
     </div>
   </div>
-
   <div v-else class="flex justify-center items-center h-40 text-gray-500">
     <ProgressSpinner />
   </div>
@@ -95,98 +18,23 @@
 <script setup lang="ts">
 import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
-import { computed, onMounted, ref, watch } from 'vue';
+import { onMounted, watch } from 'vue';
 
-import RaceChart from '@/components/chart/RaceChart.vue';
-import InputTime from '@/components/table/InputTime.vue';
-import RaceSplitsTable from '@/components/table/RaceSplitsTable.vue';
+import RaceChart from '@/components/RaceChart.vue';
+import RaceHeader from '@/components/RaceHeader.vue';
+import RaceTable from '@/components/RaceTable.vue';
 import { useRace } from '@/composables/useRace';
-import { Button, DatePicker, Fieldset, InputText } from 'primevue';
-import Breadcrumb from 'primevue/breadcrumb';
-import { MenuItem } from 'primevue/menuitem';
-import ProgressSpinner from 'primevue/progressspinner';
-
-// Mode édition
-const editing = ref(false);
-const editableName = ref('');
-const editableDate = ref<Date | null>(null);
-const editableTime = ref<Date | null>(null);
+import { ProgressSpinner } from 'primevue';
 
 const props = defineProps<{ id: string }>();
 const stores = useInjection<AppStores>('stores');
 const { splits, separators, race, startTime, initRace } = useRace();
-
-const items = ref<MenuItem[]>([]);
 
 const initRaceComposable = async () => {
   if (!props.id) return;
   const raceData = stores.races.getRace(props.id);
   if (!raceData) return;
   initRace(raceData);
-  items.value = [
-    { label: 'Plans de course', url: '/races' },
-    { label: race.value.name, disabled: true },
-  ];
-};
-
-const startEditing = () => {
-  if (!race.value) return;
-  editing.value = true;
-  editableName.value = race.value.name;
-  editableDate.value = race.value.date ? new Date(race.value.date) : null;
-  editableTime.value = startTime.value ? new Date(startTime.value) : null;
-};
-
-const cancelEdit = () => {
-  editing.value = false;
-};
-
-const saveEdit = () => {
-  if (!race.value) return;
-  race.value.name = editableName.value;
-  race.value.date = editableDate.value;
-  startTime.value = editableTime.value;
-  editing.value = false;
-
-  stores.races.updateRace(race.value.id, {
-    name: race.value.name,
-    date: race.value.date,
-    startTime: startTime.value,
-  });
-};
-
-// Format affichage
-const formattedDate = computed(() =>
-  race.value?.date ? new Date(race.value.date).toLocaleDateString('fr-FR') : '-'
-);
-const formattedTime = computed(() =>
-  startTime.value
-    ? new Date(startTime.value).toLocaleTimeString('fr-FR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '-'
-);
-
-const exportRace = () => {
-  const race = stores.races.getRace(props.id);
-  if (!race) return;
-
-  const json = JSON.stringify(race, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-
-  const safeName = (race.name || 'race')
-    .trim()
-    .replace(/\s+/g, '_')
-    .replace(/[^\w\-]/g, '');
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${safeName}.runflow.json`;
-  a.click();
-
-  URL.revokeObjectURL(url);
 };
 
 onMounted(() => initRaceComposable());
@@ -209,4 +57,18 @@ watch(
 );
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+#race {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+
+#chart {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 300px;
+  background-color: white;
+}
+</style>

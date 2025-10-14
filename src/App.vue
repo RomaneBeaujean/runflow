@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import MainMenu from './components/menus/MainMenu.vue';
+import MainMenu from '@/components/MainMenu.vue';
 </script>
 
 <style lang="scss">
@@ -27,8 +27,10 @@ import MainMenu from './components/menus/MainMenu.vue';
 }
 
 #content {
-  padding: 16px;
   flex: 1 1 auto;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px;
 }
 </style>

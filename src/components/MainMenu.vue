@@ -1,6 +1,5 @@
 <template>
   <Toolbar class="p-3 flex justify-between">
-    <!-- Gauche -->
     <template #start>
       <div class="flex items-center">
         <img src="@/assets/logo.png" alt="Logo" class="h-10 mr-4" />
@@ -16,13 +15,6 @@
         />
       </div>
     </template>
-
-    <!-- Droite -->
-    <template #end>
-      <div class="flex items-center">
-        <ToolbarEllipsisMenu />
-      </div>
-    </template>
   </Toolbar>
 </template>
 
@@ -32,7 +24,6 @@ import router from '@/router/router';
 import { AppStores } from '@/stores/AppLoader';
 import { Button, Toolbar } from 'primevue';
 import { ref } from 'vue';
-import ToolbarEllipsisMenu from '../ToolbarEllipsisMenu.vue';
 
 const stores = useInjection<AppStores>('stores');
 

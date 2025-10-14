@@ -109,7 +109,7 @@ import {
   Tag,
 } from 'primevue';
 import { ref } from 'vue';
-import InputTime from './table/InputTime.vue';
+import InputTime from './InputTime.vue';
 
 const stores = useInjection<AppStores>('stores');
 

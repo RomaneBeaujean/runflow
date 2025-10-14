@@ -1,29 +1,27 @@
 <template>
-  <div class="chart-wrapper" style="position: relative">
-    <VChart
-      v-if="race"
-      autoresize
-      ref="chartComponent"
-      style="position: relative; width: 100%; min-height: 300px"
-      :option="chartOptions"
-      @zr:click="(e) => onChartClick(e, chartInstance)"
-      @zr:mouseover="(e) => onChartHover(e, chartInstance)"
-      @zr:globalout="onChartLeave"
-    />
+  <VChart
+    v-if="race"
+    autoresize
+    ref="chartComponent"
+    style="position: relative; width: 100%; min-height: 300px"
+    :option="chartOptions"
+    @zr:click="(e) => onChartClick(e, chartInstance)"
+    @zr:mouseover="(e) => onChartHover(e, chartInstance)"
+    @zr:globalout="onChartLeave"
+  />
 
-    <ClickedPointTooltip
-      :position="clickTooltipPosition"
-      :addSeparator="addSeparatorOnClickedPoint"
-      :closeTooltip="closeTooltip"
-    />
+  <ClickedPointTooltip
+    :position="clickTooltipPosition"
+    :addSeparator="addSeparatorOnClickedPoint"
+    :closeTooltip="closeTooltip"
+  />
 
-    <ClickedSeparatorTooltip
-      :position="clickedSeparatorPosition"
-      :delete="() => deleteSeparator(clickedSeparator.distance)"
-    />
+  <ClickedSeparatorTooltip
+    :position="clickedSeparatorPosition"
+    :delete="() => deleteSeparator(clickedSeparator.distance)"
+  />
 
-    <HoveredSplitTooltip />
-  </div>
+  <HoveredSplitTooltip />
 </template>
 
 <script setup lang="ts">
@@ -93,7 +91,8 @@ watch(clickedPoint, () => {
 </script>
 
 <style lang="scss" scoped>
-.chart-wrapper {
+#chart-wrapper {
   width: 100%;
+  height: 100%;
 }
 </style>

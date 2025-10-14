@@ -2,17 +2,14 @@
   <DataTable
     v-if="race"
     :value="rowItems"
+    id="race-table"
     dataKey="id"
     editMode="row"
     selectionMode="single"
     v-model:editingRows="editingRows"
     @row-edit-save="onRowEditSave"
-    responsiveLayout="scroll"
     rowHover
-    class="w-full"
     :rowClass="getRowClass"
-    scrollable
-    scrollHeight="100%"
   >
     <Column header="Distance">
       <template #body="{ data }">
@@ -420,10 +417,36 @@ const onRowEditSave = (event: any) => {
 </script>
 
 <style>
-.p-datatable .p-datatable-tbody > tr:hover,
-.highlight-row {
+#race-table .p-datatable-tbody > tr:hover,
+#race-table .highlight-row {
   background-color: #ece6e4 !important;
 }
+
+#race-table thead {
+  position: sticky;
+  top: 300px;
+  background: yellow;
+  height: auto;
+  z-index: 30;
+}
+
+#race-table .p-datatable-table-container {
+  overflow-x: unset !important;
+  overflow-y: unset !important;
+}
+
+/* #race-table,
+#race-table * {
+  overflow: visible;
+}
+
+#race-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: white;
+} */
+
 :deep(input) {
   max-width: 100%;
 }

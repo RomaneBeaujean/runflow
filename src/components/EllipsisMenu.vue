@@ -14,7 +14,7 @@
 import { useInjection } from '@/lib/useInjection';
 import { AppStores } from '@/stores/AppLoader';
 import { Button, Menu } from 'primevue';
-import { MenuItem } from 'primevue/menuitem';
+import type { MenuItem } from 'primevue/menuitem';
 import { ref } from 'vue';
 
 const stores = useInjection<AppStores>('stores');
