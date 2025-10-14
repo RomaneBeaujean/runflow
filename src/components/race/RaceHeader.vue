@@ -90,6 +90,7 @@
 </template>
 
 <script setup lang="ts">
+import InputTime from '@/components/race/inputs/InputTime.vue';
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
 import { useRace } from '@/composables/useRace';
 import { minutesToFormattedDuration } from '@/lib/time';
@@ -98,7 +99,6 @@ import { AppStores } from '@/stores/AppLoader';
 import { Race } from '@/types/entities/Race';
 import { Button, DatePicker, InputText, Tag } from 'primevue';
 import { computed, ref } from 'vue';
-import InputTime from './InputTime.vue';
 import RaceBreadcrumbs from './RaceBreadcrumbs.vue';
 
 const stores = useInjection<AppStores>('stores');

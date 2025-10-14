@@ -103,13 +103,17 @@ export function useGpxMetrics() {
     return durationMinutes;
   }
 
-  function getSplitSlopePercent(split: Split) {
+  function getSplitSlopePercent(split: Split): {
+    positive: string;
+    negative: string;
+    major: string;
+  } {
     const elevation = getSplitElevation(split); // D+ en m
     const negativeElevation = getSplitNegativeElevation(split); // D- en m
     const distance = getSplitDistance(split); // en km
 
     if (distance === 0) {
-      return { positive: 0, negative: 0, major: 0 };
+      return null;
     }
 
     const positivePercent = roundOneNumber(
@@ -119,7 +123,7 @@ export function useGpxMetrics() {
       (negativeElevation / (distance * 1000)) * 100
     );
 
-    const majorPercent =
+    const majorPercent: string =
       positivePercent >= negativePercent
         ? `+${positivePercent}`
         : `-${negativePercent}`;

@@ -4,41 +4,43 @@
     :style="{
       position: 'absolute',
       left: hoveredSplitTooltipPosition.left,
-      top: '-12px',
+      top: '20px',
       transform: 'translate(-50%, -50%)',
     }"
     :key="hoveredSplit.startDistance"
   >
     <div class="flex justify-center items-center gap-2">
       <Tag
-        class="font-medium text-sm shadow-sm rounded-full"
-        style="background-color: #ffedd4"
+        style="background-color: #ffedd4; color: var(--color-orange-800)"
+        icon="pi pi-arrows-h"
+        severity="secondary"
       >
-        <i class="pi pi-chart-line text-orange-600"></i>
-        <span class="text-orange-800"
-          >{{ distance }} <small>km</small> / {{ elevation }}
-          <small>d+</small></span
-        >
+        {{ distance }}
+        <small>km</small>
+        / {{ elevation }}
+        <small>d+</small>
+      </Tag>
+
+      <SlopeTag
+        :percent="getSplitSlopePercent(hoveredSplit).major"
+        icon="pi pi-chart-line"
+      />
+
+      <Tag
+        style="background-color: #fce7f3; color: var(--color-violet-800)"
+        icon="pi pi-bolt"
+        severity="secondary"
+      >
+        <span>{{ hoveredSplit.pace }} <small>min/km</small></span>
       </Tag>
 
       <Tag
-        class="font-medium text-sm shadow-sm rounded-full"
-        style="background-color: #fce7f3"
+        style="background-color: #f0fdf4; color: var(--color-emeral-800)"
+        icon="pi pi-clock"
+        severity="secondary"
       >
-        <i class="pi pi-bolt text-violet-800"></i>
-        <span class="text-violet-800">
-          <span>{{ hoveredSplit.pace }} <small>min/km</small></span>
-        </span>
-      </Tag>
-      <Tag
-        class="font-medium text-sm shadow-sm rounded-full"
-        style="background-color: #f0fdf4"
-      >
-        <i class="pi pi-clock text-emerald-800"></i>
-        <span class="text-emerald-800">
-          <span>
-            {{ minutesToFormattedDuration(getSplitDuration(hoveredSplit)) }}
-          </span>
+        <span>
+          {{ minutesToFormattedDuration(getSplitDuration(hoveredSplit)) }}
         </span>
       </Tag>
     </div>
@@ -52,9 +54,11 @@ import { minutesToFormattedDuration } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
 import { Tag } from 'primevue';
 import { computed } from 'vue';
+import SlopeTag from '../SlopeTag.vue';
 
 const { hoveredSplit, hoveredSplitTooltipPosition } = useRaceHoveredSplit();
-const { getSplitElevation, getSplitDuration } = useGpxMetrics();
+const { getSplitElevation, getSplitDuration, getSplitSlopePercent } =
+  useGpxMetrics();
 
 const distance = computed(() => {
   return roundOneNumber(

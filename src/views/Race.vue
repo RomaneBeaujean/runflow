@@ -20,9 +20,9 @@ import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
 import { onMounted, watch } from 'vue';
 
-import RaceChart from '@/components/RaceChart.vue';
-import RaceHeader from '@/components/RaceHeader.vue';
-import RaceTable from '@/components/RaceTable.vue';
+import RaceChart from '@/components/race/chart/RaceChart.vue';
+import RaceHeader from '@/components/race/RaceHeader.vue';
+import RaceTable from '@/components/race/table/RaceTable.vue';
 import { useRace } from '@/composables/useRace';
 import { ProgressSpinner } from 'primevue';
 

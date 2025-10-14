@@ -1,6 +1,7 @@
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/Separator';
 import { computed, ref, watch } from 'vue';
+import useRaceChartClick from './useChartClick';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
 import useRaceHoveredSplit from './useRaceHoveredSplit';
@@ -8,8 +9,9 @@ import useRaceHoveredSplit from './useRaceHoveredSplit';
 const { hoveredSplit } = useRaceHoveredSplit();
 const { getPointsFromSplit, getCumulElevationToDistance } = useGpxMetrics();
 const { splits, separators, totalDistance } = useRace();
+const { clickedPoint, clickedSeparator } = useRaceChartClick();
 
-export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
+export default function useRaceChartData() {
   // =========================
   // Séparateurs filtrés
   // =========================
@@ -61,13 +63,13 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
           xAxis: sep.distance,
           label: {
             color:
-              sep.distance === clickedSeparator.value
+              sep.distance === clickedSeparator.value?.distance
                 ? '#F59E1D'
                 : sep.refuel
                   ? '#C026D3'
                   : '#035581',
             backgroundColor:
-              sep.distance === clickedSeparator.value
+              sep.distance === clickedSeparator.value?.distance
                 ? '#FEF3C7'
                 : sep.refuel
                   ? '#F5D0FE'
@@ -75,12 +77,12 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
           },
           lineStyle: {
             color:
-              sep.distance === clickedSeparator.value
+              sep.distance === clickedSeparator.value?.distance
                 ? '#F59E1D'
                 : sep.refuel
                   ? '#C026D3'
                   : '#035581',
-            width: sep.distance === clickedSeparator.value ? 3 : 1,
+            width: sep.distance === clickedSeparator.value?.distance ? 3 : 1,
           },
         })),
       },

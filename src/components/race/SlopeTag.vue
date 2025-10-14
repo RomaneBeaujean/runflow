@@ -3,7 +3,7 @@
     v-if="percent !== null"
     :value="props.percent + ' %'"
     :style="tagStyle"
-    class="inline-block mb-2 font-semibold"
+    :icon="props.icon"
   />
 </template>
 
@@ -11,7 +11,7 @@
 import { Tag } from 'primevue';
 import { computed } from 'vue';
 
-const props = defineProps<{ percent: string | null }>();
+const props = defineProps<{ percent: string | null; icon?: string }>();
 
 const numericPercent = computed(() => {
   if (!props.percent) return 0;

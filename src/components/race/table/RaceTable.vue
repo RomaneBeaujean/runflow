@@ -2,14 +2,14 @@
   <div ref="tableContainer">
     <DataTable
       v-if="race"
-      :value="rowItems"
+      :value="TableRowItems"
       id="race-table"
       dataKey="id"
       editMode="row"
       selectionMode="single"
       v-model:editingRows="editingRows"
       @row-edit-save="onRowEditSave"
-      @row-click="onRowClick"
+      @row-click="setTableClickedRow"
       rowHover
       :rowClass="getRowClass"
     >
@@ -205,7 +205,7 @@
           <InputTime
             v-if="data.distance === 0"
             :time="data.time"
-            :reference="rowItems[0].time"
+            :reference="TableRowItems[0].time"
             size="small"
             @update="({ time }) => (data.time = time)"
           />
@@ -267,6 +267,11 @@
 </template>
 
 <script setup lang="ts">
+import InputDistance from '@/components/race/inputs/InputDistance.vue';
+import InputDuration from '@/components/race/inputs/InputDuration.vue';
+import InputPaceDuration from '@/components/race/inputs/InputPaceDuration.vue';
+import InputRefuelStopDuration from '@/components/race/inputs/InputRefuelStopDuration.vue';
+import InputTime from '@/components/race/inputs/InputTime.vue';
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
 import { useRace } from '@/composables/useRace';
 import useRaceHoveredSplit from '@/composables/useRaceHoveredSplit';
@@ -276,25 +281,21 @@ import {
   parseDate,
 } from '@/lib/time';
 import { Separator } from '@/types/Separator';
+import { TableRowItem } from '@/types/TableRowItem';
 import { Button, Column, DataTable, Tag } from 'primevue';
-import { computed, ref } from 'vue';
-import InputDistance from './InputDistance.vue';
-import InputDuration from './InputDuration.vue';
-import InputPaceDuration from './InputPaceDuration.vue';
-import InputRefuelStopDuration from './InputRefuelStopDuration.vue';
-import InputTime from './InputTime.vue';
-import SlopeTag from './SlopeTag.vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import SlopeTag from '../SlopeTag.vue';
 
 const {
-  race,
-  splits,
-  startTime,
-  separators,
-  totalDistance,
   deleteSeparator,
-  updateSplitPace,
-  updateSeparator,
   updateRaceStartTime,
+  updateSeparator,
+  updateSplitPace,
+  totalDistance,
+  startTime,
+  splits,
+  race,
+  separators,
 } = useRace();
 
 const {
@@ -308,36 +309,16 @@ const {
   getSplitElevation,
 } = useGpxMetrics();
 
-const { hoveredSplit, setHoveredSplit } = useRaceHoveredSplit();
+const {
+  setTableClickedRow,
+  listenTableMouseEnter,
+  removeListeners,
+  hoveredSplit,
+} = useRaceHoveredSplit();
 const tableContainer = ref<HTMLElement | null>(null);
 const editingRows = ref<any[]>([]);
 
-interface RowItem {
-  id: string;
-  refuel: boolean;
-  index: number;
-
-  distance: number;
-  cumulElevation: number;
-  cumulDuration: number;
-  cumulNegativeElevation: number;
-
-  timeBarrier: number;
-  timeBarrierTime: Date;
-
-  splitDistance: number;
-  splitElevation: number;
-  splitPace: string;
-  splitDuration: number;
-  splitNegativeElevation: number;
-  splitSlopePercent: string | null;
-
-  hovered: boolean;
-
-  time: Date | null;
-}
-
-const getRowClass = (rowData: RowItem): string => {
+const getRowClass = (rowData: TableRowItem): string => {
   return [
     'race-table-row',
     `distance-${rowData.distance}`,
@@ -345,14 +326,14 @@ const getRowClass = (rowData: RowItem): string => {
   ].join(' ');
 };
 
-const isTimeBarrierOk = (data: RowItem) => {
+const isTimeBarrierOk = (data: TableRowItem) => {
   const distance = data.distance;
   const cumulDuration = getCumulDurationToDistance(distance);
   const timeBarrier = data.timeBarrier;
   return timeBarrier < cumulDuration;
 };
 
-const rowItems = computed((): RowItem[] => {
+const TableRowItems = computed((): TableRowItem[] => {
   const firstRow = {
     id: `row-0`,
     index: 0,
@@ -416,10 +397,18 @@ const rowItems = computed((): RowItem[] => {
   return [firstRow, ...rows];
 });
 
+onMounted(() => {
+  listenTableMouseEnter();
+});
+
+onBeforeUnmount(() => {
+  removeListeners();
+});
+
 const onRowEditSave = (event: any) => {
   let { newData, index } = event;
 
-  const oldData = rowItems.value[index];
+  const oldData = TableRowItems.value[index];
   const oldSeparator = separators.value.find(
     (el) => el.distance === oldData.distance
   );
@@ -442,19 +431,6 @@ const onRowEditSave = (event: any) => {
 
   if (oldData.splitPace !== newData.splitPace && split) {
     updateSplitPace(split, newData.splitPace);
-  }
-};
-
-const onRowClick = (event: any) => {
-  const { data } = event;
-  const distance = data.distance;
-  if (distance === 0) return;
-  const split = splits.value.find((el) => el.endDistance === distance);
-  if (!split) return;
-  if (hoveredSplit.value === split) {
-    setHoveredSplit(null);
-  } else {
-    setHoveredSplit(split);
   }
 };
 </script>

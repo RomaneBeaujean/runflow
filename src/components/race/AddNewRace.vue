@@ -96,6 +96,7 @@
 </template>
 
 <script setup lang="ts">
+import InputTime from '@/components/race/inputs/InputTime.vue';
 import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
 import { Race } from '@/types/entities/Race';
@@ -109,7 +110,6 @@ import {
   Tag,
 } from 'primevue';
 import { ref } from 'vue';
-import InputTime from './InputTime.vue';
 
 const stores = useInjection<AppStores>('stores');
 
