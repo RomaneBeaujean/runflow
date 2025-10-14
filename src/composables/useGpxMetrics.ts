@@ -103,6 +103,47 @@ export function useGpxMetrics() {
     return durationMinutes;
   }
 
+  function getSplitSlopePercent(split: Split) {
+    const elevation = getSplitElevation(split); // D+ en m
+    const negativeElevation = getSplitNegativeElevation(split); // D- en m
+    const distance = getSplitDistance(split); // en km
+
+    if (distance === 0) {
+      return { positive: 0, negative: 0, major: 0 };
+    }
+
+    const positivePercent = roundOneNumber(
+      (elevation / (distance * 1000)) * 100
+    );
+    const negativePercent = roundOneNumber(
+      (negativeElevation / (distance * 1000)) * 100
+    );
+
+    const majorPercent =
+      positivePercent >= negativePercent
+        ? `+${positivePercent}`
+        : `-${negativePercent}`;
+
+    return {
+      positive: `+${positivePercent}`,
+      negative: `-${negativePercent}`,
+      major: majorPercent,
+    };
+  }
+
+  function getAveragePace(splits: Split[]): string {
+    const totalDuration = splits.reduce((total, current) => {
+      return (total += getSplitDuration(current));
+    }, 0);
+    const totalDistance = splits.reduce((total, current) => {
+      return (total += getSplitDistance(current));
+    }, 0);
+    const pace = totalDuration / totalDistance;
+    const minutes = Math.floor(pace);
+    const seconds = Math.round((pace - minutes) * 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
   return {
     getPointFromDistance,
     getIndexFromDistance,
@@ -116,5 +157,7 @@ export function useGpxMetrics() {
     getFormattedDurationFromSplit,
     getCumulElevationToDistance,
     getCumulDurationToDistance,
+    getSplitSlopePercent,
+    getAveragePace,
   };
 }

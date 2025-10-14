@@ -14,7 +14,7 @@
     </div>
   </div>
   <div class="flex items-center mb-4">
-    <div class="flex flex-1 items-center gap-6 p-3">
+    <div class="flex flex-1 items-center gap-2 p-3">
       <div>
         <template v-if="!editing">
           <span class="font-semibold text-xl">{{ props.race.name }}</span>
@@ -26,7 +26,9 @@
 
       <div>
         <template v-if="!editing">
-          <span class="text-gray-600">{{ formattedDate }}</span>
+          <Tag severity="secondary" icon="pi pi-calendar">
+            Date: <b>{{ formattedDate }}</b>
+          </Tag>
         </template>
         <template v-else>
           <DatePicker
@@ -40,13 +42,31 @@
 
       <div>
         <template v-if="!editing">
-          <span class="text-gray-600">{{ formattedTime }}</span>
+          <Tag severity="secondary" icon="pi pi-calendar-clock">
+            Départ: <b>{{ formattedTime }}</b>
+          </Tag>
         </template>
         <template v-else>
           <InputTime
             :time="editableTime"
             @update="({ time }) => (editableTime = time)"
           />
+        </template>
+      </div>
+
+      <div>
+        <template v-if="!editing">
+          <Tag severity="secondary" icon="pi pi-bolt"
+            >Allure moyenne: {{ averagePace }} <small>min/km</small></Tag
+          >
+        </template>
+      </div>
+
+      <div>
+        <template v-if="!editing">
+          <Tag severity="secondary" icon="pi pi-clock">
+            Durée totale: {{ totalDuration }}
+          </Tag>
         </template>
       </div>
     </div>
@@ -70,17 +90,32 @@
 </template>
 
 <script setup lang="ts">
+import { useGpxMetrics } from '@/composables/useGpxMetrics';
 import { useRace } from '@/composables/useRace';
+import { minutesToFormattedDuration } from '@/lib/time';
 import { useInjection } from '@/lib/useInjection';
 import { AppStores } from '@/stores/AppLoader';
 import { Race } from '@/types/entities/Race';
-import { Button, DatePicker, InputText } from 'primevue';
+import { Button, DatePicker, InputText, Tag } from 'primevue';
 import { computed, ref } from 'vue';
 import InputTime from './InputTime.vue';
 import RaceBreadcrumbs from './RaceBreadcrumbs.vue';
 
 const stores = useInjection<AppStores>('stores');
-const { race, startTime } = useRace();
+const { race, startTime, splits, totalDistance } = useRace();
+const { getAveragePace, getCumulDurationToDistance } = useGpxMetrics();
+
+const averagePace = computed(() => {
+  if (!splits.value.length) return;
+  return getAveragePace(splits.value);
+});
+
+const totalDuration = computed(() => {
+  if (!splits.value.length) return;
+  return minutesToFormattedDuration(
+    getCumulDurationToDistance(totalDistance.value)
+  );
+});
 
 const props = defineProps<{ race: Race }>();
 const editing = ref(false);

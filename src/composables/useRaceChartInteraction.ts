@@ -1,13 +1,14 @@
 import { GpxPoint } from '@/types/GpxPoint';
 import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
+import { computed } from 'vue';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
 import useRaceHoveredSplit from './useRaceHoveredSplit';
 
 const { getMidPointFromSplit } = useGpxMetrics();
 const { points, separators, splits } = useRace();
-const { setHoveredSplit, setHoveredSplitTooltipPosition } =
+const { hoveredSplit, setHoveredSplit, setHoveredSplitTooltipPosition } =
   useRaceHoveredSplit();
 
 export default function useRaceChartInteraction({
@@ -16,6 +17,24 @@ export default function useRaceChartInteraction({
   clickTooltipPosition,
   clickedSeparator,
 }) {
+  // =========================
+  // Préparer tableaux triés pour recherche binaire
+  // =========================
+  const sortedSplits = computed(() =>
+    [...splits.value].sort((a, b) => a.startDistance - b.startDistance)
+  );
+
+  const sortedPoints = computed(() =>
+    [...points.value].sort((a, b) => a.distance - b.distance)
+  );
+
+  const sortedSeparators = computed(() =>
+    [...separators.value].sort((a, b) => a.distance - b.distance)
+  );
+
+  // =========================
+  // Fonctions utilitaires
+  // =========================
   const getTargetDistance = (event: any, chartInstance: any) => {
     const [targetDistance] = chartInstance.convertFromPixel(
       { xAxisIndex: 0, yAxisIndex: 0 },
@@ -24,46 +43,130 @@ export default function useRaceChartInteraction({
     return targetDistance;
   };
 
+  const getSplitFromDistance = (distance: number): Split | null => {
+    let left = 0;
+    let right = sortedSplits.value.length - 1;
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const split = sortedSplits.value[mid];
+      if (distance < split.startDistance) right = mid - 1;
+      else if (distance > split.endDistance) left = mid + 1;
+      else return split;
+    }
+    return null;
+  };
+
+  const getClosestPoint = (targetDistance: number): GpxPoint => {
+    let left = 0,
+      right = sortedPoints.value.length - 1;
+    let closest = sortedPoints.value[0];
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const midPoint = sortedPoints.value[mid];
+      if (
+        Math.abs(midPoint.distance - targetDistance) <
+        Math.abs(closest.distance - targetDistance)
+      ) {
+        closest = midPoint;
+      }
+      if (midPoint.distance < targetDistance) left = mid + 1;
+      else right = mid - 1;
+    }
+    return closest;
+  };
+
+  const getClosestSeparator = (targetDistance: number): Separator | null => {
+    if (sortedSeparators.value.length === 0) return null;
+    let left = 0,
+      right = sortedSeparators.value.length - 1;
+    let closest = sortedSeparators.value[0];
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const midSep = sortedSeparators.value[mid];
+      if (
+        Math.abs(midSep.distance - targetDistance) <
+        Math.abs(closest.distance - targetDistance)
+      ) {
+        closest = midSep;
+      }
+      if (midSep.distance < targetDistance) left = mid + 1;
+      else right = mid - 1;
+    }
+    return closest;
+  };
+
+  const getPositionFromDistance = (chartInstance: any, distance: number) =>
+    chartInstance.convertToPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [
+      distance,
+      0,
+    ]);
+
+  const getPositionFromPoint = (chartInstance: any, point: GpxPoint) =>
+    chartInstance.convertToPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [
+      point.distance,
+      point.elevation,
+    ]);
+
+  // =========================
+  // Hover sur chart
+  // =========================
   const onChartHover = (event: any, chartInstance: any) => {
     const targetDistance = getTargetDistance(event, chartInstance);
 
-    const targetSplit = splits.value.find(
-      (s: Split) =>
-        targetDistance >= s.startDistance && targetDistance <= s.endDistance
-    );
-    if (!targetSplit) return;
-
-    setHoveredSplit(targetSplit);
-
-    const midPoint = getMidPointFromSplit(targetSplit);
-    const [px, py] = chartInstance.convertToPixel(
-      { xAxisIndex: 0, yAxisIndex: 0 },
-      [midPoint.distance, midPoint.elevation]
-    );
-
-    setHoveredSplitTooltipPosition({ left: `${px}px`, top: `${py}px` });
-  };
-
-  const onChartClick = (event: any, chartInstance: any) => {
-    closeTooltip();
-    const targetDistance = getTargetDistance(event, chartInstance);
-    if (!event.target) {
-      closeTooltip();
+    const targetSplit = getSplitFromDistance(targetDistance);
+    if (!targetSplit) {
+      setHoveredSplit(null);
+      setHoveredSplitTooltipPosition(null);
       return;
     }
+
+    // Mise à jour seulement si changement
+    if (
+      !hoveredSplit.value ||
+      hoveredSplit.value.startDistance !== targetSplit.startDistance
+    ) {
+      setHoveredSplit(targetSplit);
+
+      const midPoint = getMidPointFromSplit(targetSplit);
+      const [px, py] = chartInstance.convertToPixel(
+        { xAxisIndex: 0, yAxisIndex: 0 },
+        [midPoint.distance, midPoint.elevation]
+      );
+
+      setHoveredSplitTooltipPosition({ left: `${px}px`, top: `${py}px` });
+    }
+  };
+
+  // =========================
+  // Click sur chart
+  // =========================
+  const onChartClick = (event: any, chartInstance: any) => {
+    closeTooltip();
+
+    const targetDistance = getTargetDistance(event, chartInstance);
+    if (!event.target) return;
+
     if (event.target?.name === 'line') {
       const closest = getClosestSeparator(targetDistance);
       clickedSeparator.value = closest;
-      const [px, py] = getPositionFromDistance(chartInstance, closest.distance);
-      clickedSeparatorPosition.value = { left: `${px}px`, top: `${py}px` };
+      if (closest) {
+        const [px, py] = getPositionFromDistance(
+          chartInstance,
+          closest.distance
+        );
+        clickedSeparatorPosition.value = { left: `${px}px`, top: `${py}px` };
+      }
     } else {
-      const closest = getClosestGpxPoint(targetDistance);
+      const closest = getClosestPoint(targetDistance);
       clickedPoint.value = closest;
       const [px, py] = getPositionFromPoint(chartInstance, closest);
       clickTooltipPosition.value = { left: `${px}px`, top: `${py}px` };
     }
   };
 
+  // =========================
+  // Sortie du chart
+  // =========================
   const onChartLeave = () => {
     setHoveredSplit(null);
     setHoveredSplitTooltipPosition(null);
@@ -86,44 +189,4 @@ export default function useRaceChartInteraction({
     onChartLeave,
     closeTooltip,
   };
-
-  function getPositionFromDistance(
-    chartInstance: any,
-    distance: number
-  ): [any, any] {
-    return chartInstance.convertToPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [
-      distance,
-      0,
-    ]);
-  }
-
-  function getPositionFromPoint(
-    chartInstance: any,
-    closest: GpxPoint
-  ): [any, any] {
-    return chartInstance.convertToPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [
-      closest.distance,
-      closest.elevation,
-    ]);
-  }
-
-  function getClosestGpxPoint(targetDistance: any) {
-    return points.value.reduce((prev: any, curr: any) =>
-      Math.abs(curr.distance - targetDistance) <
-      Math.abs(prev.distance - targetDistance)
-        ? curr
-        : prev
-    );
-  }
-
-  function getClosestSeparator(targetDistance: number): Separator | null {
-    if (separators.value.length === 0) return null;
-
-    return separators.value.reduce((prev, curr) =>
-      Math.abs(curr.distance - targetDistance) <
-      Math.abs(prev.distance - targetDistance)
-        ? curr
-        : prev
-    );
-  }
 }

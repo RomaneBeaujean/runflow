@@ -1,80 +1,44 @@
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/Separator';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
 import useRaceHoveredSplit from './useRaceHoveredSplit';
 
 const { hoveredSplit } = useRaceHoveredSplit();
 const { getPointsFromSplit, getCumulElevationToDistance } = useGpxMetrics();
-const { points, splits, separators, totalDistance } = useRace();
+const { splits, separators, totalDistance } = useRace();
 
 export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
+  // =========================
+  // Séparateurs filtrés
+  // =========================
   const chartSeparators = computed(() => {
     return separators.value.filter((s) => s.distance !== totalDistance.value);
   });
 
-  const series = computed(() => {
-    if (splits.value?.length < 1) {
-      const data = points.value.map((p) => [p.distance, p.elevation]);
-      return [
-        {
-          id: `serie-0-${totalDistance}`,
-          type: 'line',
-          data,
-          smooth: true,
-          showSymbol: true,
-          symbolSize: 0,
-          lineStyle: { color: '#A48B82', width: 2 },
-          areaStyle: { color: 'rgba(164, 139, 130, 0.3)' },
-          emphasis: { areaStyle: { color: '#B39E96' } },
-        },
-      ];
-    }
-    return splits.value.map((split) => {
-      const isHovered =
-        hoveredSplit.value?.startDistance === split.startDistance;
+  // =========================
+  // Séries dynamiques
+  // =========================
+  const splitsSeries = ref<any[]>([]);
+  const separatorsSeries = ref<any>(null);
 
-      const data = getPointsFromSplit(split).map((p) => [
-        p.distance,
-        p.elevation,
-      ]);
-      return {
-        id: `serie-${split.startDistance}-${split.endDistance}`,
-        type: 'line',
-        data,
-        smooth: true,
-        showSymbol: true,
-        symbolSize: 0,
-        lineStyle: {
-          color: isHovered ? '#F59E1D' : '#A48B82', // couleur spéciale si hover
-          width: isHovered ? 4 : 2, // épaissir la ligne
-        },
-        areaStyle: {
-          color: isHovered
-            ? 'rgba(245, 158, 29, 0.3)'
-            : 'rgba(164, 139, 130, 0.3)',
-        },
-        emphasis: {
-          lineStyle: { width: 4 }, // renforce le hover via ECharts
-          areaStyle: { opacity: 0.4 },
-        },
-      };
-    });
-  });
-
-  const color = (sep: Separator): { color: string; bg: string } => {
-    const color =
-      sep.distance === clickedSeparator.value
-        ? { color: '#F59E1D', bg: '#FEF3C7' } // jaune si sélectionné
-        : sep.refuel
-          ? { color: '#C026D3', bg: '#F5D0FE' } // rose si refuel
-          : { color: '#035581', bg: '#B1D5E8' }; // bleu sinon
-    return color;
+  const buildSplitsSeries = () => {
+    splitsSeries.value = splits.value.map((split) => ({
+      id: `serie-${split.startDistance}-${split.endDistance}`,
+      type: 'line',
+      data: getPointsFromSplit(split).map((p) => [p.distance, p.elevation]),
+      smooth: true,
+      showSymbol: true,
+      symbolSize: 0,
+      lineStyle: { color: '#A48B82', width: 2 },
+      areaStyle: { color: 'rgba(164,139,130,0.3)' },
+      emphasis: { lineStyle: { width: 4 }, areaStyle: { opacity: 0.4 } },
+    }));
   };
 
-  const separatorsSeries = computed(() => {
-    return {
+  const buildSeparatorsSeries = () => {
+    separatorsSeries.value = {
       id: 'separators',
       type: 'line',
       data: [],
@@ -93,23 +57,67 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
           borderRadius: 4,
           formatter: (params: any) => `${params.value}`,
         },
-        data: chartSeparators.value.map((sep: Separator) => {
-          return {
-            xAxis: sep.distance,
-            label: {
-              color: color(sep).color,
-              backgroundColor: color(sep).bg,
-            },
-            lineStyle: {
-              color: color(sep).color,
-              width: sep.distance === clickedSeparator.value ? 3 : 1,
-            },
-          };
-        }),
+        data: chartSeparators.value.map((sep: Separator) => ({
+          xAxis: sep.distance,
+          label: {
+            color:
+              sep.distance === clickedSeparator.value
+                ? '#F59E1D'
+                : sep.refuel
+                  ? '#C026D3'
+                  : '#035581',
+            backgroundColor:
+              sep.distance === clickedSeparator.value
+                ? '#FEF3C7'
+                : sep.refuel
+                  ? '#F5D0FE'
+                  : '#B1D5E8',
+          },
+          lineStyle: {
+            color:
+              sep.distance === clickedSeparator.value
+                ? '#F59E1D'
+                : sep.refuel
+                  ? '#C026D3'
+                  : '#035581',
+            width: sep.distance === clickedSeparator.value ? 3 : 1,
+          },
+        })),
       },
     };
-  });
+  };
 
+  // =========================
+  // Série du point cliqué
+  // =========================
+  const lineSerie = computed(() => ({
+    id: 'line',
+    type: 'line',
+    data: [],
+    markLine: {
+      animation: false,
+      symbol: 'none',
+      lineStyle: { color: '#b6af72ff', type: 'dashed', width: 1 },
+      label: {
+        show: true,
+        position: 'end',
+        fontWeight: 'bold',
+        color: '#6b5511',
+        fontSize: 10,
+        backgroundColor: '#ffe79c',
+        padding: 4,
+        borderRadius: 4,
+        formatter: (params: any) => `${roundOneNumber(params.value)}`,
+      },
+      data: clickedPoint.value?.distance
+        ? [{ xAxis: roundOneNumber(clickedPoint.value.distance) }]
+        : [],
+    },
+  }));
+
+  // =========================
+  // Chart options
+  // =========================
   const chartOptions = ref({
     tooltip: {
       trigger: 'axis',
@@ -129,13 +137,7 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
         },
       },
     },
-    grid: {
-      top: 24,
-      right: 24,
-      bottom: 24,
-      left: 24,
-      containLabel: true, // permet de ne pas couper les labels
-    },
+    grid: { top: 24, right: 24, bottom: 24, left: 24, containLabel: true },
     xAxis: {
       type: 'value',
       boundaryGap: false,
@@ -144,47 +146,75 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
     },
     yAxis: {
       type: 'value',
-      axisLabel: {
-        formatter: (value: number) => (value % 100 === 0 ? `${value} m` : ''),
-      },
+      axisLabel: { formatter: (v: number) => (v % 100 === 0 ? `${v} m` : '') },
     },
     series: [],
   });
 
-  const lineSerie = computed(() => {
-    return {
-      id: 'line',
-      type: 'line',
-      data: [],
-      markLine: {
-        animation: false,
-        symbol: 'none',
-        lineStyle: { color: '#b6af72ff', type: 'dashed', width: 1 },
-        label: {
-          show: true,
-          position: 'end',
-          fontWeight: 'bold',
-          color: '#6b5511',
-          fontSize: 10,
-          backgroundColor: '#ffe79c',
-          padding: 4,
-          borderRadius: 4,
-          formatter: (params: any) => `${roundOneNumber(params.value)}`,
-        },
-        data: clickedPoint.value?.distance
-          ? [{ xAxis: roundOneNumber(clickedPoint.value.distance) }]
-          : [],
-      },
-    };
-  });
+  // =========================
+  // Initialisation
+  // =========================
+  buildSplitsSeries();
+  buildSeparatorsSeries();
+
+  // =========================
+  // Update du graphique
+  // =========================
 
   const updateChartSeries = () => {
     chartOptions.value.series = [
-      ...series.value,
+      ...splitsSeries.value,
       separatorsSeries.value,
       lineSerie.value,
     ];
   };
+
+  // =========================
+  // Hover dynamique
+  // =========================
+  watch(hoveredSplit, (newHovered, previousHovered) => {
+    if (previousHovered) {
+      const unHoveredSerie = splitsSeries.value.find((s) =>
+        s.id.includes(`serie-${previousHovered.startDistance}-`)
+      );
+      if (unHoveredSerie) {
+        unHoveredSerie.lineStyle.color = '#A48B82';
+        unHoveredSerie.lineStyle.width = 2;
+        unHoveredSerie.areaStyle.color = 'rgba(164,139,130,0.3)';
+      }
+    }
+
+    // HOVER le nouveau
+    if (newHovered) {
+      const hoveredSerie = splitsSeries.value.find((s) =>
+        s.id.includes(`serie-${newHovered.startDistance}-`)
+      );
+      if (hoveredSerie) {
+        hoveredSerie.lineStyle.color = '#F59E1D';
+        hoveredSerie.lineStyle.width = 4;
+        hoveredSerie.areaStyle.color = 'rgba(245,158,29,0.3)';
+      }
+    }
+
+    updateChartSeries();
+  });
+
+  // =========================
+  // Watch sur splits et separators
+  // =========================
+  watch(splits, () => {
+    buildSplitsSeries();
+    updateChartSeries();
+  });
+
+  watch(separators, () => {
+    buildSeparatorsSeries();
+    updateChartSeries();
+  });
+
+  watch([clickedSeparator, clickedPoint], () => {
+    updateChartSeries();
+  });
 
   return {
     chartOptions,

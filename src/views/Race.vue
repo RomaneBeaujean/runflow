@@ -6,7 +6,7 @@
     <div id="chart">
       <RaceChart />
     </div>
-    <div>
+    <div id="table">
       <RaceTable />
     </div>
   </div>
