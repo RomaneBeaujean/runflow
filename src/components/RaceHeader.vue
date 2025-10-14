@@ -80,7 +80,7 @@ import InputTime from './InputTime.vue';
 import RaceBreadcrumbs from './RaceBreadcrumbs.vue';
 
 const stores = useInjection<AppStores>('stores');
-const { splits, separators, race, startTime, initRace } = useRace();
+const { race, startTime } = useRace();
 
 const props = defineProps<{ race: Race }>();
 const editing = ref(false);

@@ -3,7 +3,9 @@ import { Separator } from '@/types/Separator';
 import { computed, ref } from 'vue';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
+import useRaceHoveredSplit from './useRaceHoveredSplit';
 
+const { hoveredSplit } = useRaceHoveredSplit();
 const { getPointsFromSplit, getCumulElevationToDistance } = useGpxMetrics();
 const { points, splits, separators, totalDistance } = useRace();
 
@@ -30,6 +32,9 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
       ];
     }
     return splits.value.map((split) => {
+      const isHovered =
+        hoveredSplit.value?.startDistance === split.startDistance;
+
       const data = getPointsFromSplit(split).map((p) => [
         p.distance,
         p.elevation,
@@ -41,9 +46,19 @@ export default function useRaceChartData({ clickedSeparator, clickedPoint }) {
         smooth: true,
         showSymbol: true,
         symbolSize: 0,
-        lineStyle: { color: '#A48B82', width: 2 },
-        areaStyle: { color: 'rgba(164, 139, 130, 0.3)' },
-        emphasis: { areaStyle: { color: '#B39E96' } },
+        lineStyle: {
+          color: isHovered ? '#F59E1D' : '#A48B82', // couleur spéciale si hover
+          width: isHovered ? 4 : 2, // épaissir la ligne
+        },
+        areaStyle: {
+          color: isHovered
+            ? 'rgba(245, 158, 29, 0.3)'
+            : 'rgba(164, 139, 130, 0.3)',
+        },
+        emphasis: {
+          lineStyle: { width: 4 }, // renforce le hover via ECharts
+          areaStyle: { opacity: 0.4 },
+        },
       };
     });
   });

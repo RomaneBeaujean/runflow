@@ -3,6 +3,7 @@
     v-if="race"
     :value="rowItems"
     id="race-table"
+    ref="tableRef"
     dataKey="id"
     editMode="row"
     selectionMode="single"
@@ -254,8 +255,9 @@ import {
   parseDate,
 } from '@/lib/time';
 import { Separator } from '@/types/Separator';
+import { Split } from '@/types/Split';
 import { Button, Column, DataTable, Tag } from 'primevue';
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import InputDistance from './InputDistance.vue';
 import InputDuration from './InputDuration.vue';
 import InputPaceDuration from './InputPaceDuration.vue';
@@ -284,7 +286,7 @@ const {
   getSplitElevation,
 } = useGpxMetrics();
 
-const { hoveredSplit } = useRaceHoveredSplit();
+const { hoveredSplit, setHoveredSplit } = useRaceHoveredSplit();
 
 const editingRows = ref<any[]>([]);
 
@@ -305,15 +307,13 @@ interface RowItem {
   splitPace: string;
   splitDuration: number;
   splitNegativeElevation: number;
-  highlighted: boolean;
+  hovered: boolean;
 
   time: Date | null;
 }
 
 const getRowClass = (rowData: RowItem) => {
-  const hovered = hoveredSplit.value;
-  if (!hovered) return '';
-  return rowData.distance === hovered.startDistance ? 'highlight-row' : '';
+  return rowData.hovered && rowData.distance !== 0 ? 'hovered-row' : '';
 };
 
 const isTimeBarrierOk = (data: RowItem) => {
@@ -339,16 +339,13 @@ const rowItems = computed((): RowItem[] => {
     splitPace: null,
     timeBarrierTime: null,
     time: parseDate(startTime.value),
-    highlighted: false,
+    hovered: false,
   };
 
   const rows = separators.value.map((separator: Separator) => {
     const split = splits.value.find(
       (s) => s.endDistance === separator.distance
     );
-
-    const isHighlighted =
-      hoveredSplit.value?.startDistance === split.startDistance;
 
     const cumulDuration = getCumulDurationToDistance(separator.distance);
 
@@ -379,7 +376,7 @@ const rowItems = computed((): RowItem[] => {
       splitPace: split.pace,
       time,
       timeBarrierTime,
-      highlighted: isHighlighted,
+      hovered: hoveredSplit.value?.endDistance === separator.distance,
     };
   });
 
@@ -414,12 +411,64 @@ const onRowEditSave = (event: any) => {
     updateSplitPace(split, newData.splitPace);
   }
 };
+
+const retrieveRowSplit = (event: MouseEvent): Split | null => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return null;
+  const closestRow = target.closest('tr');
+  if (!closestRow) return null;
+
+  const rowData = (closestRow as any).__vueParentComponent?.props?.rowData;
+  if (!rowData) return null;
+
+  return splits.value.find((s) => s.endDistance === rowData.distance) || null;
+};
+
+const handleMouseEnter = (event: MouseEvent) => {
+  const split = retrieveRowSplit(event);
+  if (
+    !split ||
+    (split && hoveredSplit.value?.startDistance == split.startDistance)
+  )
+    return;
+  setHoveredSplit(split);
+};
+
+const handleMouseLeave = (event: MouseEvent) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return null;
+  if (target.tagName.toLowerCase() === 'table') {
+    setHoveredSplit(null);
+  }
+};
+
+const tableRef = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  if (tableRef.value && (tableRef.value as any).$el) {
+    const el = (tableRef.value as any).$el as HTMLElement;
+    el.addEventListener('mouseenter', handleMouseEnter, true);
+    el.addEventListener('mouseleave', handleMouseLeave, true);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (tableRef.value && (tableRef.value as any).$el) {
+    const el = (tableRef.value as any).$el as HTMLElement;
+    el.removeEventListener('mouseenter', handleMouseEnter, true);
+    el.removeEventListener('mouseleave', handleMouseLeave, true);
+  }
+});
 </script>
 
 <style>
+#race-table {
+  background-color: white;
+}
+
 #race-table .p-datatable-tbody > tr:hover,
-#race-table .highlight-row {
-  background-color: #ece6e4 !important;
+#race-table .hovered-row {
+  background-color: #ffedd4 !important;
 }
 
 #race-table thead {
@@ -434,18 +483,6 @@ const onRowEditSave = (event: any) => {
   overflow-x: unset !important;
   overflow-y: unset !important;
 }
-
-/* #race-table,
-#race-table * {
-  overflow: visible;
-}
-
-#race-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  background: white;
-} */
 
 :deep(input) {
   max-width: 100%;

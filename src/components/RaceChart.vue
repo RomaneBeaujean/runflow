@@ -81,11 +81,7 @@ watch(splits, () => {
   updateChartSeries();
 });
 
-watch(clickedSeparator, () => {
-  updateChartSeries();
-});
-
-watch(clickedPoint, () => {
+watch([clickedSeparator, clickedPoint, hoveredSplit], () => {
   updateChartSeries();
 });
 </script>

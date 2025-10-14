@@ -4,7 +4,7 @@
     :style="{
       position: 'absolute',
       left: hoveredSplitTooltipPosition.left,
-      top: '45px',
+      top: '-12px',
       transform: 'translate(-50%, -50%)',
     }"
     :key="hoveredSplit.startDistance"
