@@ -28,11 +28,14 @@ use([
 ]);
 
 const { points, separators, splits } = useRace();
-const chartComponent = ref(null);
+
+const chartRef = ref(null);
+
+const chartInstance = computed(() => {
+  return chartRef.value?.chart || null;
+});
 
 export function useEcharts() {
-  const chartInstance = computed(() => chartComponent.value.chart);
-
   const sortedSplits = computed(() =>
     [...splits.value].sort((a, b) => a.startDistance - b.startDistance)
   );
@@ -118,7 +121,7 @@ export function useEcharts() {
     ]);
 
   return {
-    chartComponent,
+    chartRef,
     chartInstance,
     getPositionFromPoint,
     getPositionFromDistance,

@@ -1,17 +1,24 @@
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/Separator';
+import { Split } from '@/types/Split';
 import { computed, ref, watch } from 'vue';
 import useRaceChartClick from './useChartClick';
+import { useEcharts } from './useEcharts';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
-import useRaceHoveredSplit from './useRaceHoveredSplit';
+import useRaceChartSplitHover from './useRaceChartSplitHover';
 
-const { hoveredSplit } = useRaceHoveredSplit();
+const { hoveredSplit } = useRaceChartSplitHover();
 const { getPointsFromSplit, getCumulElevationToDistance } = useGpxMetrics();
 const { splits, separators, totalDistance } = useRace();
 const { clickedPoint, clickedSeparator } = useRaceChartClick();
+const { chartInstance } = useEcharts();
 
 export default function useRaceChartData() {
+  const AREA_LINE_COLOR = '#155E75';
+  const AREA_COLOR = '#EFF6FF';
+  const AREA_EMPHASIS_COLOR = '#b1d5e8';
+
   // =========================
   // Séparateurs filtrés
   // =========================
@@ -19,28 +26,8 @@ export default function useRaceChartData() {
     return separators.value.filter((s) => s.distance !== totalDistance.value);
   });
 
-  // =========================
-  // Séries dynamiques
-  // =========================
-  const splitsSeries = ref<any[]>([]);
-  const separatorsSeries = ref<any>(null);
-
-  const buildSplitsSeries = () => {
-    splitsSeries.value = splits.value.map((split) => ({
-      id: `serie-${split.startDistance}-${split.endDistance}`,
-      type: 'line',
-      data: getPointsFromSplit(split).map((p) => [p.distance, p.elevation]),
-      smooth: true,
-      showSymbol: true,
-      symbolSize: 0,
-      lineStyle: { color: '#A48B82', width: 2 },
-      areaStyle: { color: 'rgba(164,139,130,0.3)' },
-      emphasis: { lineStyle: { width: 4 }, areaStyle: { opacity: 0.4 } },
-    }));
-  };
-
-  const buildSeparatorsSeries = () => {
-    separatorsSeries.value = {
+  const separatorsSeries = computed(() => {
+    return {
       id: 'separators',
       type: 'line',
       data: [],
@@ -87,11 +74,25 @@ export default function useRaceChartData() {
         })),
       },
     };
-  };
+  });
 
-  // =========================
-  // Série du point cliqué
-  // =========================
+  const splitsSeries = computed(() => {
+    return splits.value.map((split) => ({
+      id: `serie-${split.startDistance}-${split.endDistance}`,
+      type: 'line',
+      data: getPointsFromSplit(split).map((p) => [p.distance, p.elevation]),
+      smooth: true,
+      showSymbol: true,
+      symbolSize: 0,
+      lineStyle: { color: AREA_LINE_COLOR, width: 2 },
+      areaStyle: { color: AREA_COLOR, opacity: 1 },
+      emphasis: {
+        lineStyle: { width: 4 },
+        areaStyle: { color: AREA_EMPHASIS_COLOR, opacity: 1 },
+      },
+    }));
+  });
+
   const lineSerie = computed(() => ({
     id: 'line',
     type: 'line',
@@ -120,6 +121,7 @@ export default function useRaceChartData() {
   // =========================
   // Chart options
   // =========================
+
   const chartOptions = ref({
     tooltip: {
       trigger: 'axis',
@@ -139,7 +141,7 @@ export default function useRaceChartData() {
         },
       },
     },
-    grid: { top: 24, right: 24, bottom: 24, left: 24, containLabel: true },
+    grid: { top: 100, right: 80, bottom: 50, left: 70 },
     xAxis: {
       type: 'value',
       boundaryGap: false,
@@ -154,16 +156,10 @@ export default function useRaceChartData() {
   });
 
   // =========================
-  // Initialisation
-  // =========================
-  buildSplitsSeries();
-  buildSeparatorsSeries();
-
-  // =========================
   // Update du graphique
   // =========================
 
-  const updateChartSeries = () => {
+  const updateChartData = () => {
     chartOptions.value.series = [
       ...splitsSeries.value,
       separatorsSeries.value,
@@ -175,51 +171,48 @@ export default function useRaceChartData() {
   // Hover dynamique
   // =========================
   watch(hoveredSplit, (newHovered, previousHovered) => {
+    if (!chartInstance.value) return;
+
+    const updateSerieStyle = (
+      split: Split,
+      width: number,
+      areaColor: string
+    ) => {
+      const serieIndex = splitsSeries.value.findIndex((s) =>
+        s.id.includes(`serie-${split.startDistance}-`)
+      );
+      if (serieIndex === -1) return;
+
+      chartInstance.value.setOption({
+        series: [
+          {
+            id: splitsSeries.value[serieIndex].id,
+            lineStyle: { width },
+            areaStyle: { color: areaColor },
+          },
+        ],
+      });
+    };
+
     if (previousHovered) {
-      const unHoveredSerie = splitsSeries.value.find((s) =>
-        s.id.includes(`serie-${previousHovered.startDistance}-`)
-      );
-      if (unHoveredSerie) {
-        unHoveredSerie.lineStyle.color = '#A48B82';
-        unHoveredSerie.lineStyle.width = 2;
-        unHoveredSerie.areaStyle.color = 'rgba(164,139,130,0.3)';
-      }
+      updateSerieStyle(previousHovered, 2, AREA_COLOR);
     }
 
-    // HOVER le nouveau
     if (newHovered) {
-      const hoveredSerie = splitsSeries.value.find((s) =>
-        s.id.includes(`serie-${newHovered.startDistance}-`)
-      );
-      if (hoveredSerie) {
-        hoveredSerie.lineStyle.color = '#F59E1D';
-        hoveredSerie.lineStyle.width = 4;
-        hoveredSerie.areaStyle.color = 'rgba(245,158,29,0.3)';
-      }
+      updateSerieStyle(newHovered, 4, AREA_EMPHASIS_COLOR);
     }
-
-    updateChartSeries();
   });
 
   // =========================
   // Watch sur splits et separators
   // =========================
-  watch(splits, () => {
-    buildSplitsSeries();
-    updateChartSeries();
-  });
 
-  watch(separators, () => {
-    buildSeparatorsSeries();
-    updateChartSeries();
-  });
-
-  watch([clickedSeparator, clickedPoint], () => {
-    updateChartSeries();
+  watch([splits, separators, clickedSeparator, clickedPoint], () => {
+    updateChartData();
   });
 
   return {
     chartOptions,
-    updateChartSeries,
+    updateChartData,
   };
 }

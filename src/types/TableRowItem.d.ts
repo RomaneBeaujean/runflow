@@ -18,7 +18,5 @@ export interface TableRowItem {
   splitNegativeElevation: number;
   splitSlopePercent: string | null;
 
-  hovered: boolean;
-
   time: Date | null;
 }

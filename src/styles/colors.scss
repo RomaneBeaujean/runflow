@@ -1,0 +1,221 @@
+$hexapalette: (
+  'neutral': (
+    '0': #fff,
+    '10': #f9fafa,
+    '20': #f4f5f5,
+    '30': #eceeef,
+    '40': #dee1e3,
+    '50': #c3c8cb,
+    '60': #b3b9bd,
+    '70': #a5adb1,
+    '80': #97a1a5,
+    '90': #8a9499,
+    '100': #79868b,
+    '200': #6b7880,
+    '300': #5e6c73,
+    '400': #505f68,
+    '500': #43535b,
+    '600': #354750,
+    '700': #243742,
+    '800': #152833,
+    '900': #091e2a
+  ),
+  'primary': (
+    '50': #e6f2f8,
+    '100': #b1d5e8,
+    '200': #8cc1dd,
+    '300': #57a5ce,
+    '400': #3693c5,
+    '500': #0478b6,
+    '600': #046da6,
+    '700': #035581,
+    '800': #024264,
+    '900': #02324c
+  ),
+  'semantic': (
+    'green-50': #e7f7f3,
+    'green-100': #b4e7db,
+    'green-200': #90dcca,
+    'green-300': #5dcbb1,
+    'green-400': #3dc1a2,
+    'green-500': #0db28b,
+    'green-600': #0ca27e,
+    'green-700': #097e63,
+    'green-800': #07624c,
+    'green-900': #054b3a,
+    'orange-50': #fcf5e9,
+    'orange-100': #f6e1ba,
+    'orange-200': #f2d299,
+    'orange-300': #ecbe6a,
+    'orange-400': #e8b14d,
+    'orange-500': #e29e21,
+    'orange-600': #ce901e,
+    'orange-700': #a07017,
+    'orange-800': #7c5712,
+    'orange-900': #5f420e,
+    'red-50': #faeced,
+    'red-100': #eec4c8,
+    'red-200': #e6a8ae,
+    'red-300': #da8088,
+    'red-400': #d36871,
+    'red-500': #c8424e,
+    'red-600': #b63c47,
+    'red-700': #8e2f37,
+    'red-800': #6e242b,
+    'red-900': #541c21
+  ),
+  'accent': (
+    'pink-50': #f9eef4,
+    'pink-100': #eec9de,
+    'pink-200': #e5afcd,
+    'pink-300': #d98ab7,
+    'pink-400': #d274a9,
+    'pink-500': #c75193,
+    'pink-600': #b54a86,
+    'pink-700': #8d3a68,
+    'pink-800': #6d2d51,
+    'pink-900': #54223e,
+    'purple-50': #f7eff6,
+    'purple-100': #e7cce4,
+    'purple-200': #dbb3d7,
+    'purple-300': #ca90c4,
+    'purple-400': #c07bb9,
+    'purple-500': #b05aa7,
+    'purple-600': #a05298,
+    'purple-700': #7d4077,
+    'purple-800': #61325c,
+    'purple-900': #4a2646,
+    'deep-purple-50': #f4f0f8,
+    'deep-purple-100': #decfe8,
+    'deep-purple-200': #cdb8dd,
+    'deep-purple-300': #b797ce,
+    'deep-purple-400': #a983c5,
+    'deep-purple-500': #9364b6,
+    'deep-purple-600': #865ba6,
+    'deep-purple-700': #684781,
+    'deep-purple-800': #513764,
+    'deep-purple-900': #3e2a4c,
+    'cyan-50': #e6f8ff,
+    'cyan-100': #b1e9ff,
+    'cyan-200': #8bdeff,
+    'cyan-300': #56cfff,
+    'cyan-400': #35c5ff,
+    'cyan-500': #03b7ff,
+    'cyan-600': #03a7e8,
+    'cyan-700': #0282b5,
+    'cyan-800': #02658c,
+    'cyan-900': #014d6b,
+    'teal-50': #e6f8f9,
+    'teal-100': #b0eaec,
+    'teal-200': #8adfe2,
+    'teal-300': #54d1d5,
+    'teal-400': #33c8cd,
+    'teal-500': #00bac1,
+    'teal-600': #00a9b0,
+    'teal-700': #008489,
+    'teal-800': #00666a,
+    'teal-900': #004e51,
+    'bright-green-50': #e7fbf6,
+    'bright-green-100': #b4f2e3,
+    'bright-green-200': #8fecd6,
+    'bright-green-300': #5ce3c3,
+    'bright-green-400': #3dddb8,
+    'bright-green-500': #0cd5a6,
+    'bright-green-600': #0bc297,
+    'bright-green-700': #099776,
+    'bright-green-800': #07755b,
+    'bright-green-900': #055946,
+    'lime-50': #f5fdf3,
+    'lime-100': #dff9d9,
+    'lime-200': #d0f6c6,
+    'lime-300': #baf2ad,
+    'lime-400': #adef9d,
+    'lime-500': #98eb84,
+    'lime-600': #8ad678,
+    'lime-700': #6ca75e,
+    'lime-800': #548149,
+    'lime-900': #406337,
+    'yellow-50': #fefef1,
+    'yellow-100': #fdfdd3,
+    'yellow-200': #fcfcbe,
+    'yellow-300': #fbfaa0,
+    'yellow-400': #faf98d,
+    'yellow-500': #f9f871,
+    'yellow-600': #e3e267,
+    'yellow-700': #b1b050,
+    'yellow-800': #89883e,
+    'yellow-900': #69682f,
+    'amber-50': #fffaea,
+    'amber-100': #ffefbc,
+    'amber-200': #ffe79c,
+    'amber-300': #ffdb6f,
+    'amber-400': #ffd553,
+    'amber-500': #ffca28,
+    'amber-600': #e8b824,
+    'amber-700': #b58f1c,
+    'amber-800': #8c6f16,
+    'amber-900': #6b5511,
+    'deep-orange-50': #fff1ec,
+    'deep-orange-100': #ffd3c5,
+    'deep-orange-200': #ffbda9,
+    'deep-orange-300': #ff9f81,
+    'deep-orange-400': #ff8d69,
+    'deep-orange-500': #ff7043,
+    'deep-orange-600': #e8663d,
+    'deep-orange-700': #b55030,
+    'deep-orange-800': #8c3e25,
+    'deep-orange-900': #6b2f1c,
+    'brown-50': #f4f1ef,
+    'brown-100': #dcd2cf,
+    'brown-200': #cbbcb7,
+    'brown-300': #b39e96,
+    'brown-400': #a48b82,
+    'brown-500': #8d6e63,
+    'brown-600': #80645a,
+    'brown-700': #644e46,
+    'brown-800': #4e3d36,
+    'brown-900': #3b2e2a
+  ),
+  'page': (
+    'background': #eceff2
+  )
+);
+
+@function rgb-from-hex($hexcolor) {
+  @return red($hexcolor), green($hexcolor), blue($hexcolor);
+}
+
+@mixin color-variables() {
+  @each $type, $colors in $hexapalette {
+    @each $variant, $value in $colors {
+      --swm-#{$type}-#{$variant}: #{rgb-from-hex($value)};
+    }
+  }
+}
+
+@mixin color-classes() {
+  @each $type, $colors in $palette {
+    @if  $type == 'page' {
+      $value: map-get(map-get($palette, 'page'), 'background');
+
+      .swm-page-background {
+        background-color: rgb($value);
+      }
+    } @else {
+      @each $variant, $value in $colors {
+        .swm-text-#{$type}-#{$variant} {
+          color: rgb($value);
+        }
+        .swm-bg-#{$type}-#{$variant} {
+          background-color: rgb($value);
+        }
+      }
+    }
+  }
+}
+
+@function rgbcolorize($color: 'primary', $variant: 'default', $alpha: 1) {
+  $hexcolor: map-get(map-get($hexapalette, $color), $variant);
+
+  @return rgba($hexcolor, $alpha);
+}

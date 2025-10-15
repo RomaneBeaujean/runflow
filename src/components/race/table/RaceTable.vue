@@ -1,15 +1,17 @@
 <template>
-  <div ref="tableContainer">
+  <div
+    ref="tableContainer"
+    @mouseenter.capture="onTableMouseEnter"
+    @mouseleave.capture="onTableMouseLeave"
+  >
     <DataTable
       v-if="race"
-      :value="TableRowItems"
+      :value="rows"
       id="race-table"
       dataKey="id"
       editMode="row"
-      selectionMode="single"
       v-model:editingRows="editingRows"
       @row-edit-save="onRowEditSave"
-      @row-click="setTableClickedRow"
       rowHover
       :rowClass="getRowClass"
     >
@@ -52,23 +54,17 @@
 
       <Column header="D+ cumulé">
         <template #body="{ data }">
-          <Tag
-            v-if="data.distance !== 0"
-            :value="'+ ' + data.cumulElevation + ' m'"
-            style="background-color: #e0cebe; color: #713f12"
-            class="inline-block mb-2"
-          />
+          <Tag severity="secondary" v-if="data.distance !== 0">
+            +{{ data.cumulElevation }} m
+          </Tag>
         </template>
       </Column>
 
       <Column header="D- cumulé">
         <template #body="{ data }">
-          <Tag
-            v-if="data.distance !== 0"
-            :value="'- ' + data.cumulNegativeElevation + ' m'"
-            style="background-color: #e0cebe; color: #713f12"
-            class="inline-block mb-2"
-          />
+          <Tag severity="secondary" v-if="data.distance !== 0">
+            -{{ data.cumulNegativeElevation }} m
+          </Tag>
         </template>
       </Column>
 
@@ -91,7 +87,7 @@
         <template #body="{ data }">
           <Tag
             v-if="data.distance !== 0"
-            :value="'+ ' + data.splitElevation + ' m'"
+            :value="'+' + data.splitElevation + 'm'"
             style="background-color: #fffbeb; color: #713f12"
             class="inline-block mb-2"
           />
@@ -102,7 +98,7 @@
         <template #body="{ data }">
           <Tag
             v-if="data.distance !== 0"
-            :value="'- ' + data.splitNegativeElevation + ' m'"
+            :value="'-' + data.splitNegativeElevation + 'm'"
             style="background-color: #fffbeb; color: #713f12"
             class="inline-block mb-2"
           />
@@ -130,18 +126,41 @@
           >
             <div class="flex-1 p-2 mr-8">
               <Tag
+                style="
+                  background-color: #fce7f3;
+                  color: var(--color-violet-800);
+                "
+                icon="pi pi-bolt"
+                severity="secondary"
+              >
+                <span>{{ data.splitPace }} <small>min/km</small></span>
+              </Tag>
+
+              <!-- <Tag
                 style="background-color: #fffbeb; color: #713f12"
                 class="inline-block mb-2"
               >
                 {{ data.splitPace }} <small>min/km</small></Tag
-              >
+              > -->
             </div>
             <div class="flex-1 p-2">
               <Tag
+                style="
+                  background-color: #f0fdf4;
+                  color: var(--color-emerald-800);
+                "
+                icon="pi pi-clock"
+                severity="secondary"
+              >
+                <span>
+                  {{ minutesToFormattedDuration(data.splitDuration) }}
+                </span>
+              </Tag>
+              <!-- <Tag
                 :value="minutesToFormattedDuration(data.splitDuration)"
                 style="background-color: #fffbeb; color: #713f12"
                 class="inline-block mb-2"
-              />
+              /> -->
             </div>
           </div>
         </template>
@@ -160,7 +179,7 @@
           <Tag
             v-if="data.refuel"
             severity="warn"
-            :value="data.stopDuration + ' minute(s)'"
+            :value="data.stopDuration + ' min(s)'"
           />
         </template>
         <template #editor="{ data }">
@@ -205,7 +224,7 @@
           <InputTime
             v-if="data.distance === 0"
             :time="data.time"
-            :reference="TableRowItems[0].time"
+            :reference="rows[0].time"
             size="small"
             @update="({ time }) => (data.time = time)"
           />
@@ -274,16 +293,11 @@ import InputRefuelStopDuration from '@/components/race/inputs/InputRefuelStopDur
 import InputTime from '@/components/race/inputs/InputTime.vue';
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
 import { useRace } from '@/composables/useRace';
-import useRaceHoveredSplit from '@/composables/useRaceHoveredSplit';
-import {
-  dateToFormattedTime,
-  minutesToFormattedDuration,
-  parseDate,
-} from '@/lib/time';
-import { Separator } from '@/types/Separator';
+import useRaceTableRows from '@/composables/useRaceTableRows';
+import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 import { TableRowItem } from '@/types/TableRowItem';
 import { Button, Column, DataTable, Tag } from 'primevue';
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import SlopeTag from '../SlopeTag.vue';
 
 const {
@@ -298,32 +312,25 @@ const {
   separators,
 } = useRace();
 
-const {
-  getCumulElevationToDistance,
-  getCumulDurationToDistance,
-  getCumulNegativeElevationToDistance,
-  getSplitDistance,
-  getSplitNegativeElevation,
-  getSplitSlopePercent,
-  getSplitDuration,
-  getSplitElevation,
-} = useGpxMetrics();
+const { getCumulDurationToDistance } = useGpxMetrics();
 
-const {
-  setTableClickedRow,
-  listenTableMouseEnter,
-  removeListeners,
-  hoveredSplit,
-} = useRaceHoveredSplit();
+const { rows, hoveredRow, onTableMouseEnter, onTableMouseLeave } =
+  useRaceTableRows();
+
 const tableContainer = ref<HTMLElement | null>(null);
-const editingRows = ref<any[]>([]);
+const editingRows = ref<TableRowItem[]>([]);
 
 const getRowClass = (rowData: TableRowItem): string => {
   return [
     'race-table-row',
     `distance-${rowData.distance}`,
-    rowData.hovered && rowData.distance !== 0 ? 'hovered-row' : '',
+    isRowHovered(rowData) ? 'hovered-row' : '',
   ].join(' ');
+};
+
+const isRowHovered = (rowData: TableRowItem): boolean => {
+  if (!hoveredRow.value) return false;
+  return hoveredRow.value.distance == rowData.distance;
 };
 
 const isTimeBarrierOk = (data: TableRowItem) => {
@@ -333,82 +340,10 @@ const isTimeBarrierOk = (data: TableRowItem) => {
   return timeBarrier < cumulDuration;
 };
 
-const TableRowItems = computed((): TableRowItem[] => {
-  const firstRow = {
-    id: `row-0`,
-    index: 0,
-    refuel: false,
-    distance: 0,
-    timeBarrier: null,
-    cumulDuration: 0,
-    cumulElevation: 0,
-    cumulNegativeElevation: 0,
-    splitDistance: 0,
-    splitDuration: 0,
-    splitElevation: 0,
-    splitNegativeElevation: 0,
-    splitPace: null,
-    timeBarrierTime: null,
-    splitSlopePercent: null,
-    time: parseDate(startTime.value),
-    hovered: false,
-  };
-
-  const rows = separators.value.map((separator: Separator, index: number) => {
-    const split = splits.value.find(
-      (s) => s.endDistance === separator.distance
-    );
-
-    const cumulDuration = getCumulDurationToDistance(separator.distance);
-
-    const time = firstRow.time
-      ? new Date(firstRow.time.getTime() + cumulDuration * 60 * 1000)
-      : null;
-
-    const timeBarrierTime =
-      firstRow.time && separator.timeBarrier
-        ? new Date(firstRow.time.getTime() + separator.timeBarrier * 60 * 1000)
-        : null;
-
-    return {
-      id: `row-${separator.distance}`,
-      index: index + 1,
-      refuel: separator.refuel,
-      distance: separator.distance,
-      timeBarrier: separator.timeBarrier || null,
-      stopDuration: separator.stopDuration || 0,
-      cumulDuration,
-      cumulElevation: getCumulElevationToDistance(separator.distance),
-      cumulNegativeElevation: getCumulNegativeElevationToDistance(
-        separator.distance
-      ),
-      splitDistance: getSplitDistance(split),
-      splitDuration: getSplitDuration(split),
-      splitElevation: getSplitElevation(split),
-      splitNegativeElevation: getSplitNegativeElevation(split),
-      splitSlopePercent: getSplitSlopePercent(split).major,
-      splitPace: split.pace,
-      time,
-      timeBarrierTime,
-      hovered: hoveredSplit.value?.endDistance === separator.distance,
-    };
-  });
-
-  return [firstRow, ...rows];
-});
-
-onMounted(() => {
-  listenTableMouseEnter();
-});
-
-onBeforeUnmount(() => {
-  removeListeners();
-});
-
 const onRowEditSave = (event: any) => {
   let { newData, index } = event;
 
-  const oldData = TableRowItems.value[index];
+  const oldData = rows.value[index];
   const oldSeparator = separators.value.find(
     (el) => el.distance === oldData.distance
   );
@@ -442,12 +377,12 @@ const onRowEditSave = (event: any) => {
 
 #race-table .p-datatable-tbody > tr:hover,
 #race-table .hovered-row {
-  background-color: #ffedd4 !important;
+  background-color: #b1d5e8 !important;
 }
 
 #race-table thead {
   position: sticky;
-  top: 300px;
+  top: 400px;
   height: auto;
   z-index: 30;
 }

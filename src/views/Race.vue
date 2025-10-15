@@ -68,7 +68,7 @@ watch(
   position: sticky;
   top: 0;
   z-index: 40;
-  height: 300px;
+  height: 400px;
   background-color: white;
 }
 </style>

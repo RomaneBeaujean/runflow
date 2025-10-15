@@ -2,8 +2,8 @@
   <VChart
     v-if="race"
     autoresize
-    ref="chartComponent"
-    style="position: relative; width: 100%; min-height: 300px"
+    ref="chartRef"
+    style="position: relative; width: 100%; min-height: 400px"
     :option="chartOptions"
     @zr:click="onChartClick"
     @zr:mouseover="onChartHover"
@@ -19,34 +19,22 @@ import useRaceChartClick from '@/composables/useChartClick';
 import { useEcharts } from '@/composables/useEcharts';
 import { useRace } from '@/composables/useRace';
 import useRaceChartData from '@/composables/useRaceChartData';
-import useRaceHoveredSplit from '@/composables/useRaceHoveredSplit';
-import { onMounted, watch } from 'vue';
+import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
+import { onMounted } from 'vue';
 import VChart from 'vue-echarts';
 import ClickedPointTooltip from './ClickedPointTooltip.vue';
 import ClickedSeparatorTooltip from './ClickedSeparatorTooltip.vue';
 import HoveredSplitTooltip from './HoveredSplitTooltip.vue';
 
-const { hoveredSplit } = useRaceHoveredSplit();
-const { race, splits } = useRace();
-const { onChartHover, onChartLeave } = useRaceHoveredSplit();
-const { onChartClick, closeTooltip, clickedSeparator, clickedPoint } =
-  useRaceChartClick();
+const { onChartHover, onChartLeave } = useRaceChartSplitHover();
+const { onChartClick } = useRaceChartClick();
 
-const { chartComponent } = useEcharts();
-
-const { chartOptions, updateChartSeries } = useRaceChartData();
+const { race } = useRace();
+const { chartRef } = useEcharts();
+const { chartOptions, updateChartData } = useRaceChartData();
 
 onMounted(() => {
-  updateChartSeries();
-});
-
-watch(splits, () => {
-  closeTooltip();
-  updateChartSeries();
-});
-
-watch([clickedSeparator, clickedPoint, hoveredSplit], () => {
-  updateChartSeries();
+  updateChartData();
 });
 </script>
 

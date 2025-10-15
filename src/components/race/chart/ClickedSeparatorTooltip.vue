@@ -26,11 +26,13 @@
 import useRaceChartClick from '@/composables/useChartClick';
 import { useRace } from '@/composables/useRace';
 import { Button } from 'primevue';
-const { clickedSeparatorPosition, clickedSeparator } = useRaceChartClick();
+const { clickedSeparatorPosition, clickedSeparator, closeTooltip } =
+  useRaceChartClick();
 const { deleteSeparator } = useRace();
 
 const handleDeleteSeparator = () => {
   deleteSeparator(clickedSeparator.value.distance);
+  closeTooltip();
 };
 </script>
 
