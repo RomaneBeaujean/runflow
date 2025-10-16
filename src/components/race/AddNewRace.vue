@@ -1,13 +1,11 @@
 <template>
   <div class="m-4">
-    <!-- Bouton principal -->
     <Button
       label="Ajouter un nouveau plan de course"
       icon="pi pi-plus"
       @click="openModal"
     />
 
-    <!-- Modale -->
     <Dialog
       v-model:visible="modalOpened"
       modal
@@ -15,9 +13,8 @@
       :style="{ width: '50vw' }"
       :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
     >
-      <div class="flex flex-col gap-4">
-        <!-- Sélection de la trace GPX -->
-        <div class="file-upload-holder flex flex-col gap-2">
+      <div class="flex flex-col items-center mb-4">
+        <div class="file-upload-holder flex flex-1 items-center flex-col gap-2">
           <FileUpload
             name="gpx"
             accept=".gpx"
@@ -40,9 +37,14 @@
             </Tag>
           </div>
         </div>
+      </div>
 
-        <!-- Nom du plan -->
-        <div>
+      <Panel
+        header="Options de course"
+        v-if="totalDistance"
+        class="flex flex-1"
+      >
+        <div class="mb-2">
           <label class="block mb-2 text-sm font-medium text-gray-700">
             Nom du plan de course
           </label>
@@ -54,22 +56,20 @@
           />
         </div>
 
-        <!-- Date de la course (optionnelle) -->
-        <div class="flex gap-2">
-          <div>
+        <div class="flex flex-1 gap-2 mb-2">
+          <div class="flex-1">
             <label class="block mb-2 text-sm font-medium text-gray-700">
               Date de la course
             </label>
             <DatePicker
               v-model="raceDate"
-              locale="fr"
-              dateFormat="dd-mm-yy"
+              dateFormat="dd/mm/yyyy"
               showIcon
               placeholder="Choisir une date"
               :showTime="false"
             />
           </div>
-          <div>
+          <div class="flex-1">
             <label class="block mb-2 text-sm font-medium text-gray-700">
               Heure de départ
             </label>
@@ -80,16 +80,47 @@
           </div>
         </div>
 
-        <!-- Boutons -->
-        <div class="flex justify-end gap-2 pt-4">
-          <Button label="Annuler" severity="secondary" @click="closeModal" />
-          <Button
-            label="Créer"
-            icon="pi pi-check"
-            @click="createCourse"
-            :disabled="!gpxFile || !raceName"
-          />
+        <div class="flex flex-col gap-2 mb-2">
+          <div class="flex flex-1">
+            <div class="flex flex-1 text-sm font-medium text-gray-700">
+              Allure souhaité
+            </div>
+            <div class="flex flex-1 text-sm font-medium text-gray-700">
+              Temps souhaité
+            </div>
+          </div>
+
+          <div class="flex flex-1">
+            <InputPaceDuration
+              size="default"
+              :pace="pace"
+              :distance="totalDistance"
+              @update="(newPace) => (pace = newPace.pace)"
+            ></InputPaceDuration>
+          </div>
+
+          <div class="flex items-center gap-2 mt-4">
+            <Checkbox
+              v-model="automaticSeparators"
+              inputId="automatic_separators"
+              name="generateGpxOptions"
+              value="automatic_separators"
+            />
+            <label for="automatic_separators">
+              Générer automatiquement les splits
+            </label>
+          </div>
         </div>
+      </Panel>
+
+      <div class="flex justify-end gap-2 pt-4">
+        <Button label="Annuler" severity="secondary" @click="closeModal" />
+        <Button
+          label="Créer"
+          icon="pi pi-check"
+          @click="createCourse"
+          :disabled="!gpxFile || !raceName"
+        />
       </div>
     </Dialog>
   </div>
@@ -97,40 +128,53 @@
 
 <script setup lang="ts">
 import InputTime from '@/components/race/inputs/InputTime.vue';
+import { useGpxParser } from '@/composables/useGpxParser';
 import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
-import { Race } from '@/types/entities/Race';
+import { Separator } from '@/types/entities/Separator';
 import {
   Button,
+  Checkbox,
   DatePicker,
   Dialog,
   FileUpload,
   FileUploadSelectEvent,
   InputText,
+  Panel,
   Tag,
 } from 'primevue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import InputPaceDuration from './inputs/InputPaceDuration.vue';
 
 const stores = useInjection<AppStores>('stores');
-
+const router = useRouter();
 const gpxFile = ref<{ content: string; name: string }>(null);
 const raceName = ref<string | null>(null);
 const modalOpened = ref<boolean>(false);
 const raceDate = ref<Date | null>(null);
 const startTime = ref<Date | null>(null);
+const automaticSeparators = ref<boolean>(false);
+const pace = ref<string>('06:30');
 
 const addFile = async (event: FileUploadSelectEvent) => {
-  const uploaded = event.files[0];
-  if (!uploaded) return;
+  const uploadedFile = event.files[0];
+  if (!uploadedFile) return;
 
-  const content = await uploaded.text();
-  const name = uploaded.name;
+  const content = await uploadedFile.text();
+  const name = uploadedFile.name;
   gpxFile.value = { content, name };
 
   if (raceName.value === '' || raceName.value === null) {
     raceName.value = name;
   }
 };
+
+const totalDistance = computed(() => {
+  if (!gpxFile.value) return;
+  const parser = useGpxParser(gpxFile.value.content);
+  return parser.gpxtotalDistance;
+});
 
 function openModal() {
   modalOpened.value = true;
@@ -145,22 +189,35 @@ function closeModal() {
 async function createCourse() {
   if (!gpxFile.value || !raceName.value) return;
 
-  const race: Partial<Race> = {
-    name: raceName.value,
-    gpxContent: gpxFile.value.content,
-    date: raceDate.value,
-    startTime: startTime.value,
-  };
+  const gpxParser = useGpxParser(gpxFile.value.content);
+  const splits = automaticSeparators.value ? gpxParser.generateSplits() : [];
 
-  await stores.races.addRace({
+  const separators = splits
+    .map((el) => el.endDistance)
+    .filter((el) => el !== gpxParser.gpxtotalDistance)
+    .map((it) => new Separator({ distance: it }));
+
+  const id = await stores.races.addRace({
     name: raceName.value,
     gpxContent: gpxFile.value.content,
     date: raceDate.value,
     startTime: startTime.value,
+    splits,
+    separators,
   });
 
-  closeModal();
+  goToCourse(id);
+}
+
+function goToCourse(id: string) {
+  router.push(`/races/${id}`);
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped>
+:deep(input),
+:deep(.p-datepicker) {
+  width: 100%;
+  max-width: 100% !important;
+}
+</style>

@@ -1,6 +1,6 @@
 import { useRace } from '@/composables/useRace';
 import { parseDate } from '@/lib/time';
-import { Separator } from '@/types/Separator';
+import { Separator } from '@/types/entities/Separator';
 import { TableRowItem } from '@/types/TableRowItem';
 import { computed, ref, watch } from 'vue';
 import { useGpxMetrics } from './useGpxMetrics';

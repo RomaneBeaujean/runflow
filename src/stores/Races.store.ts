@@ -53,8 +53,8 @@ export class RacesStore {
       id: nanoid(),
       name: r.name,
       gpxContent: r.gpxContent,
-      splits: [],
-      separators: [],
+      splits: r.splits || [],
+      separators: r.separators || [],
       date: r.date || null,
       startTime: r.startTime || null,
       createdAt: new Date().toISOString(),
@@ -63,6 +63,7 @@ export class RacesStore {
     const cleanRace = JSON.parse(JSON.stringify(toRaw(race)));
     await db.races.add(cleanRace);
     await this.init();
+    return race.id;
   };
 
   updateRace = async (id: string, updated: Partial<Race>) => {

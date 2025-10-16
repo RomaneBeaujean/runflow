@@ -1,5 +1,5 @@
 import { roundOneNumber } from '@/lib/utils';
-import { Separator } from '@/types/Separator';
+import { Separator } from '@/types/entities/Separator';
 import { Split } from '@/types/Split';
 import { computed, ref, watch } from 'vue';
 import useRaceChartClick from './useChartClick';

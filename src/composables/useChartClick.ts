@@ -1,6 +1,6 @@
 import { GpxPoint } from '@/types/GpxPoint';
 import { Position } from '@/types/Position';
-import { Separator } from '@/types/Separator';
+import { Separator } from '@/types/entities/Separator';
 import { ref } from 'vue';
 import { useEcharts } from './useEcharts';
 

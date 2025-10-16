@@ -19,16 +19,13 @@
 </template>
 
 <script setup lang="ts">
-import { useInjection } from '@/lib/useInjection';
 import router from '@/router/router';
-import { AppStores } from '@/stores/AppLoader';
 import { Button, Toolbar } from 'primevue';
 import { ref } from 'vue';
 
-const stores = useInjection<AppStores>('stores');
-
 const items = [
   { label: 'Plans de course', path: 'races', illustration: 'pi pi-map' },
+  // { label: 'Laboratoire', path: 'lab', illustration: 'pi pi-map' },
 ];
 
 const getInitialRoute = (): string => {
@@ -46,11 +43,6 @@ const selectItem = (path: string) => {
     )
       console.error(err);
   });
-};
-
-const fileInput = ref<HTMLInputElement>();
-const triggerFileInput = () => {
-  fileInput.value?.click();
 };
 </script>
 

@@ -4,14 +4,14 @@
     mask="99:99 (min/km)"
     placeholder="(min/km)"
     class="mr-2"
-    size="small"
+    :size="props.size || 'small'"
     style="max-width: 120px"
   />
   <InputMask
     v-model="currentDuration"
     mask="99h99"
     placeholder="__h__"
-    size="small"
+    :size="props.size || 'small'"
     style="max-width: 120px"
   />
 </template>
@@ -28,7 +28,7 @@ import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update']);
 
-const props = defineProps<{ pace: string; distance: number }>();
+const props = defineProps<{ pace: string; distance: number; size?: string }>();
 
 const currentPace = ref<string>(props.pace);
 
@@ -100,6 +100,6 @@ watch([currentPace, currentDuration], () => {
 
 <style lang="scss" scoped>
 :deep(input) {
-  max-width: 100%;
+  max-width: 100% !important;
 }
 </style>

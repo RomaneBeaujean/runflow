@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import useRaceChartClick from '@/composables/useChartClick';
 import { useRace } from '@/composables/useRace';
-import { Separator } from '@/types/Separator';
+import { Separator } from '@/types/entities/Separator';
 import { Button } from 'primevue';
 
 const { clickedPoint, clickedPointPosition, closeTooltip } =

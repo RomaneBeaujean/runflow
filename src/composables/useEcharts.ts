@@ -1,6 +1,6 @@
 // src/ui/composables/useRaceChartEcharts.ts
+import { Separator } from '@/types/entities/Separator';
 import { GpxPoint } from '@/types/GpxPoint';
-import { Separator } from '@/types/Separator';
 import { Split } from '@/types/Split';
 import { LineChart } from 'echarts/charts';
 import {

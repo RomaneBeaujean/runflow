@@ -135,13 +135,6 @@
               >
                 <span>{{ data.splitPace }} <small>min/km</small></span>
               </Tag>
-
-              <!-- <Tag
-                style="background-color: #fffbeb; color: #713f12"
-                class="inline-block mb-2"
-              >
-                {{ data.splitPace }} <small>min/km</small></Tag
-              > -->
             </div>
             <div class="flex-1 p-2">
               <Tag
@@ -156,11 +149,6 @@
                   {{ minutesToFormattedDuration(data.splitDuration) }}
                 </span>
               </Tag>
-              <!-- <Tag
-                :value="minutesToFormattedDuration(data.splitDuration)"
-                style="background-color: #fffbeb; color: #713f12"
-                class="inline-block mb-2"
-              /> -->
             </div>
           </div>
         </template>

@@ -19,6 +19,11 @@ const router = createRouter({
       path: '/:catchAll(.*)',
       redirect: '/',
     },
+    // {
+    //   path: '/lab',
+    //   name: 'Lab',
+    //   component: Lab,
+    // },
   ],
 });
 

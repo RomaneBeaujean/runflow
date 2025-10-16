@@ -1,5 +1,5 @@
-import { Separator } from '../Separator';
 import { Split } from '../Split';
+import { Separator } from './Separator';
 
 export class Race {
   id: string;

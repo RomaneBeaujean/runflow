@@ -3,7 +3,7 @@ import {
   minutesToFormattedDuration,
 } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
-import { Separator } from '@/types/Separator';
+import { Separator } from '@/types/entities/Separator';
 import { Split } from '@/types/Split';
 import { useRace } from './useRace';
 
@@ -12,12 +12,12 @@ const { points, separators, splits } = useRace();
 export function useGpxMetrics() {
   function getCumulElevationToDistance(distance: number) {
     const point = points.value.find((el) => el.distance === distance);
-    return point?.cumulElevation ?? 0;
+    return Math.round(point?.cumulElevation ?? 0);
   }
 
   function getCumulNegativeElevationToDistance(distance: number) {
     const point = points.value.find((el) => el.distance === distance);
-    return point?.cumulNegativeElevation ?? 0;
+    return Math.round(point?.cumulNegativeElevation ?? 0);
   }
 
   function getPointFromDistance(distance: number) {
@@ -44,13 +44,15 @@ export function useGpxMetrics() {
   function getSplitElevation(split: Split) {
     const start = getPointFromDistance(split.startDistance);
     const end = getPointFromDistance(split.endDistance);
-    return (end?.cumulElevation ?? 0) - (start?.cumulElevation ?? 0);
+    return Math.round(
+      (end?.cumulElevation ?? 0) - (start?.cumulElevation ?? 0)
+    );
   }
 
   function getSplitNegativeElevation(split: Split) {
     const start = getPointFromDistance(split.startDistance);
     const end = getPointFromDistance(split.endDistance);
-    return (
+    return Math.round(
       (end?.cumulNegativeElevation ?? 0) - (start?.cumulNegativeElevation ?? 0)
     );
   }
@@ -94,7 +96,7 @@ export function useGpxMetrics() {
 
   function getSplitDistance(split: Split): number {
     const distance = roundOneNumber(split.endDistance - split.startDistance);
-    return distance;
+    return roundOneNumber(distance);
   }
 
   function getSplitDuration(split: Split): number {

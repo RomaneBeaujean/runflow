@@ -137,16 +137,13 @@ const cancelEdit = () => {
 
 const saveEdit = () => {
   if (!props.race) return;
-  props.race.name = editableName.value;
-  props.race.date = editableDate.value;
-  startTime.value = editableTime.value;
-  editing.value = false;
-
   stores.races.updateRace(props.race.id, {
-    name: props.race.name,
-    date: props.race.date,
-    startTime: startTime.value,
+    name: editableName.value,
+    date: editableDate.value,
+    startTime: editableTime.value,
   });
+
+  editing.value = false;
 };
 
 // Format affichage
