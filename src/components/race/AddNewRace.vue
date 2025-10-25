@@ -1,20 +1,19 @@
 <template>
-  <div class="m-4">
-    <Button
-      label="Ajouter un nouveau plan de course"
-      icon="pi pi-plus"
-      @click="openModal"
-    />
-
-    <Dialog
-      v-model:visible="modalOpened"
-      modal
-      header="Créer un nouveau plan de course"
-      :style="{ width: '50vw' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-    >
-      <div class="flex flex-col items-center mb-4">
-        <div class="file-upload-holder flex flex-1 items-center flex-col gap-2">
+  <div class="p-5 w-full max-w-[700px] mx-auto">
+    <Panel toggleable v-model:collapsed="collapsed">
+      <template #header>
+        <div
+          class="flex flex-row flex-1 w-full h-full cursor-pointer"
+          @click="collapsed = !collapsed"
+        >
+          <div class="flex items-center gap-2 cursor-pointer">
+            <i class="pi pi-chart-bar"></i>
+            <span class="font-bold">Ajouter un plan de course</span>
+          </div>
+        </div>
+      </template>
+      <div class="flex flex-col gap-2">
+        <div class="file-upload-holder flex flex-1 flex-col items-center gap-2">
           <FileUpload
             name="gpx"
             accept=".gpx"
@@ -22,6 +21,7 @@
             :customUpload="true"
             auto
             chooseLabel="Choisir un fichier GPX"
+            chooseIcon="pi pi-file"
             @select="addFile"
           />
           <div v-if="gpxFile">
@@ -37,106 +37,102 @@
             </Tag>
           </div>
         </div>
-      </div>
+        <div class="flex flex-1 flex-col gap-2">
+          <div>
+            <label class="block mb-2 text-sm font-medium text-gray-700">
+              Nom du plan de course
+            </label>
+            <InputText
+              v-model="raceName"
+              type="text"
+              placeholder="Nom du plan de course"
+              class="w-full"
+            />
+          </div>
 
-      <Panel
-        header="Options de course"
-        v-if="totalDistance"
-        class="flex flex-1"
-      >
-        <div class="mb-2">
-          <label class="block mb-2 text-sm font-medium text-gray-700">
-            Nom du plan de course
-          </label>
-          <InputText
-            v-model="raceName"
-            type="text"
-            placeholder="Nom du plan de course"
-            class="w-full"
+          <div class="flex flex-1 gap-2">
+            <div class="flex-1">
+              <label class="block mb-2 text-sm font-medium text-gray-700">
+                Date de la course
+              </label>
+              <DatePicker
+                v-model="raceDate"
+                dateFormat="dd/mm/yyyy"
+                showIcon
+                placeholder="Choisir une date"
+                :showTime="false"
+              />
+            </div>
+            <div class="flex-1">
+              <label class="block mb-2 text-sm font-medium text-gray-700">
+                Heure de départ
+              </label>
+              <InputTime
+                :time="startTime"
+                @update="({ time }) => (startTime = time)"
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div class="flex flex-1">
+              <div class="flex flex-1 text-sm font-medium text-gray-700">
+                Allure souhaité
+              </div>
+              <div class="flex flex-1 text-sm font-medium text-gray-700">
+                Temps souhaité
+              </div>
+            </div>
+
+            <div class="flex flex-1">
+              <InputPaceDuration
+                size="default"
+                :pace="pace"
+                :distance="totalDistance"
+                @update="(newPace) => (pace = newPace.pace)"
+              ></InputPaceDuration>
+            </div>
+
+            <div class="flex items-center gap-2 mt-4">
+              <Checkbox
+                v-model="automaticSeparators"
+                inputId="automatic_separators"
+                name="generateGpxOptions"
+                value="automatic_separators"
+              />
+              <label for="automatic_separators">
+                Générer automatiquement les splits
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <Button label="Annuler" severity="secondary" @click="close" />
+          <Button
+            label="Créer"
+            icon="pi pi-check"
+            @click="createCourse"
+            :disabled="!gpxFile || !raceName"
           />
         </div>
-
-        <div class="flex flex-1 gap-2 mb-2">
-          <div class="flex-1">
-            <label class="block mb-2 text-sm font-medium text-gray-700">
-              Date de la course
-            </label>
-            <DatePicker
-              v-model="raceDate"
-              dateFormat="dd/mm/yyyy"
-              showIcon
-              placeholder="Choisir une date"
-              :showTime="false"
-            />
-          </div>
-          <div class="flex-1">
-            <label class="block mb-2 text-sm font-medium text-gray-700">
-              Heure de départ
-            </label>
-            <InputTime
-              :time="startTime"
-              @update="({ time }) => (startTime = time)"
-            />
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-2 mb-2">
-          <div class="flex flex-1">
-            <div class="flex flex-1 text-sm font-medium text-gray-700">
-              Allure souhaité
-            </div>
-            <div class="flex flex-1 text-sm font-medium text-gray-700">
-              Temps souhaité
-            </div>
-          </div>
-
-          <div class="flex flex-1">
-            <InputPaceDuration
-              size="default"
-              :pace="pace"
-              :distance="totalDistance"
-              @update="(newPace) => (pace = newPace.pace)"
-            ></InputPaceDuration>
-          </div>
-
-          <div class="flex items-center gap-2 mt-4">
-            <Checkbox
-              v-model="automaticSeparators"
-              inputId="automatic_separators"
-              name="generateGpxOptions"
-              value="automatic_separators"
-            />
-            <label for="automatic_separators">
-              Générer automatiquement les splits
-            </label>
-          </div>
-        </div>
-      </Panel>
-
-      <div class="flex justify-end gap-2 pt-4">
-        <Button label="Annuler" severity="secondary" @click="closeModal" />
-        <Button
-          label="Créer"
-          icon="pi pi-check"
-          @click="createCourse"
-          :disabled="!gpxFile || !raceName"
-        />
-      </div>
-    </Dialog>
+      </template>
+    </Panel>
   </div>
 </template>
 
 <script setup lang="ts">
-import InputTime from '@/components/race/inputs/InputTime.vue';
 import { useGpxParser } from '@/composables/useGpxParser';
+import { ClimbDetector } from '@/lib/ClimbDetector';
 import { useInjection } from '@/lib/useInjection';
+import { roundOneNumber } from '@/lib/utils';
 import type { AppStores } from '@/stores/AppLoader';
 import { Separator } from '@/types/entities/Separator';
 import {
   Button,
   Checkbox,
   DatePicker,
-  Dialog,
   FileUpload,
   FileUploadSelectEvent,
   InputText,
@@ -146,12 +142,13 @@ import {
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import InputPaceDuration from './inputs/InputPaceDuration.vue';
+import InputTime from './inputs/InputTime.vue';
 
+const collapsed = ref<boolean>(true);
 const stores = useInjection<AppStores>('stores');
 const router = useRouter();
 const gpxFile = ref<{ content: string; name: string }>(null);
 const raceName = ref<string | null>(null);
-const modalOpened = ref<boolean>(false);
 const raceDate = ref<Date | null>(null);
 const startTime = ref<Date | null>(null);
 const automaticSeparators = ref<boolean>(false);
@@ -176,12 +173,8 @@ const totalDistance = computed(() => {
   return parser.gpxtotalDistance;
 });
 
-function openModal() {
-  modalOpened.value = true;
-}
-
-function closeModal() {
-  modalOpened.value = false;
+function close() {
+  collapsed.value = true;
   raceName.value = null;
   gpxFile.value = null;
 }
@@ -190,7 +183,19 @@ async function createCourse() {
   if (!gpxFile.value || !raceName.value) return;
 
   const gpxParser = useGpxParser(gpxFile.value.content);
-  const splits = automaticSeparators.value ? gpxParser.generateSplits() : [];
+
+  const transitions = automaticSeparators.value
+    ? new ClimbDetector(gpxFile.value.content, 10, 10, 800).separators
+    : [roundOneNumber(gpxParser.gpxtotalDistance)];
+
+  const splits = [];
+
+  transitions.forEach((distance: number, index: number) => {
+    const startDistance = index === 0 ? 0 : splits[index - 1].endDistance;
+    const endDistance = distance;
+    const splitPace = pace.value || '06:30';
+    splits.push({ startDistance, endDistance, pace: splitPace });
+  });
 
   const separators = splits
     .map((el) => el.endDistance)
@@ -206,6 +211,8 @@ async function createCourse() {
     separators,
   });
 
+  console.log(transitions, splits, separators);
+
   goToCourse(id);
 }
 
@@ -215,9 +222,10 @@ function goToCourse(id: string) {
 </script>
 
 <style lang="scss" scoped>
-:deep(input),
-:deep(.p-datepicker) {
-  width: 100%;
+:deep(.p-datepicker),
+:deep(.p-datepicker-input),
+:deep(input) {
+  width: 100% !important;
   max-width: 100% !important;
 }
 </style>

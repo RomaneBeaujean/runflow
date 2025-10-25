@@ -1,12 +1,15 @@
 <template>
-  <div v-if="race" id="race">
-    <div id="race-header" class="full-w">
+  <div v-if="race" id="race" :class="classes">
+    <div id="race-header">
       <RaceHeader :race="race" />
     </div>
     <div id="chart">
       <RaceChart />
     </div>
-    <div id="table">
+    <div>
+      <AddSeparator />
+    </div>
+    <div id="table" class="p-2">
       <RaceTable />
     </div>
   </div>
@@ -18,17 +21,30 @@
 <script setup lang="ts">
 import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
-import { onMounted, watch } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 
+import AddSeparator from '@/components/race/AddSeparator.vue';
 import RaceChart from '@/components/race/chart/RaceChart.vue';
 import RaceHeader from '@/components/race/RaceHeader.vue';
 import RaceTable from '@/components/race/table/RaceTable.vue';
 import { useRace } from '@/composables/useRace';
+import { useRaceFilters } from '@/composables/useRaceFilters';
+import { useViewport } from '@/composables/useViewport';
 import { ProgressSpinner } from 'primevue';
 
 const props = defineProps<{ id: string }>();
 const stores = useInjection<AppStores>('stores');
 const { splits, separators, race, startTime, initRace } = useRace();
+const { sticky } = useRaceFilters();
+const { isMobile } = useViewport();
+
+const classes = computed(() => {
+  return [
+    'race',
+    sticky.value ? 'sticky' : '',
+    isMobile.value ? 'mobile' : 'desktop',
+  ].join(' ');
+});
 
 const initRaceComposable = async () => {
   if (!props.id) return;
@@ -57,18 +73,62 @@ watch(
 );
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 #race {
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
+  display: flex;
+  padding: 8px;
+  flex-direction: column;
 }
 
+#race-header,
 #chart {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  height: 400px;
+  flex: 1 1 auto;
   background-color: white;
+  position: relative;
+}
+
+#race-table .header-row {
+  position: sticky;
+  background-color: white;
+  height: auto;
+  z-index: 30;
+  top: 0;
+}
+
+#race-table .p-datatable-table-container {
+  overflow-x: unset !important;
+  overflow-y: unset !important;
+}
+
+.desktop {
+  #chart {
+    height: 400px;
+  }
+}
+
+.mobile {
+  #chart {
+    height: 200px;
+  }
+}
+
+.sticky {
+  #chart {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  &.mobile {
+    #race-table .header-row {
+      top: 200px !important;
+    }
+  }
+
+  &.desktop {
+    #race-table .header-row {
+      top: 400px !important;
+    }
+  }
 }
 </style>

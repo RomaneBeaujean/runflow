@@ -31,6 +31,6 @@ import MainMenu from '@/components/MainMenu.vue';
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding: 16px;
+  overflow: auto;
 }
 </style>

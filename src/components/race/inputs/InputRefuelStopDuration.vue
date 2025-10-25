@@ -5,7 +5,7 @@
     :min="0"
     placeholder="min"
     class="w-auto"
-    style="max-width: 100px"
+    style="width: 70px"
     size="small"
     showButtons
   />
@@ -28,8 +28,4 @@ watch(currentDurationMinutes, () => {
 });
 </script>
 
-<style lang="scss" scoped>
-:deep(input) {
-  max-width: 100%;
-}
-</style>
+<style lang="scss" scoped></style>

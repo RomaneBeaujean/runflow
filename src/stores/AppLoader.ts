@@ -1,17 +1,11 @@
-import { ViewportStore } from '@/stores/Viewport.store';
 import { reactive, type App } from 'vue';
-import { GlobalStore } from './Global.store';
 import { RacesStore } from './Races.store';
 
 export interface AppStores {
-  viewports: ViewportStore;
-  global: GlobalStore;
   races: RacesStore;
 }
 export class AppLoader {
   private _stores = reactive<AppStores>({
-    viewports: new ViewportStore(),
-    global: new GlobalStore(),
     races: new RacesStore(),
   });
 

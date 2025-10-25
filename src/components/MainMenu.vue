@@ -9,7 +9,7 @@
           :key="item.path"
           :label="item.label"
           :icon="item.illustration"
-          :text="!isActive(item.path)"
+          text
           @click="selectItem(item.path)"
           class="m-2"
         />

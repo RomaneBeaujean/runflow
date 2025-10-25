@@ -6,7 +6,7 @@
     :min="0"
     :max="totalDistance - 0.1"
     :step="0.1"
-    style="max-width: 100px"
+    style="width: 70px"
     size="small"
   />
 </template>
@@ -29,8 +29,4 @@ watch(distance, () => {
 });
 </script>
 
-<style lang="scss" scoped>
-:deep(input) {
-  max-width: 100%;
-}
-</style>
+<style lang="scss" scoped></style>

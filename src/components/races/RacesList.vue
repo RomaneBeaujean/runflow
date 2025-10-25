@@ -1,9 +1,5 @@
 <template>
-  <div class="m-4">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">
-      Plans de courses existants
-    </h2>
-
+  <template v-if="!isMobile">
     <DataTable
       :value="stores.races.races"
       responsiveLayout="scroll"
@@ -26,15 +22,16 @@
 
       <Column>
         <template #body="{ data }">
-          <Tag
-            severity="info"
-            :value="getRaceTotalDistance(data.gpxContent)"
-            class="mr-3"
-          ></Tag>
-          <Tag
-            severity="warn"
-            :value="getRaceTotalElevation(data.gpxContent)"
-          ></Tag>
+          <div class="flex gap-2">
+            <Tag
+              severity="info"
+              :value="getRaceTotalDistance(data.gpxContent)"
+            ></Tag>
+            <Tag
+              severity="warn"
+              :value="getRaceTotalElevation(data.gpxContent)"
+            ></Tag>
+          </div>
         </template>
       </Column>
 
@@ -57,11 +54,50 @@
         </template>
       </Column>
     </DataTable>
-  </div>
+  </template>
+  <template v-else>
+    <Fieldset
+      v-for="race in stores.races.races"
+      class="mb-3"
+      @click="goToCourse(race.id)"
+    >
+      <template #legend>
+        <div class="flex flex-row gap-2 items-center">
+          <div class="text-sm font-bold">
+            {{ race.name }}
+          </div>
+          <Button
+            icon="pi pi-trash"
+            severity="danger"
+            text
+            rounded
+            size="small"
+            @click.stop="deleteCourse(race.id)"
+          />
+        </div>
+      </template>
+      <div>
+        <div class="flex justify-center gap-2">
+          <ColorTag
+            color="primary"
+            :label="getRaceTotalDistance(race.gpxContent)"
+          ></ColorTag>
+          <ColorTag
+            color="amber"
+            :label="getRaceTotalElevation(race.gpxContent)"
+          ></ColorTag>
+          <ColorTag color="green" v-if="race.date" icon="pi pi-calendar">
+            {{ new Date(race.date).toLocaleDateString('fr-FR') }}
+          </ColorTag>
+        </div>
+      </div>
+    </Fieldset>
+  </template>
 </template>
 
 <script setup lang="ts">
 import { useGpxParser } from '@/composables/useGpxParser';
+import { useViewport } from '@/composables/useViewport';
 import { useInjection } from '@/lib/useInjection';
 import { roundOneNumber } from '@/lib/utils';
 import type { AppStores } from '@/stores/AppLoader';
@@ -70,10 +106,12 @@ import {
   Column,
   DataTable,
   DataTableRowClickEvent,
+  Fieldset,
   Tag,
 } from 'primevue';
 import { useRouter } from 'vue-router';
-
+import ColorTag from '../ColorTag.vue';
+const { isMobile } = useViewport();
 const stores = useInjection<AppStores>('stores');
 const router = useRouter();
 const { deleteRace } = stores.races;

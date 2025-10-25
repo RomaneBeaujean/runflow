@@ -1,51 +1,45 @@
 <template>
-  <Tag
-    v-if="percent !== null"
-    :value="props.percent + ' %'"
-    :style="tagStyle"
-    :icon="props.icon"
-  />
+  <ColorTag
+    v-if="slope !== null"
+    :color="tagColor"
+    :icon="icon"
+    :size="size"
+    :fluid="fluid"
+  >
+    <slot></slot>
+  </ColorTag>
 </template>
 
 <script setup lang="ts">
-import { Tag } from 'primevue';
 import { computed } from 'vue';
+import ColorTag, { TagColor } from '../ColorTag.vue';
 
-const props = defineProps<{ percent: string | null; icon?: string }>();
+const props = defineProps<{
+  slope: string | null;
+  icon?: string;
+  fluid?: boolean;
+  size?: 'small' | 'medium';
+}>();
 
 const numericPercent = computed(() => {
-  if (!props.percent) return 0;
-  return Number(props.percent) || 0;
+  if (!props.slope) return 0;
+  return Number(props.slope) || 0;
 });
 
-const tagStyle = computed(() => {
+const tagColor = computed((): TagColor => {
   const value = numericPercent.value;
-
-  let background = '';
-  let color = '#000';
-
   const absVal = Math.abs(value);
 
   if (absVal <= 5) {
-    background = '#bbf7d0'; // vert pastel
-    color = '#065f46';
+    return 'green';
   } else if (absVal <= 10) {
-    background = '#fef08a'; // jaune pastel
-    color = '#78350f';
+    return 'brown';
   } else if (absVal <= 15) {
-    background = '#fed7aa'; // orange pastel
-    color = '#78350f';
+    return 'deep-orange';
   } else if (absVal <= 20) {
-    background = '#fecaca'; // rouge pastel
-    color = '#7f1d1d';
+    return 'red';
   } else {
-    background = '#e0d7fd'; // violet pastel
-    color = '#4c1d95';
+    return 'deep-purple';
   }
-
-  return {
-    backgroundColor: background,
-    color: color,
-  };
 });
 </script>

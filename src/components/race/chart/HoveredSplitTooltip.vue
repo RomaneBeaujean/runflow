@@ -4,21 +4,12 @@
     :style="{
       position: 'absolute',
       left: position.left,
-      top: '0',
+      top: '24px',
       transform: 'translate(-50%)',
     }"
     :key="hoveredSplit.startDistance"
   >
     <div class="flex flex-col justify-center items-center">
-      <div class="flex gap-2 mb-2">
-        <Tag style="background-color: #fffbeb; color: #713f12">
-          {{ distance }}
-          <small>km</small>
-          / {{ elevation }}
-        </Tag>
-
-        <SlopeTag :percent="slopePercent" icon="pi pi-chart-line" />
-      </div>
       <div class="flex gap-2">
         <Tag
           style="background-color: #fce7f3; color: var(--color-violet-800)"
@@ -47,41 +38,14 @@ import { useEcharts } from '@/composables/useEcharts';
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
 import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
 import { minutesToFormattedDuration } from '@/lib/time';
-import { roundOneNumber } from '@/lib/utils';
 import { Position } from '@/types/Position';
 import { Tag } from 'primevue';
 import { computed, ref, watch } from 'vue';
-import SlopeTag from '../SlopeTag.vue';
 
 const position = ref<Position | null>(null);
 const { hoveredSplit } = useRaceChartSplitHover();
-const {
-  getSplitElevation,
-  getSplitDuration,
-  getSplitSlopePercent,
-  getMidPointFromSplit,
-  getSplitNegativeElevation,
-} = useGpxMetrics();
+const { getSplitDuration, getMidPointFromSplit } = useGpxMetrics();
 const { chartInstance } = useEcharts();
-
-const distance = computed(() => {
-  return roundOneNumber(
-    hoveredSplit.value!.endDistance - hoveredSplit.value!.startDistance
-  );
-});
-
-const elevation = computed(() => {
-  const positive = getSplitElevation(hoveredSplit.value!);
-  const negative = getSplitNegativeElevation(hoveredSplit.value!);
-  if (Math.abs(positive) > Math.abs(negative)) {
-    return `+${positive} m`;
-  }
-  return `-${negative}m`;
-});
-
-const slopePercent = computed(() => {
-  return getSplitSlopePercent(hoveredSplit.value).major;
-});
 
 const duration = computed(() => {
   return minutesToFormattedDuration(getSplitDuration(hoveredSplit.value));

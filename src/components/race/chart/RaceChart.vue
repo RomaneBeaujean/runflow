@@ -3,15 +3,15 @@
     v-if="race"
     autoresize
     ref="chartRef"
-    style="position: relative; width: 100%; min-height: 400px"
+    style="position: relative"
     :option="chartOptions"
     @zr:click="onChartClick"
     @zr:mouseover="onChartHover"
     @zr:globalout="onChartLeave"
   />
-  <ClickedPointTooltip />
-  <ClickedSeparatorTooltip />
-  <HoveredSplitTooltip />
+  <ClickedPointTooltip v-if="!isMobile" />
+  <ClickedSeparatorTooltip v-if="!isMobile" />
+  <HoveredSplitTooltip v-if="!isMobile" />
 </template>
 
 <script setup lang="ts">
@@ -20,12 +20,14 @@ import { useEcharts } from '@/composables/useEcharts';
 import { useRace } from '@/composables/useRace';
 import useRaceChartData from '@/composables/useRaceChartData';
 import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
+import { useViewport } from '@/composables/useViewport';
 import { onMounted } from 'vue';
 import VChart from 'vue-echarts';
 import ClickedPointTooltip from './ClickedPointTooltip.vue';
 import ClickedSeparatorTooltip from './ClickedSeparatorTooltip.vue';
 import HoveredSplitTooltip from './HoveredSplitTooltip.vue';
 
+const { isMobile } = useViewport();
 const { onChartHover, onChartLeave } = useRaceChartSplitHover();
 const { onChartClick } = useRaceChartClick();
 

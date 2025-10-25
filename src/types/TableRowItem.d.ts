@@ -8,9 +8,12 @@ export interface TableRowItem {
   cumulDuration: number;
   cumulNegativeElevation: number;
 
-  timeBarrier: number;
-  timeBarrierTime: Date;
+  timeBarrier: Date;
+  timeBarrierDuration: number;
+  stopDuration: number;
+  timeBarrierValid: boolean;
 
+  split: Split;
   splitDistance: number;
   splitElevation: number;
   splitPace: string;

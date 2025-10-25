@@ -16,14 +16,25 @@ export class ClimbDetector {
   public points: GpxPoint[];
   public smoothedPoints: GpxPoint[];
   public slidingSlopePoints: SlidingSlopePoint[];
-  public transitions: number[];
+  public separators: number[];
 
-  constructor(xml: string) {
+  constructor(
+    xml: string,
+    smoothSizeMeters: number,
+    slidingSlopeMeters: number,
+    minSegmentLengthMeters: number
+  ) {
     this.gpxParser.parse(xml);
     this.points = this.extractPoints();
-    this.smoothedPoints = smoothByDistance(this.points, 20);
-    this.slidingSlopePoints = computeSlidingSlope(this.smoothedPoints, 50);
-    this.transitions = detectTransitions(this.slidingSlopePoints, 500, 300);
+    this.smoothedPoints = smoothByDistance(this.points, smoothSizeMeters);
+    this.slidingSlopePoints = computeSlidingSlope(
+      this.smoothedPoints,
+      slidingSlopeMeters
+    );
+    this.separators = detectTransitions(
+      this.slidingSlopePoints,
+      minSegmentLengthMeters
+    );
   }
 
   private extractPoints(): GpxPoint[] {
@@ -124,12 +135,11 @@ const getSlopeType = (slope: number): SlopeType => {
 
 const detectTransitions = (
   points: SlidingSlopePoint[],
-  minimumSegmentLength: number,
-  sampleSegmentLength: number
+  minimumSegmentLength: number
 ): number[] => {
   let transitions = [];
   const sampleEndIndex = points.findIndex(
-    (el) => el.distance >= sampleSegmentLength
+    (el) => el.distance >= minimumSegmentLength
   );
   const firstSample = points.slice(0, sampleEndIndex);
   let segmentType = getSlopeType(getSlopeAverage(firstSample));
@@ -145,7 +155,7 @@ const detectTransitions = (
     )
       continue;
     let endIndex = points.findIndex(
-      (el) => el.distance >= points[i].distance + sampleSegmentLength
+      (el) => el.distance >= points[i].distance + minimumSegmentLength
     );
     if (endIndex < 0) endIndex = points.length - 1;
 

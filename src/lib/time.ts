@@ -114,6 +114,7 @@ export const minutesToDate = (minutes: number): Date => {
 };
 
 export const dateToFormattedTime = (date: Date): string => {
+  if (!date) return '';
   return date.toLocaleTimeString('fr-FR', {
     hour: '2-digit',
     minute: '2-digit',

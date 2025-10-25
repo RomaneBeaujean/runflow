@@ -7,7 +7,9 @@ import {
   GraphicComponent,
   GridComponent,
   LegendComponent,
+  MarkAreaComponent,
   MarkLineComponent,
+  MarkPointComponent,
   TitleComponent,
   TooltipComponent,
 } from 'echarts/components';
@@ -24,6 +26,8 @@ use([
   LegendComponent,
   TitleComponent,
   MarkLineComponent,
+  MarkPointComponent,
+  MarkAreaComponent,
   GraphicComponent,
 ]);
 

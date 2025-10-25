@@ -1,3 +1,4 @@
+import Lab from '@/components/Lab.vue';
 import Race from '@/views/Race.vue';
 import Races from '@/views/Races.vue';
 import { createRouter, createWebHistory } from 'vue-router';
@@ -19,11 +20,11 @@ const router = createRouter({
       path: '/:catchAll(.*)',
       redirect: '/',
     },
-    // {
-    //   path: '/lab',
-    //   name: 'Lab',
-    //   component: Lab,
-    // },
+    {
+      path: '/lab',
+      name: 'Lab',
+      component: Lab,
+    },
   ],
 });
 

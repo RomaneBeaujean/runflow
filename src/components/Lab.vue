@@ -23,6 +23,7 @@
 
 <script setup lang="ts">
 import { useGpxParser } from '@/composables/useGpxParser';
+import { ClimbDetector } from '@/lib/ClimbDetector';
 import { computeSeparators } from '@/lib/climbPasPro';
 import { GpxPoint } from '@/types/GpxPoint';
 import { LineChart } from 'echarts/charts';
@@ -37,7 +38,7 @@ import {
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { FileUpload, FileUploadSelectEvent } from 'primevue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import VChart from 'vue-echarts';
 
 use([
@@ -146,8 +147,7 @@ onMounted(async () => {
   const { gpxexactpoints } = useGpxParser(text);
   points.value = gpxexactpoints;
   separators1.value = computeSeparators(points.value, 10, 0.05, 0.5);
-  // separators2.value = computeSeparators2(points.value, 10, 0.1, 0.2);
-  // console.log('sep-2', separators2.value);
+  separators2.value = new ClimbDetector(text, 10, 10, 800).separators;
   updateChartData();
 });
 
@@ -158,13 +158,6 @@ const addFile = async (event: FileUploadSelectEvent) => {
   const content = await uploadedFile.text();
   xml.value = content;
 };
-
-watch(xml, () => {
-  // points.value = useGpxParser(xml.value).gpxexactpoints;
-  // separators1.value = computeSeparators(points.value);
-  // separators2.value = computeSeparators2(points.value);
-  // updateChartData();
-});
 
 const updateChartData = () => {
   chartOptions.value.series = [];

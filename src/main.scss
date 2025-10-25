@@ -62,3 +62,20 @@ body {
   white-space: nowrap !important;
   min-width: min-content !important;
 }
+
+input {
+  max-width: 100% !important;
+}
+
+.p-toggleswitch {
+  height: 20px !important;
+}
+
+.p-inputnumber-increment-button,
+.p-inputnumber-decrement-button {
+  width: 16px !important;
+}
+
+.p-inputnumber-input {
+  padding-right: 16px !important;
+}

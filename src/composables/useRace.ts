@@ -26,40 +26,11 @@ export function useRace() {
     separators.value = r.separators || [];
     splits.value = r.splits || [];
     startTime.value = r.startTime || null;
-
-    // addEndSeparator();
-
-    // splits.value = recomputeSplits({
-    //   separators: separatorsDistances.value,
-    //   oldSplits: r.splits?.length > 0 ? r.splits : initialSplits(),
-    // });
   };
 
   const separatorsDistances = computed(() => {
     return separators.value.map((el) => el.distance);
   });
-
-  const initialSplits = () => {
-    return recomputeSplits({
-      separators: [],
-      oldSplits: [],
-    });
-  };
-
-  const addEndSeparator = () => {
-    if (
-      separators.value.findIndex((el) => el.distance === totalDistance.value) <
-      0
-    ) {
-      const separator: Separator = {
-        distance: totalDistance.value,
-        refuel: false,
-        stopDuration: 0,
-        timeBarrier: null,
-      };
-      separators.value = addNewSeparator(separator);
-    }
-  };
 
   const updateRaceStartTime = (newStartTime: Date) => {
     startTime.value = newStartTime;

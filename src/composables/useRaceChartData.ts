@@ -1,3 +1,5 @@
+import { getSlopeColors } from '@/lib/slope';
+import { minutesToFormattedDuration } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';
 import { Split } from '@/types/Split';
@@ -7,12 +9,20 @@ import { useEcharts } from './useEcharts';
 import { useGpxMetrics } from './useGpxMetrics';
 import { useRace } from './useRace';
 import useRaceChartSplitHover from './useRaceChartSplitHover';
+import { useViewport } from './useViewport';
 
 const { hoveredSplit } = useRaceChartSplitHover();
-const { getPointsFromSplit, getCumulElevationToDistance } = useGpxMetrics();
+const {
+  getPointsFromSplit,
+  getSplitSlopePercent,
+  getSplitElevation,
+  getSplitNegativeElevation,
+  getCumulDurationToDistance,
+} = useGpxMetrics();
 const { splits, separators, totalDistance } = useRace();
 const { clickedPoint, clickedSeparator } = useRaceChartClick();
 const { chartInstance } = useEcharts();
+const { isMobile } = useViewport();
 
 export default function useRaceChartData() {
   const AREA_LINE_COLOR = '#155E75';
@@ -23,7 +33,9 @@ export default function useRaceChartData() {
   // Séparateurs filtrés
   // =========================
   const chartSeparators = computed(() => {
-    return separators.value.filter((s) => s.distance !== totalDistance.value);
+    return separators.value.filter((s) => {
+      return s.distance !== totalDistance.value;
+    });
   });
 
   const separatorsSeries = computed(() => {
@@ -40,9 +52,9 @@ export default function useRaceChartData() {
           position: 'end',
           fontWeight: 'bold',
           color: '#035581',
-          fontSize: 10,
+          fontSize: isMobile.value ? 9 : 11,
           backgroundColor: '#B1D5E8',
-          padding: 4,
+          padding: isMobile.value ? 2 : 4,
           borderRadius: 4,
           formatter: (params: any) => `${params.value}`,
         },
@@ -77,20 +89,105 @@ export default function useRaceChartData() {
   });
 
   const splitsSeries = computed(() => {
-    return splits.value.map((split) => ({
-      id: `serie-${split.startDistance}-${split.endDistance}`,
-      type: 'line',
-      data: getPointsFromSplit(split).map((p) => [p.distance, p.elevation]),
-      smooth: true,
-      showSymbol: true,
-      symbolSize: 0,
-      lineStyle: { color: AREA_LINE_COLOR, width: 2 },
-      areaStyle: { color: AREA_COLOR, opacity: 1 },
-      emphasis: {
-        lineStyle: { width: 4 },
-        areaStyle: { color: AREA_EMPHASIS_COLOR, opacity: 1 },
-      },
-    }));
+    return splits.value.map((split) => {
+      const points = getPointsFromSplit(split);
+      const middleIndex = Math.floor((points.length - 1) / 2);
+      const middlePoint = points[middleIndex];
+
+      const positive = getSplitElevation(split);
+      const negative = getSplitNegativeElevation(split);
+      const elevation =
+        Math.abs(positive) > Math.abs(negative)
+          ? `+${positive} m`
+          : `-${negative} m`;
+
+      const { color, background } = getSlopeColors(
+        getSplitSlopePercent(split).major
+      );
+
+      const serie: any = {
+        id: `serie-${split.startDistance}-${split.endDistance}`,
+        type: 'line',
+        data: points.map((p) => [p.distance, p.elevation]),
+        smooth: true,
+        showSymbol: false,
+        lineStyle: { color: AREA_LINE_COLOR, width: 2 },
+        areaStyle: { color: AREA_COLOR, opacity: 1 },
+        emphasis: {
+          lineStyle: { width: 4 },
+          areaStyle: { color: AREA_EMPHASIS_COLOR, opacity: 1 },
+        },
+        markArea: {
+          zlevel: 1,
+          silent: true,
+          itemStyle: { color: 'transparent' },
+          label: {
+            show: true,
+            fontSize: 11,
+            fontWeight: 'bold',
+            borderRadius: 4,
+            padding: 4,
+          },
+          data: [],
+        },
+      };
+
+      if (!isMobile.value) {
+        serie.markArea.data = [
+          [
+            {
+              xAxis: split.endDistance,
+              yAxis: 0,
+              label: {
+                position: 'bottom',
+                color: '#054b3a',
+                backgroundColor: '#e7f7f3',
+                formatter: () =>
+                  `${minutesToFormattedDuration(getCumulDurationToDistance(split.endDistance))}`,
+              },
+            },
+            {
+              xAxis: split.endDistance,
+              yAxis: 0,
+            },
+          ],
+          [
+            {
+              xAxis: split.startDistance,
+              label: {
+                position: 'insideBottom',
+                color: '#0C4A6E',
+                backgroundColor: '#E0F2FE',
+                formatter: () =>
+                  `${roundOneNumber(split.endDistance - split.startDistance)} km`,
+              },
+            },
+            {
+              xAxis: split.endDistance,
+            },
+          ],
+          [
+            {
+              xAxis: split.startDistance,
+              yAxis: middlePoint.elevation + 100,
+              label: {
+                position: 'inside',
+                color,
+                backgroundColor: background,
+                formatter: () =>
+                  `${elevation}\n(${getSplitSlopePercent(split).major}%)`,
+              },
+            },
+            {
+              xAxis: split.endDistance,
+              yAxis: middlePoint.elevation + 100,
+            },
+          ],
+        ];
+      }
+
+      return serie;
+    });
   });
 
   const lineSerie = computed(() => ({
@@ -102,11 +199,11 @@ export default function useRaceChartData() {
       symbol: 'none',
       lineStyle: { color: '#b6af72ff', type: 'dashed', width: 1 },
       label: {
-        show: true,
+        show: !isMobile.value,
         position: 'end',
         fontWeight: 'bold',
         color: '#6b5511',
-        fontSize: 10,
+        fontSize: 11,
         backgroundColor: '#ffe79c',
         padding: 4,
         borderRadius: 4,
@@ -135,13 +232,17 @@ export default function useRaceChartData() {
           color: '#fff',
           formatter: (params: any) => {
             const distance = params.value;
-            const denivTotal = getCumulElevationToDistance(distance) || 0;
-            return `${distance} km - ${denivTotal}m d+`;
+            return `${distance} km`;
           },
         },
       },
     },
-    grid: { top: 100, right: 80, bottom: 50, left: 70 },
+    grid: {
+      top: 24,
+      right: 16,
+      bottom: 40,
+      left: 8,
+    },
     xAxis: {
       type: 'value',
       boundaryGap: false,
@@ -150,6 +251,7 @@ export default function useRaceChartData() {
     },
     yAxis: {
       type: 'value',
+      show: true,
       axisLabel: { formatter: (v: number) => (v % 100 === 0 ? `${v} m` : '') },
     },
     series: [],
@@ -160,11 +262,16 @@ export default function useRaceChartData() {
   // =========================
 
   const updateChartData = () => {
-    chartOptions.value.series = [
-      ...splitsSeries.value,
-      separatorsSeries.value,
-      lineSerie.value,
-    ];
+    const options = {
+      ...chartOptions.value,
+      series: [...splitsSeries.value, separatorsSeries.value, lineSerie.value],
+    };
+
+    chartOptions.value = options;
+
+    if (chartInstance.value) {
+      chartInstance.value.setOption(options, true); // notMerge = true
+    }
   };
 
   // =========================
@@ -207,7 +314,7 @@ export default function useRaceChartData() {
   // Watch sur splits et separators
   // =========================
 
-  watch([splits, separators, clickedSeparator, clickedPoint], () => {
+  watch([isMobile, splits, separators, clickedSeparator, clickedPoint], () => {
     updateChartData();
   });
 

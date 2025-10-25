@@ -1,5 +1,5 @@
 import { useRace } from '@/composables/useRace';
-import { parseDate } from '@/lib/time';
+import { dateToMinutes, parseDate } from '@/lib/time';
 import { Separator } from '@/types/entities/Separator';
 import { TableRowItem } from '@/types/TableRowItem';
 import { computed, ref, watch } from 'vue';
@@ -27,7 +27,6 @@ const rows = computed((): TableRowItem[] => {
     index: 0,
     refuel: false,
     distance: 0,
-    timeBarrier: null,
     cumulDuration: 0,
     cumulElevation: 0,
     cumulNegativeElevation: 0,
@@ -36,7 +35,11 @@ const rows = computed((): TableRowItem[] => {
     splitElevation: 0,
     splitNegativeElevation: 0,
     splitPace: null,
-    timeBarrierTime: null,
+    split: null,
+    timeBarrier: null,
+    timeBarrierDuration: null,
+    timeBarrierValid: null,
+    stopDuration: null,
     splitSlopePercent: null,
     time: parseDate(startTime.value),
   };
@@ -52,23 +55,24 @@ const rows = computed((): TableRowItem[] => {
       ? new Date(firstRow.time.getTime() + cumulDuration * 60 * 1000)
       : null;
 
-    const timeBarrierTime =
-      firstRow.time && separator.timeBarrier
-        ? new Date(firstRow.time.getTime() + separator.timeBarrier * 60 * 1000)
-        : null;
+    const timeBarrier = parseDate(separator.timeBarrier);
+
+    const timeBarrierDuration = dateToMinutes(timeBarrier, firstRow.time);
+
+    const timeBarrierValid = timeBarrier ? timeBarrier > time : null;
 
     return {
       id: `row-${separator.distance}`,
       index: index + 1,
       refuel: separator.refuel,
       distance: separator.distance,
-      timeBarrier: separator.timeBarrier || null,
       stopDuration: separator.stopDuration || 0,
       cumulDuration,
       cumulElevation: getCumulElevationToDistance(separator.distance),
       cumulNegativeElevation: getCumulNegativeElevationToDistance(
         separator.distance
       ),
+      split,
       splitDistance: getSplitDistance(split),
       splitDuration: getSplitDuration(split),
       splitElevation: getSplitElevation(split),
@@ -76,7 +80,9 @@ const rows = computed((): TableRowItem[] => {
       splitSlopePercent: getSplitSlopePercent(split).major,
       splitPace: split.pace,
       time,
-      timeBarrierTime,
+      timeBarrier,
+      timeBarrierDuration,
+      timeBarrierValid,
     };
   });
 
@@ -84,47 +90,22 @@ const rows = computed((): TableRowItem[] => {
 });
 
 export default function useRaceTableRows() {
-  const onTableMouseEnter = (e: MouseEvent) => {
-    if (
-      !(e.target instanceof HTMLElement) ||
-      !e.target.classList.contains('race-table-row')
-    )
-      return;
-    const distanceString = Array.from(e.target.classList)
-      .find((c) => c.includes('distance-'))
-      ?.replace('distance-', '');
-    if (!distanceString) return;
-    const distance = Number(distanceString);
-    if (distance === 0) return;
-    const split = splits.value.find((el) => el.endDistance === distance);
-    if (!split) return;
-    hoveredSplit.value = split;
-  };
-
-  const onTableMouseLeave = (e: MouseEvent) => {
-    if (
-      !(e.target instanceof HTMLElement) ||
-      e.target.tagName.toLowerCase() !== 'table'
-    )
-      return;
-    hoveredRow.value = null;
-  };
-
   watch(hoveredSplit, () => {
-    if (!hoveredSplit.value) {
-      hoveredRow.value = null;
-    } else {
-      const rowItem = rows.value.find(
-        (r) => r.distance == hoveredSplit.value.endDistance
-      );
-      hoveredRow.value = rowItem || null;
-    }
+    const rowItem =
+      rows.value.find((r) => r.distance == hoveredSplit.value?.endDistance) ||
+      null;
+    hoveredRow.value = rowItem;
   });
+
+  const getRowSplit = (row: TableRowItem) => {
+    return (
+      splits.value.find((split) => split.endDistance == row.distance) || null
+    );
+  };
 
   return {
     rows,
     hoveredRow,
-    onTableMouseLeave,
-    onTableMouseEnter,
+    getRowSplit,
   };
 }

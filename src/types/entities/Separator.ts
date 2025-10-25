@@ -2,14 +2,14 @@ export interface Separator {
   refuel: boolean;
   distance: number;
   stopDuration: number;
-  timeBarrier: number;
+  timeBarrier: Date;
 }
 
 export class Separator {
   refuel: boolean;
   distance: number;
   stopDuration: number;
-  timeBarrier: number;
+  timeBarrier: Date;
 
   constructor(data?: Partial<Separator>) {
     this.refuel = data.refuel ?? false;

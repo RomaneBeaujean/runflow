@@ -1,7 +1,5 @@
-import { computeSeparators } from '@/lib/climbPasPro';
 import { roundOneNumber } from '@/lib/utils';
 import { GpxPoint } from '@/types/GpxPoint';
-import { Split } from '@/types/Split';
 import GpxParser, { Point } from 'gpxparser';
 
 export function useGpxParser(xml: string) {
@@ -63,28 +61,11 @@ export function useGpxParser(xml: string) {
     });
   }
 
-  function generateSplits(): Split[] {
-    const separators = [
-      ...computeSeparators(gpxexactpoints, 10, 0.05, 0.5),
-      roundOneNumber(gpxtotalDistance),
-    ];
-    const splits = [];
-    separators.forEach((distance: number, index: number) => {
-      const startDistance = index === 0 ? 0 : splits[index - 1].endDistance;
-      const endDistance = distance;
-      const pace = '06:30';
-      splits.push({ startDistance, endDistance, pace });
-    });
-
-    return splits;
-  }
-
   return {
     gpxpoints,
     gpxexactpoints,
     gpxtotalDistance,
     gpxtotalElevation,
     gpxtotalNegativeElevation,
-    generateSplits,
   };
 }

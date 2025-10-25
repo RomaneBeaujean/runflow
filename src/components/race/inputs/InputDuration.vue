@@ -41,8 +41,4 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped>
-:deep(input) {
-  max-width: 100%;
-}
-</style>
+<style lang="scss" scoped></style>

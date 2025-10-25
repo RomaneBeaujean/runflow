@@ -3,16 +3,17 @@
     v-model="currentPace"
     mask="99:99 (min/km)"
     placeholder="(min/km)"
-    class="mr-2"
+    class="input-pace mr-2"
     :size="props.size || 'small'"
-    style="max-width: 120px"
+    style="width: 125px"
   />
   <InputMask
     v-model="currentDuration"
     mask="99h99"
     placeholder="__h__"
+    class="input-duration"
     :size="props.size || 'small'"
-    style="max-width: 120px"
+    style="width: 75px"
   />
 </template>
 
@@ -98,8 +99,4 @@ watch([currentPace, currentDuration], () => {
 });
 </script>
 
-<style lang="scss" scoped>
-:deep(input) {
-  max-width: 100% !important;
-}
-</style>
+<style lang="scss" scoped></style>
