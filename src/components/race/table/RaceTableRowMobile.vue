@@ -29,7 +29,7 @@
               Ravitaillement
             </ColorTag>
           </div>
-          <div v-if="edition" class="ml-3">
+          <div v-if="edition && isNotFirstLine" class="ml-3">
             <div class="flex flex-wrap gap-2 items-center justify-center">
               <ToggleSwitch
                 :id="'refuel' + row.id"

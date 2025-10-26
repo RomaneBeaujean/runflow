@@ -58,7 +58,7 @@
   <template v-else>
     <Fieldset
       v-for="race in stores.races.races"
-      class="mb-3"
+      class="mb-3 relative"
       @click="goToCourse(race.id)"
     >
       <template #legend>
@@ -66,6 +66,17 @@
           <div class="text-sm font-bold">
             {{ race.name }}
           </div>
+        </div>
+      </template>
+      <div>
+        <div class="bottom-0 right-0 absolute bg-white">
+          <Button
+            icon="pi pi-external-link"
+            text
+            rounded
+            size="small"
+            @click.stop="goToCourse(race.id)"
+          />
           <Button
             icon="pi pi-trash"
             severity="danger"
@@ -75,9 +86,7 @@
             @click.stop="deleteCourse(race.id)"
           />
         </div>
-      </template>
-      <div>
-        <div class="flex justify-center gap-2">
+        <div class="flex justify-center gap-2 mb-3">
           <ColorTag
             color="primary"
             :label="getRaceTotalDistance(race.gpxContent)"

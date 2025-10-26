@@ -88,7 +88,7 @@
               <InputPaceDuration
                 size="default"
                 :pace="pace"
-                :distance="totalDistance"
+                :distance="totalDistance || 0"
                 @update="(newPace) => (pace = newPace.pace)"
               ></InputPaceDuration>
             </div>

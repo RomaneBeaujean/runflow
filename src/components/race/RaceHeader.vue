@@ -1,14 +1,22 @@
 <template>
   <div class="flex flex-col gap-2 mb-4">
-    <div class="flex justify-between items-center">
-      <RaceBreadcrumbs :race="race" />
-
-      <div class="buttons flex flex-row">
+    <RaceBreadcrumbs :race="race" v-if="!isMobile" />
+    <div class="flex justify-between gap-2 ml-3">
+      <div v-if="!editing" class="flex flex-1 items-center">
+        <span class="font-semibold text-xl block truncate">{{
+          props.race.name
+        }}</span>
+      </div>
+      <div v-else>
+        <InputText v-model="editableName" class="w-full sm:w-auto" />
+      </div>
+      <div class="flex flex-row">
         <Button
           icon="pi pi-file-export"
           class="p-button-rounded p-button-text"
           :icon-class="'text-xs'"
           @click="exportRace"
+          v-if="!editing"
         />
         <div>
           <Button
@@ -31,17 +39,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="ml-3">
-      <template v-if="!editing">
-        <span class="font-semibold text-xl block truncate">{{
-          props.race.name
-        }}</span>
-      </template>
-      <template v-else>
-        <InputText v-model="editableName" class="w-full sm:w-auto" />
-      </template>
     </div>
   </div>
 
@@ -116,6 +113,7 @@ import InputTime from '@/components/race/inputs/InputTime.vue';
 import { useGpxMetrics } from '@/composables/useGpxMetrics';
 import { useRace } from '@/composables/useRace';
 import { useRaceFilters } from '@/composables/useRaceFilters';
+import { useViewport } from '@/composables/useViewport';
 import { minutesToFormattedDuration } from '@/lib/time';
 import { useInjection } from '@/lib/useInjection';
 import { AppStores } from '@/stores/AppLoader';
@@ -126,7 +124,7 @@ import ColorTag from '../ColorTag.vue';
 import RaceBreadcrumbs from './RaceBreadcrumbs.vue';
 
 const stores = useInjection<AppStores>('stores');
-
+const { isMobile } = useViewport();
 const { race, startTime, splits, totalDistance } = useRace();
 const { getAveragePace, getCumulDurationToDistance } = useGpxMetrics();
 const { sticky } = useRaceFilters();
