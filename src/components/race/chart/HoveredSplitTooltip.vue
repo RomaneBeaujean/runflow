@@ -34,9 +34,9 @@
 </template>
 
 <script setup lang="ts">
-import { useEcharts } from '@/composables/useEcharts';
-import { useGpxMetrics } from '@/composables/useGpxMetrics';
-import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
+import { useEcharts } from '@/composables/Race/useEcharts';
+import useRaceChartSplitHover from '@/composables/Race/useRaceChartSplitHover';
+import { useRaceMetrics } from '@/composables/Race/useRaceMetrics';
 import { minutesToFormattedDuration } from '@/lib/time';
 import { Position } from '@/types/Position';
 import { Tag } from 'primevue';
@@ -44,7 +44,7 @@ import { computed, ref, watch } from 'vue';
 
 const position = ref<Position | null>(null);
 const { hoveredSplit } = useRaceChartSplitHover();
-const { getSplitDuration, getMidPointFromSplit } = useGpxMetrics();
+const { getSplitDuration, getMidPointFromSplit } = useRaceMetrics();
 const { chartInstance } = useEcharts();
 
 const duration = computed(() => {

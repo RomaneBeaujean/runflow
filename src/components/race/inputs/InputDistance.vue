@@ -11,7 +11,7 @@
   />
 </template>
 <script lang="ts" setup>
-import { useRace } from '@/composables/useRace';
+import { useRace } from '@/composables/Race/useRace';
 import { InputNumber } from 'primevue';
 import { ref, watch } from 'vue';
 

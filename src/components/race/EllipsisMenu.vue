@@ -1,13 +1,11 @@
 <template>
-  <div class="flex justify-end">
-    <Button
-      icon="pi pi-ellipsis-v"
-      class="p-button-sm p-button-text p-button-rounded"
-      @click="menu.toggle($event)"
-    />
+  <Button
+    icon="pi pi-ellipsis-v"
+    class="p-button-sm p-button-text p-button-rounded"
+    @click="menu.toggle($event)"
+  />
 
-    <Menu :model="items" popup ref="menu" />
-  </div>
+  <Menu :model="items" popup ref="menu" />
 </template>
 
 <script setup lang="ts">

@@ -5,14 +5,20 @@
       position: 'absolute',
       left: clickedPointPosition.left,
       top: clickedPointPosition.top,
-      transform: 'translate(-50%)',
     }"
   >
-    <div class="p-4 bg-white rounded-md shadow-md">
+    <i
+      class="pi pi-circle-fill text-amber-500"
+      style="transform: translate(-50%, -50%)"
+    ></i>
+    <div
+      class="p-2 bg-white rounded-md shadow-md"
+      style="transform: translate(-15px)"
+    >
       <div class="flex flex-col gap-1">
         <Button
           label="Ajouter un séparateur"
-          icon="pi pi-ellipsis-v"
+          icon="pi pi-arrows-v"
           size="small"
           class="p-button-text w-full justify-start hover:bg-gray-100"
           @click="() => addSeparatorOnClickedPoint(false)"
@@ -36,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import useRaceChartClick from '@/composables/useChartClick';
-import { useRace } from '@/composables/useRace';
+import useRaceChartClick from '@/composables/Race/useChartClick';
+import { useRace } from '@/composables/Race/useRace';
 import { Separator } from '@/types/entities/Separator';
 import { Button } from 'primevue';
 

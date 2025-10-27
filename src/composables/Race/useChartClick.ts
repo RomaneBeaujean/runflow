@@ -3,6 +3,7 @@ import { Position } from '@/types/Position';
 import { Separator } from '@/types/entities/Separator';
 import { ref } from 'vue';
 import { useEcharts } from './useEcharts';
+import { useRaceFilters } from './useRaceFilters';
 
 const {
   getTargetDistance,
@@ -12,18 +13,18 @@ const {
   getPositionFromPoint,
 } = useEcharts();
 
+const { editableMode } = useRaceFilters();
 const clickedPoint = ref<GpxPoint | null>(null);
 const clickedPointPosition = ref<Position | null>(null);
-
 const clickedSeparator = ref<Separator | null>(null);
 const clickedSeparatorPosition = ref<Position | null>(null);
 
 export default function useRaceChartClick() {
   const onChartClick = (event: any) => {
+    if (!editableMode.value) return;
     closeTooltip();
 
     const targetDistance = getTargetDistance(event);
-
     if (!event.target) return;
     if (event.target?.name === 'line') {
       const closest = getClosestSeparator(targetDistance);

@@ -11,8 +11,8 @@
 </template>
 
 <script setup lang="ts">
+import ColorTag, { TagColor } from '@/components/tags/ColorTag.vue';
 import { computed } from 'vue';
-import ColorTag, { TagColor } from '../ColorTag.vue';
 
 const props = defineProps<{
   slope: string | null;

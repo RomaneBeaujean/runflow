@@ -1,4 +1,4 @@
-import Lab from '@/components/Lab.vue';
+import Lab from '@/components/lab/Lab.vue';
 import Race from '@/views/Race.vue';
 import Races from '@/views/Races.vue';
 import { createRouter, createWebHistory } from 'vue-router';

@@ -1,3 +1,4 @@
+import { getAveragePace } from '@/lib/Metrics';
 import {
   durationFromPaceAndDistance,
   minutesToFormattedDuration,
@@ -5,11 +6,12 @@ import {
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';
 import { Split } from '@/types/Split';
+import { computed } from 'vue';
 import { useRace } from './useRace';
 
-const { points, separators, splits } = useRace();
+const { points, separators, splits, totalDistance } = useRace();
 
-export function useGpxMetrics() {
+export function useRaceMetrics() {
   function getCumulElevationToDistance(distance: number) {
     const point = points.value.find((el) => el.distance === distance);
     return Math.round(point?.cumulElevation ?? 0);
@@ -137,18 +139,9 @@ export function useGpxMetrics() {
     };
   }
 
-  function getAveragePace(splits: Split[]): string {
-    const totalDuration = splits.reduce((total, current) => {
-      return (total += getSplitDuration(current));
-    }, 0);
-    const totalDistance = splits.reduce((total, current) => {
-      return (total += getSplitDistance(current));
-    }, 0);
-    const pace = totalDuration / totalDistance;
-    const minutes = Math.floor(pace);
-    const seconds = Math.round((pace - minutes) * 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  }
+  const averagePace = computed(() => {
+    return getAveragePace(splits.value, separators.value, totalDistance.value);
+  });
 
   return {
     getPointFromDistance,
@@ -164,6 +157,6 @@ export function useGpxMetrics() {
     getCumulElevationToDistance,
     getCumulDurationToDistance,
     getSplitSlopePercent,
-    getAveragePace,
+    averagePace,
   };
 }

@@ -49,7 +49,7 @@ export class RacesStore {
   };
 
   addRace = async (r: Partial<Race>) => {
-    const race: Race = {
+    const race: Partial<Race> = {
       id: nanoid(),
       name: r.name,
       gpxContent: r.gpxContent,
@@ -76,6 +76,7 @@ export class RacesStore {
     try {
       await db.races.update(id, cleanRace);
       await this.init();
+      return newRace;
     } catch (err) {
       console.error('❌ Dexie updateRace error', err, cleanRace);
     }

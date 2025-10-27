@@ -12,7 +12,7 @@
           </div>
         </div>
       </template>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col">
         <div class="file-upload-holder flex flex-1 flex-col items-center gap-2">
           <FileUpload
             name="gpx"
@@ -25,19 +25,23 @@
             @select="addFile"
           />
           <div v-if="gpxFile">
-            <Tag severity="secondary">
-              {{ gpxFile.name }}
+            <ColorTag color="neutral">
+              <div class="max-w-[250px] min-w-0 truncate">
+                {{ gpxFile.name }}
+              </div>
               <button
                 type="button"
                 class="m-1 text-grey-600 hover:text-grey-900 font-bold cursor-pointer"
-                @click="gpxFile = null"
+                @click="removeFile"
               >
                 ×
               </button>
-            </Tag>
+            </ColorTag>
           </div>
         </div>
-        <div class="flex flex-1 flex-col gap-2">
+        <div class="flex flex-1 flex-col">
+          <Divider />
+
           <div>
             <label class="block mb-2 text-sm font-medium text-gray-700">
               Nom du plan de course
@@ -45,12 +49,12 @@
             <InputText
               v-model="raceName"
               type="text"
-              placeholder="Nom du plan de course"
+              placeholder="Nom"
               class="w-full"
             />
           </div>
 
-          <div class="flex flex-1 gap-2">
+          <div class="flex flex-1 gap-2 mt-2">
             <div class="flex-1">
               <label class="block mb-2 text-sm font-medium text-gray-700">
                 Date de la course
@@ -59,7 +63,7 @@
                 v-model="raceDate"
                 dateFormat="dd/mm/yyyy"
                 showIcon
-                placeholder="Choisir une date"
+                placeholder="Date"
                 :showTime="false"
               />
             </div>
@@ -74,13 +78,16 @@
             </div>
           </div>
 
+          <Divider />
+
           <div class="flex flex-col gap-2">
+            <div class="font-semibold text-primary-700">Objectifs</div>
             <div class="flex flex-1">
               <div class="flex flex-1 text-sm font-medium text-gray-700">
-                Allure souhaité
+                Allure moyenne
               </div>
               <div class="flex flex-1 text-sm font-medium text-gray-700">
-                Temps souhaité
+                Temps total
               </div>
             </div>
 
@@ -93,15 +100,17 @@
               ></InputPaceDuration>
             </div>
 
-            <div class="flex items-center gap-2 mt-4">
+            <Divider />
+
+            <div class="flex items-center gap-2">
               <Checkbox
                 v-model="automaticSeparators"
                 inputId="automatic_separators"
                 name="generateGpxOptions"
                 value="automatic_separators"
               />
-              <label for="automatic_separators">
-                Générer automatiquement les splits
+              <label for="automatic_separators" class="text-sm">
+                Détecter automatiquement les segments (montées/descentes)
               </label>
             </div>
           </div>
@@ -123,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGpxParser } from '@/composables/useGpxParser';
+import { useGpxParser } from '@/composables/Race/useGpxParser';
 import { ClimbDetector } from '@/lib/ClimbDetector';
 import { useInjection } from '@/lib/useInjection';
 import { roundOneNumber } from '@/lib/utils';
@@ -133,14 +142,15 @@ import {
   Button,
   Checkbox,
   DatePicker,
+  Divider,
   FileUpload,
   FileUploadSelectEvent,
   InputText,
   Panel,
-  Tag,
 } from 'primevue';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import ColorTag from '../tags/ColorTag.vue';
 import InputPaceDuration from './inputs/InputPaceDuration.vue';
 import InputTime from './inputs/InputTime.vue';
 
@@ -153,6 +163,15 @@ const raceDate = ref<Date | null>(null);
 const startTime = ref<Date | null>(null);
 const automaticSeparators = ref<boolean>(false);
 const pace = ref<string>('06:30');
+
+const removeFile = () => {
+  raceName.value = null;
+  gpxFile.value = null;
+  raceDate.value = null;
+  startTime.value = null;
+  automaticSeparators.value = false;
+  pace.value = '06:30';
+};
 
 const addFile = async (event: FileUploadSelectEvent) => {
   const uploadedFile = event.files[0];
@@ -177,6 +196,10 @@ function close() {
   collapsed.value = true;
   raceName.value = null;
   gpxFile.value = null;
+  raceDate.value = null;
+  startTime.value = null;
+  automaticSeparators.value = false;
+  pace.value = '06:30';
 }
 
 async function createCourse() {
@@ -210,8 +233,6 @@ async function createCourse() {
     splits,
     separators,
   });
-
-  console.log(transitions, splits, separators);
 
   goToCourse(id);
 }

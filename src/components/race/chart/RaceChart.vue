@@ -11,21 +11,19 @@
   />
   <ClickedPointTooltip v-if="!isMobile" />
   <ClickedSeparatorTooltip v-if="!isMobile" />
-  <HoveredSplitTooltip v-if="!isMobile" />
 </template>
 
 <script setup lang="ts">
-import useRaceChartClick from '@/composables/useChartClick';
-import { useEcharts } from '@/composables/useEcharts';
-import { useRace } from '@/composables/useRace';
-import useRaceChartData from '@/composables/useRaceChartData';
-import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
+import useRaceChartClick from '@/composables/Race/useChartClick';
+import { useEcharts } from '@/composables/Race/useEcharts';
+import { useRace } from '@/composables/Race/useRace';
+import useRaceChartData from '@/composables/Race/useRaceChartData';
+import useRaceChartSplitHover from '@/composables/Race/useRaceChartSplitHover';
 import { useViewport } from '@/composables/useViewport';
 import { onMounted } from 'vue';
 import VChart from 'vue-echarts';
 import ClickedPointTooltip from './ClickedPointTooltip.vue';
 import ClickedSeparatorTooltip from './ClickedSeparatorTooltip.vue';
-import HoveredSplitTooltip from './HoveredSplitTooltip.vue';
 
 const { isMobile } = useViewport();
 const { onChartHover, onChartLeave } = useRaceChartSplitHover();

@@ -1,12 +1,15 @@
 <template>
-  <div class="mb-3 relative">
-    <div class="absolute right-0 top-0 bg-white flex justify-center">
+  <div class="relative">
+    <div
+      class="absolute right-0 top-0 bg-white flex justify-center"
+      v-if="editableMode"
+    >
       <div v-if="!edition">
-        <Button icon="pi pi-pencil" size="small" text @click="editRow" />
+        <Button icon="pi pi-pencil" text rounded @click="editRow" />
       </div>
-      <div v-else>
-        <Button icon="pi pi-check" size="small" text @click="saveRow" />
-        <Button icon="pi pi-times" size="small" text @click="uneditRow" />
+      <div v-else class="flex gap-2">
+        <Button icon="pi pi-check" @click="saveRow" rounded />
+        <Button icon="pi pi-times" @click="uneditRow" rounded />
       </div>
     </div>
     <Fieldset :legend="isNotFirstLine ? `${row.distance} km` : 'Départ'">
@@ -92,9 +95,6 @@
             <ColorTag color="primary">
               {{ row.splitDistance }} <span class="xsmall">km</span></ColorTag
             >
-            <SlopeTag :slope="row.splitSlopePercent">
-              {{ row.splitSlopePercent }} <span class="xsmall">%</span>
-            </SlopeTag>
             <ColorTag color="amber">
               <span class="xsmall">+</span><span>{{ row.splitElevation }}</span
               ><span class="xsmall">m</span>
@@ -104,6 +104,9 @@
               ><span>{{ row.splitNegativeElevation }}</span
               ><span class="xsmall">m</span>
             </ColorTag>
+            <SlopeTag :slope="row.splitSlopePercent">
+              {{ row.splitSlopePercent }} <span class="xsmall">%</span>
+            </SlopeTag>
           </div>
           <div class="flex mt-1">
             <div class="flex flex-col items-center flex-1 gap-2">
@@ -210,21 +213,27 @@
         </div>
       </template>
     </Fieldset>
+
+    <div class="flex justify-center mt-2" v-if="editableMode">
+      <AddSeparator :initialdistance="row.distance + 1" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import ColorTag from '@/components/ColorTag.vue';
-import { useRace } from '@/composables/useRace';
+import InputDistance from '@/components/race/inputs/InputDistance.vue';
+import InputPaceDuration from '@/components/race/inputs/InputPaceDuration.vue';
+import InputRefuelStopDuration from '@/components/race/inputs/InputRefuelStopDuration.vue';
+import InputTime from '@/components/race/inputs/InputTime.vue';
+import ColorTag from '@/components/tags/ColorTag.vue';
+import SlopeTag from '@/components/tags/SlopeTag.vue';
+import { useRace } from '@/composables/Race/useRace';
+import { useRaceFilters } from '@/composables/Race/useRaceFilters';
 import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 import { TableRowItem } from '@/types/TableRowItem';
 import { Button, Divider, Fieldset, ToggleSwitch } from 'primevue';
 import { computed, ref, watch } from 'vue';
-import SlopeTag from '../SlopeTag.vue';
-import InputDistance from '../inputs/InputDistance.vue';
-import InputPaceDuration from '../inputs/InputPaceDuration.vue';
-import InputRefuelStopDuration from '../inputs/InputRefuelStopDuration.vue';
-import InputTime from '../inputs/InputTime.vue';
+import AddSeparator from '../AddSeparatorMobile.vue';
 
 const props = defineProps<{ row: TableRowItem }>();
 const {
@@ -234,6 +243,8 @@ const {
   separators,
   race,
 } = useRace();
+const { editableMode } = useRaceFilters();
+
 const edition = ref<boolean>(false);
 const newRowData = ref<{
   refuel: boolean;

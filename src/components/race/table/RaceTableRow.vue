@@ -168,7 +168,7 @@
       </template>
     </div>
   </div>
-  <div class="cell border-l-1 border-gray-200">
+  <div class="cell border-l-1 border-gray-200" v-if="editableMode">
     <div v-if="!edition" class="flex flex-nowrap">
       <Button
         icon="pi pi-pencil"
@@ -198,17 +198,18 @@
 </template>
 
 <script setup lang="ts">
-import ColorTag from '@/components/ColorTag.vue';
-import { useRace } from '@/composables/useRace';
+import InputDistance from '@/components/race/inputs/InputDistance.vue';
+import InputPaceDuration from '@/components/race/inputs/InputPaceDuration.vue';
+import InputRefuelStopDuration from '@/components/race/inputs/InputRefuelStopDuration.vue';
+import InputTime from '@/components/race/inputs/InputTime.vue';
+import ColorTag from '@/components/tags/ColorTag.vue';
+import SlopeTag from '@/components/tags/SlopeTag.vue';
+import { useRace } from '@/composables/Race/useRace';
+import { useRaceFilters } from '@/composables/Race/useRaceFilters';
 import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 import { TableRowItem } from '@/types/TableRowItem';
 import { Button, ToggleSwitch } from 'primevue';
 import { computed, ref, watch } from 'vue';
-import SlopeTag from '../SlopeTag.vue';
-import InputDistance from '../inputs/InputDistance.vue';
-import InputPaceDuration from '../inputs/InputPaceDuration.vue';
-import InputRefuelStopDuration from '../inputs/InputRefuelStopDuration.vue';
-import InputTime from '../inputs/InputTime.vue';
 
 const props = defineProps<{ row: TableRowItem }>();
 const {
@@ -219,6 +220,7 @@ const {
   separators,
   race,
 } = useRace();
+const { editableMode } = useRaceFilters();
 const edition = ref<boolean>(false);
 const newRowData = ref<{
   refuel: boolean;

@@ -1,10 +1,10 @@
-import { useRace } from '@/composables/useRace';
+import { useRace } from '@/composables/Race/useRace';
 import { dateToMinutes, parseDate } from '@/lib/time';
 import { Separator } from '@/types/entities/Separator';
 import { TableRowItem } from '@/types/TableRowItem';
 import { computed, ref, watch } from 'vue';
-import { useGpxMetrics } from './useGpxMetrics';
 import useRaceChartSplitHover from './useRaceChartSplitHover';
+import { useRaceMetrics } from './useRaceMetrics';
 
 const { splits, startTime, separators } = useRace();
 const { hoveredSplit } = useRaceChartSplitHover();
@@ -17,7 +17,7 @@ const {
   getSplitSlopePercent,
   getSplitDuration,
   getSplitElevation,
-} = useGpxMetrics();
+} = useRaceMetrics();
 
 const hoveredRow = ref<TableRowItem | null>();
 

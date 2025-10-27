@@ -1,78 +1,80 @@
 <template>
   <template v-if="!showAddSeparator">
-    <div class="flex justify-center">
-      <Button
-        size="small"
-        label="Ajouter un séparateur"
-        text
-        icon="pi pi-plus"
-        @click="showAddSeparator = true"
-      />
+    <div class="relative z-10">
+      <div class="absolute top-[-15px] left-[40px]">
+        <Button
+          icon="pi pi-plus-circle"
+          text
+          rounded
+          size="small"
+          @click="showAddSeparator = true"
+        />
+      </div>
     </div>
   </template>
   <template v-else>
-    <div class="flex justify-center mb-3 mt-3">
-      <div class="max-w-[500px] flex-1">
-        <Panel>
-          <template #header>
-            <span class="font-bold text-sm">Ajouter un séparateur</span>
-          </template>
-          <div class="flex flex-col gap-2">
-            <div class="flex gap-2">
-              <div class="flex flex-1 flex-col gap-2 items-center">
-                <div class="text-xs font-semibold">Distance</div>
-                <InputDistance
-                  :distance="newSeparatorDistance"
-                  @update="({ distance }) => (newSeparatorDistance = distance)"
-                />
-              </div>
-              <Divider layout="vertical" />
-              <div class="flex flex-1 flex-col items-center justify-center">
-                <div class="flex flex-wrap gap-2 items-center justify-center">
-                  <ToggleSwitch name="refuel" v-model="newSeparatorRefuel" />
-                  <label
-                    class="text-xs cursor-pointer"
-                    @click="newSeparatorRefuel = !newSeparatorRefuel"
-                    >Ravitaillement</label
-                  >
-                </div>
-              </div>
-            </div>
-            <div class="flex gap-2 justify-center mt-2">
+    <div class="row relative h-[70px]">
+      <div class="absolute top-0 left-0 bottom-0 right-0 p-2">
+        <div class="flex gap-2">
+          <!-- Distance -->
+          <div class="flex flex-col gap-1 items-center mr-5">
+            <span class="text-xs font-semibold">Distance</span>
+            <InputDistance
+              :distance="newSeparatorDistance"
+              @update="({ distance }) => (newSeparatorDistance = distance)"
+            />
+          </div>
+
+          <!-- Switch -->
+          <div class="flex gap-2 items-center justify-center mr-5">
+            <ToggleSwitch name="refuel" v-model="newSeparatorRefuel" />
+            <label
+              class="text-xs cursor-pointer"
+              @click="newSeparatorRefuel = !newSeparatorRefuel"
+              >Ravitaillement</label
+            >
+          </div>
+
+          <!-- Boutons -->
+          <div class="flex gap-2 items-center">
+            <div>
               <Button
                 size="small"
                 label="Ajouter"
                 icon="pi pi-check"
-                text
-                @click="addSeparatorOnDistance"
+                @click="save"
               />
+            </div>
+            <div>
               <Button
                 size="small"
                 label="Annuler"
                 icon="pi pi-times"
-                text
-                @click="closeAddSeparator"
+                severity="secondary"
+                @click="cancel"
               />
             </div>
           </div>
-        </Panel>
+        </div>
       </div>
     </div>
   </template>
 </template>
 <script setup lang="ts">
 import InputDistance from '@/components/race/inputs/InputDistance.vue';
-import { useRace } from '@/composables/useRace';
+import { useRace } from '@/composables/Race/useRace';
 import { Separator } from '@/types/entities/Separator';
-import { Button, Divider, Panel, ToggleSwitch } from 'primevue';
+import { Button, ToggleSwitch } from 'primevue';
 import { ref } from 'vue';
 
-const showAddSeparator = ref(false);
-const newSeparatorDistance = ref(0);
-const newSeparatorRefuel = ref(false);
-const { addSeparator } = useRace();
+const props = defineProps<{ initialdistance?: number }>();
 
-const addSeparatorOnDistance = () => {
+const { addSeparator } = useRace();
+const showAddSeparator = ref(false);
+const newSeparatorDistance = ref(props.initialdistance || 0);
+const newSeparatorRefuel = ref(false);
+
+const save = () => {
   const separator: Separator = {
     distance: newSeparatorDistance.value,
     refuel: newSeparatorRefuel.value,
@@ -80,12 +82,27 @@ const addSeparatorOnDistance = () => {
     timeBarrier: null,
   };
   addSeparator(separator);
-  closeAddSeparator();
+  cancel();
 };
 
-const closeAddSeparator = () => {
+const cancel = () => {
   showAddSeparator.value = false;
-  newSeparatorDistance.value = 0;
+  newSeparatorDistance.value = props.initialdistance;
   newSeparatorRefuel.value = false;
 };
 </script>
+<style lang="scss" scoped>
+.row {
+  border-bottom: 1px solid #ddd;
+}
+
+@media (max-width: 1200px) {
+  .cell {
+    padding: 4px;
+  }
+}
+
+.xsmall {
+  font-size: 10px;
+}
+</style>

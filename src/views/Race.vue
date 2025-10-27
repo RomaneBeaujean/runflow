@@ -6,9 +6,6 @@
     <div id="chart">
       <RaceChart />
     </div>
-    <div>
-      <AddSeparator />
-    </div>
     <div id="table" class="p-2">
       <RaceTable />
     </div>
@@ -23,12 +20,11 @@ import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
 import { computed, onMounted, watch } from 'vue';
 
-import AddSeparator from '@/components/race/AddSeparator.vue';
 import RaceChart from '@/components/race/chart/RaceChart.vue';
-import RaceHeader from '@/components/race/RaceHeader.vue';
+import RaceHeader from '@/components/race/header/RaceHeader.vue';
 import RaceTable from '@/components/race/table/RaceTable.vue';
-import { useRace } from '@/composables/useRace';
-import { useRaceFilters } from '@/composables/useRaceFilters';
+import { useRace } from '@/composables/Race/useRace';
+import { useRaceFilters } from '@/composables/Race/useRaceFilters';
 import { useViewport } from '@/composables/useViewport';
 import { ProgressSpinner } from 'primevue';
 

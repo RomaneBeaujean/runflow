@@ -137,3 +137,8 @@ export function parseDate(
   if (value instanceof Date) return value;
   return null;
 }
+
+export function dateToFormatted(value: Date) {
+  if (!value) return null;
+  return value.toLocaleDateString('fr-FR');
+}

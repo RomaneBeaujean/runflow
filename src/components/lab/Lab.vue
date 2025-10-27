@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGpxParser } from '@/composables/useGpxParser';
+import { useGpxParser } from '@/composables/Race/useGpxParser';
 import { ClimbDetector } from '@/lib/ClimbDetector';
 import { computeSeparators } from '@/lib/climbPasPro';
 import { GpxPoint } from '@/types/GpxPoint';
