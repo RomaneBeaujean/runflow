@@ -215,9 +215,8 @@ export default function useRaceChartData() {
     grid: {
       top: 40,
       right: 16,
-      bottom: isMobile.value ? 0 : 40,
+      bottom: isMobile.value ? 0 : 60,
       left: 8,
-      containLabel: true,
     },
     xAxis: {
       type: 'value',

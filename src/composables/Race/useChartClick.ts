@@ -2,6 +2,7 @@ import { GpxPoint } from '@/types/GpxPoint';
 import { Position } from '@/types/Position';
 import { Separator } from '@/types/entities/Separator';
 import { ref } from 'vue';
+import { useViewport } from '../useViewport';
 import { useEcharts } from './useEcharts';
 import { useRaceFilters } from './useRaceFilters';
 
@@ -13,6 +14,7 @@ const {
   getPositionFromPoint,
 } = useEcharts();
 
+const { isMobile } = useViewport();
 const { editableMode } = useRaceFilters();
 const clickedPoint = ref<GpxPoint | null>(null);
 const clickedPointPosition = ref<Position | null>(null);
@@ -21,7 +23,8 @@ const clickedSeparatorPosition = ref<Position | null>(null);
 
 export default function useRaceChartClick() {
   const onChartClick = (event: any) => {
-    if (!editableMode.value) return;
+    if (!editableMode.value || isMobile) return;
+    console.log(clickedPoint.value);
     closeTooltip();
 
     const targetDistance = getTargetDistance(event);

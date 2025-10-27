@@ -18,7 +18,7 @@ const router = createRouter({
     { path: '/races/:id', component: Race, props: true },
     {
       path: '/:catchAll(.*)',
-      redirect: '/',
+      redirect: '/races',
     },
     {
       path: '/lab',
