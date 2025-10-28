@@ -1,4 +1,4 @@
-export interface TableRowItem {
+export interface SplitItem {
   id: string;
   refuel: boolean;
   index: number;

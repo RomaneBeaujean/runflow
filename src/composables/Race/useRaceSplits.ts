@@ -1,7 +1,7 @@
 import { useRace } from '@/composables/Race/useRace';
 import { dateToMinutes, parseDate } from '@/lib/time';
 import { Separator } from '@/types/entities/Separator';
-import { TableRowItem } from '@/types/TableRowItem';
+import { SplitItem } from '@/types/SplitItem';
 import { computed, ref, watch } from 'vue';
 import useRaceChartSplitHover from './useRaceChartSplitHover';
 import { useRaceMetrics } from './useRaceMetrics';
@@ -19,10 +19,10 @@ const {
   getSplitElevation,
 } = useRaceMetrics();
 
-const hoveredRow = ref<TableRowItem | null>();
+const hoveredSplitItem = ref<SplitItem | null>();
 
-const rows = computed((): TableRowItem[] => {
-  const firstRow = {
+const splitItems = computed((): SplitItem[] => {
+  const firstItem = {
     id: `row-0`,
     index: 0,
     refuel: false,
@@ -44,20 +44,20 @@ const rows = computed((): TableRowItem[] => {
     time: parseDate(startTime.value),
   };
 
-  const rows = separators.value.map((separator: Separator, index: number) => {
+  const items = separators.value.map((separator: Separator, index: number) => {
     const split = splits.value.find(
       (s) => s.endDistance === separator.distance
     );
 
     const cumulDuration = getCumulDurationToDistance(separator.distance);
 
-    const time = firstRow.time
-      ? new Date(firstRow.time.getTime() + cumulDuration * 60 * 1000)
+    const time = firstItem.time
+      ? new Date(firstItem.time.getTime() + cumulDuration * 60 * 1000)
       : null;
 
     const timeBarrier = parseDate(separator.timeBarrier);
 
-    const timeBarrierDuration = dateToMinutes(timeBarrier, firstRow.time);
+    const timeBarrierDuration = dateToMinutes(timeBarrier, firstItem.time);
 
     const timeBarrierValid = timeBarrier ? timeBarrier > time : null;
 
@@ -86,26 +86,27 @@ const rows = computed((): TableRowItem[] => {
     };
   });
 
-  return [firstRow, ...rows];
+  return [firstItem, ...items];
 });
 
-export default function useRaceTableRows() {
+export default function useRaceSplits() {
   watch(hoveredSplit, () => {
     const rowItem =
-      rows.value.find((r) => r.distance == hoveredSplit.value?.endDistance) ||
-      null;
-    hoveredRow.value = rowItem;
+      splitItems.value.find(
+        (r) => r.distance == hoveredSplit.value?.endDistance
+      ) || null;
+    hoveredSplitItem.value = rowItem;
   });
 
-  const getRowSplit = (row: TableRowItem) => {
+  const getItemSplit = (row: SplitItem) => {
     return (
       splits.value.find((split) => split.endDistance == row.distance) || null
     );
   };
 
   return {
-    rows,
-    hoveredRow,
-    getRowSplit,
+    splitItems,
+    hoveredSplitItem,
+    getItemSplit,
   };
 }

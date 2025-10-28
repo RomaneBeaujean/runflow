@@ -1,18 +1,19 @@
 <template>
   <div v-if="race" id="race" :class="classes">
     <div id="race-header">
-      <RaceHeader :race="race" />
+      <RaceHeader />
     </div>
     <div id="chart">
       <RaceChart />
     </div>
-    <div id="table" class="p-2">
-      <RaceTable />
+    <div id="splits" class="p-2">
+      <RaceSplits />
     </div>
   </div>
   <div v-else class="flex justify-center items-center h-40 text-gray-500">
     <ProgressSpinner />
   </div>
+  <RaceRecapModal />
 </template>
 
 <script setup lang="ts">
@@ -22,7 +23,8 @@ import { computed, onMounted, watch } from 'vue';
 
 import RaceChart from '@/components/race/chart/RaceChart.vue';
 import RaceHeader from '@/components/race/header/RaceHeader.vue';
-import RaceTable from '@/components/race/table/RaceTable.vue';
+import RaceRecapModal from '@/components/race/recap/RaceRecapModal.vue';
+import RaceSplits from '@/components/race/splits/RaceSplits.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceFilters } from '@/composables/Race/useRaceFilters';
 import { useViewport } from '@/composables/useViewport';

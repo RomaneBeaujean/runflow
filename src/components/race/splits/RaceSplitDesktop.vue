@@ -1,21 +1,21 @@
 <template>
   <div class="cell w-[24px] font-semibold">
-    <span v-if="isNotFirstLine" class="text-xs"> #{{ row.index }} </span>
+    <span v-if="isNotFirstLine" class="text-xs"> #{{ split.index }} </span>
     <span v-else class="text-xs"> Départ </span>
   </div>
   <div class="cell w-[24px]">
-    <span v-if="row.refuel && !edition">
+    <span v-if="split.refuel && !edition">
       <ColorTag color="pink">Ravitaillement</ColorTag>
     </span>
     <template v-if="isNotFirstLine && edition">
       <div class="flex flex-wrap gap-2 items-center justify-center">
         <ToggleSwitch
-          :id="'refuel' + row.id"
+          :id="'refuel' + split.id"
           name="refuel"
           v-model="newRowData.refuel"
         />
         <label
-          :for="'refuel' + row.id"
+          :for="'refuel' + split.id"
           class="text-xs cursor-pointer"
           @click="newRowData.refuel = !newRowData.refuel"
           >Ravitaillement</label
@@ -25,12 +25,12 @@
   </div>
   <div class="cell font-semibold whitespace-nowrap border-l-1 border-gray-200">
     <template v-if="!edition">
-      {{ row.distance }} <span class="xsmall">km</span>
+      {{ split.distance }} <span class="xsmall">km</span>
     </template>
     <template
-      v-if="edition && isNotFirstLine && row.distance !== totalDistance"
+      v-if="edition && isNotFirstLine && split.distance !== totalDistance"
     >
-      <InputDistance :distance="row.distance" @update="updateDistance" />
+      <InputDistance :distance="split.distance" @update="updateDistance" />
     </template>
   </div>
   <div class="cell">
@@ -39,11 +39,11 @@
       class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
     >
       <ColorTag class="mr-2">
-        <span class="xsmall">+</span>{{ row.cumulElevation }}
+        <span class="xsmall">+</span>{{ split.cumulElevation }}
         <span class="xsmall">m</span>
       </ColorTag>
       <ColorTag>
-        <span class="xsmall">-</span>{{ row.cumulNegativeElevation }}
+        <span class="xsmall">-</span>{{ split.cumulNegativeElevation }}
         <span class="xsmall">m</span>
       </ColorTag>
     </div>
@@ -51,7 +51,7 @@
   <div class="cell border-l-1 border-gray-200">
     <div v-if="isNotFirstLine">
       <ColorTag color="amber" class="font-semibold">
-        {{ row.splitDistance }} <span class="xsmall">km</span>
+        {{ split.splitDistance }} <span class="xsmall">km</span>
       </ColorTag>
     </div>
   </div>
@@ -61,19 +61,19 @@
       class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
     >
       <ColorTag class="mr-2" color="amber">
-        <span class="xsmall">+</span> {{ row.splitElevation }}
+        <span class="xsmall">+</span> {{ split.splitElevation }}
         <span class="xsmall">m</span>
       </ColorTag>
       <ColorTag color="amber">
-        <span class="xsmall">-</span> {{ row.splitNegativeElevation }}
+        <span class="xsmall">-</span> {{ split.splitNegativeElevation }}
         <span class="xsmall">m</span>
       </ColorTag>
     </div>
   </div>
   <div class="cell">
     <div v-if="isNotFirstLine">
-      <SlopeTag :slope="row.splitSlopePercent">
-        {{ row.splitSlopePercent }} <span class="xsmall">%</span>
+      <SlopeTag :slope="split.splitSlopePercent">
+        {{ split.splitSlopePercent }} <span class="xsmall">%</span>
       </SlopeTag>
     </div>
   </div>
@@ -83,11 +83,11 @@
       class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
     >
       <ColorTag icon="pi pi-bolt" color="deep-purple" class="mr-2">
-        {{ row.splitPace }}
+        {{ split.splitPace }}
         <span class="xsmall">min/km</span>
       </ColorTag>
       <ColorTag icon="pi pi-stopwatch" color="green">
-        {{ minutesToFormattedDuration(row.splitDuration) }}
+        {{ minutesToFormattedDuration(split.splitDuration) }}
       </ColorTag>
     </div>
     <div
@@ -95,16 +95,16 @@
       class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
     >
       <InputPaceDuration
-        :pace="row.splitPace"
-        :distance="row.splitDistance"
+        :pace="split.splitPace"
+        :distance="split.splitDistance"
         @update="updatePace"
       />
     </div>
   </div>
   <div class="cell border-r-1 border-gray-200">
-    <template v-if="row.refuel && isNotFirstLine && !edition">
+    <template v-if="split.refuel && isNotFirstLine && !edition">
       <ColorTag color="pink">
-        {{ row.stopDuration }} <span class="xsmall">min</span>
+        {{ split.stopDuration }} <span class="xsmall">min</span>
       </ColorTag>
     </template>
     <template v-if="isNotFirstLine && edition && newRowData.refuel">
@@ -121,18 +121,18 @@
           icon="pi pi-clock"
           color="primary"
           class="mb-2"
-          v-if="row.time"
+          v-if="split.time"
         >
-          {{ dateToFormattedTime(row.time) }}
+          {{ dateToFormattedTime(split.time) }}
         </ColorTag>
         <ColorTag icon="pi pi-stopwatch" color="green" v-if="isNotFirstLine">
-          {{ minutesToFormattedDuration(row.cumulDuration) }}
+          {{ minutesToFormattedDuration(split.cumulDuration) }}
         </ColorTag>
       </template>
       <template v-if="edition && !isNotFirstLine">
         <InputTime
-          :time="row.time"
-          :reference="row.time"
+          :time="split.time"
+          :reference="split.time"
           size="small"
           @update="updateStartTime"
         />
@@ -143,24 +143,24 @@
     <div v-if="isNotFirstLine" class="w-[70px] inline-block">
       <template v-if="!isNotFirstLine || (isNotFirstLine && !edition)">
         <ColorTag
-          v-if="row.timeBarrier"
+          v-if="split.timeBarrier"
           icon="pi pi-clock"
-          :color="row.timeBarrierValid ? 'bright-green' : 'red'"
+          :color="split.timeBarrierValid ? 'bright-green' : 'red'"
           class="mb-2"
         >
-          {{ dateToFormattedTime(row.timeBarrier) }}
+          {{ dateToFormattedTime(split.timeBarrier) }}
         </ColorTag>
         <ColorTag
-          v-if="row.timeBarrier"
+          v-if="split.timeBarrier"
           icon="pi pi-stopwatch"
-          :color="row.timeBarrierValid ? 'bright-green' : 'red'"
+          :color="split.timeBarrierValid ? 'bright-green' : 'red'"
         >
-          {{ minutesToFormattedDuration(row.timeBarrierDuration) }}
+          {{ minutesToFormattedDuration(split.timeBarrierDuration) }}
         </ColorTag>
       </template>
       <template v-if="isNotFirstLine && edition">
         <InputTime
-          :time="row.timeBarrier"
+          :time="split.timeBarrier"
           :reference="race.startTime"
           size="small"
           @update="updateTimeBarrier"
@@ -181,7 +181,7 @@
         icon="pi pi-trash"
         size="small"
         text
-        :disabled="row.distance === 0 || row.distance === totalDistance"
+        :disabled="split.distance === 0 || split.distance === totalDistance"
       />
     </div>
     <template v-else>
@@ -207,11 +207,12 @@ import SlopeTag from '@/components/tags/SlopeTag.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceFilters } from '@/composables/Race/useRaceFilters';
 import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
-import { TableRowItem } from '@/types/TableRowItem';
+import { SplitItem } from '@/types/SplitItem';
 import { Button, ToggleSwitch } from 'primevue';
 import { computed, ref, watch } from 'vue';
 
-const props = defineProps<{ row: TableRowItem }>();
+const props = defineProps<{ split: SplitItem }>();
+
 const {
   totalDistance,
   updateSplitPace,
@@ -220,8 +221,11 @@ const {
   separators,
   race,
 } = useRace();
+
 const { editableMode } = useRaceFilters();
+
 const edition = ref<boolean>(false);
+
 const newRowData = ref<{
   refuel: boolean;
   pace: string;
@@ -230,20 +234,20 @@ const newRowData = ref<{
   timeBarrier: Date;
   startTime: Date;
 }>({
-  refuel: props.row.refuel,
-  pace: props.row.splitPace,
-  distance: props.row.distance,
-  stopDuration: props.row.stopDuration,
-  timeBarrier: props.row.timeBarrier,
-  startTime: props.row.time,
+  refuel: props.split.refuel,
+  pace: props.split.splitPace,
+  distance: props.split.distance,
+  stopDuration: props.split.stopDuration,
+  timeBarrier: props.split.timeBarrier,
+  startTime: props.split.time,
 });
 
 const isNotFirstLine = computed(() => {
-  return props.row.index !== 0;
+  return props.split.index !== 0;
 });
 
 const separator = computed(() => {
-  return separators.value.find((el) => el.distance === props.row.distance);
+  return separators.value.find((el) => el.distance === props.split.distance);
 });
 
 const editRow = () => {
@@ -254,8 +258,8 @@ const saveRow = () => {
   const { pace, distance, stopDuration, timeBarrier, startTime, refuel } =
     newRowData.value;
 
-  if (props.row.distance === 0) {
-    if (startTime !== props.row.time) updateRaceStartTime(startTime);
+  if (props.split.distance === 0) {
+    if (startTime !== props.split.time) updateRaceStartTime(startTime);
     uneditRow();
     return;
   }
@@ -267,7 +271,7 @@ const saveRow = () => {
     timeBarrier,
     refuel,
   };
-  if (props.row.splitPace !== pace) updateSplitPace(props.row.split, pace);
+  if (props.split.splitPace !== pace) updateSplitPace(props.split.split, pace);
   if (separator.value !== newSeparator)
     updateSeparator(separator.value, newSeparator);
 
@@ -277,12 +281,12 @@ const saveRow = () => {
 const uneditRow = () => {
   edition.value = false;
   newRowData.value = {
-    refuel: props.row.refuel,
-    pace: props.row.splitPace,
-    distance: props.row.distance,
-    stopDuration: props.row.stopDuration,
-    timeBarrier: props.row.timeBarrier,
-    startTime: props.row.time,
+    refuel: props.split.refuel,
+    pace: props.split.splitPace,
+    distance: props.split.distance,
+    stopDuration: props.split.stopDuration,
+    timeBarrier: props.split.timeBarrier,
+    startTime: props.split.time,
   };
 };
 

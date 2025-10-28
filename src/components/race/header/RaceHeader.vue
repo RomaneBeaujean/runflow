@@ -8,7 +8,7 @@
       <div class="flex min-w-0">
         <div v-if="!editing" class="flex flex-1 items-center min-w-0">
           <span class="font-semibold text-xl truncate block max-w-full">
-            {{ props.race.name }}
+            {{ race.name }}
           </span>
         </div>
         <div v-else>
@@ -66,7 +66,7 @@
     <!-- Boutons -->
     <div class="flex-0">
       <div v-if="!editing" class="flex flex-row">
-        <RaceOptions />
+        <RaceViewParams />
         <RaceEllipsisMenu :race="race" :edit="startEditing" />
       </div>
       <div v-if="editing" class="flex gap-1">
@@ -81,7 +81,7 @@
 import RaceBreadcrumbs from '@/components/race/header/RaceBreadcrumbs.vue';
 import RaceEllipsisMenu from '@/components/race/header/RaceEllipsisMenu.vue';
 import InputTime from '@/components/race/inputs/InputTime.vue';
-import RaceOptions from '@/components/race/RaceOptions.vue';
+import RaceViewParams from '@/components/race/RaceViewParams.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceMetrics } from '@/composables/Race/useRaceMetrics';
@@ -109,17 +109,16 @@ const totalDuration = computed(() => {
   );
 });
 
-const props = defineProps<{ race: Race }>();
 const editing = ref(false);
 const editableName = ref('');
 const editableDate = ref<Date | null>(null);
 const editableTime = ref<Date | null>(null);
 
 const startEditing = () => {
-  if (!props.race) return;
+  if (!race) return;
   editing.value = true;
-  editableName.value = props.race.name;
-  editableDate.value = props.race.date ? new Date(props.race.date) : null;
+  editableName.value = race.value.name;
+  editableDate.value = race.value.date ? new Date(race.value.date) : null;
   editableTime.value = startTime.value ? new Date(startTime.value) : null;
 };
 
@@ -128,35 +127,14 @@ const cancelEdit = () => {
 };
 
 const saveEdit = async () => {
-  if (!props.race) return;
-  const newRace = await stores.races.updateRace(props.race.id, {
+  if (!race.value) return;
+  const newRace = await stores.races.updateRace(race.value.id, {
     name: editableName.value,
     date: editableDate.value,
     startTime: editableTime.value,
   });
   race.value = new Race(newRace);
   editing.value = false;
-};
-
-const exportRace = () => {
-  const race = stores.races.getRace(props.race.id);
-  if (!race) return;
-
-  const json = JSON.stringify(race, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-
-  const safeName = (props.race.name || 'race')
-    .trim()
-    .replace(/\s+/g, '_')
-    .replace(/[^\w\-]/g, '');
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${safeName}.runflow.json`;
-  a.click();
-
-  URL.revokeObjectURL(url);
 };
 </script>
 

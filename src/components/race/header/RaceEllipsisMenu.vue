@@ -1,10 +1,10 @@
 <template>
   <Button icon="pi pi-ellipsis-v" rounded text @click="menu.toggle($event)" />
-
   <Menu :model="items" popup ref="menu" />
 </template>
 
 <script setup lang="ts">
+import { useRaceRecap } from '@/composables/Race/useRaceRecap';
 import { useInjection } from '@/lib/useInjection';
 import { AppStores } from '@/stores/AppLoader';
 import { Race } from '@/types/entities/Race';
@@ -15,6 +15,7 @@ import { ref } from 'vue';
 const stores = useInjection<AppStores>('stores');
 const props = defineProps<{ race: Race; edit: () => void }>();
 const menu = ref(null);
+const { showModal } = useRaceRecap();
 
 const items: MenuItem[] = [
   {
@@ -25,10 +26,17 @@ const items: MenuItem[] = [
     },
   },
   {
-    label: 'Télécharger le plan de course',
-    icon: 'pi pi-download',
+    label: 'Exporter le plan de course',
+    icon: 'pi pi-file-export',
     command: () => {
       downloadRace();
+    },
+  },
+  {
+    label: 'Télécharger le récapitulatif',
+    icon: 'pi pi-download',
+    command: () => {
+      showModal.value = true;
     },
   },
 ];

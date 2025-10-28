@@ -12,22 +12,25 @@
         <Button icon="pi pi-times" @click="uneditRow" rounded />
       </div>
     </div>
-    <Fieldset :legend="isNotFirstLine ? `${row.distance} km` : 'Départ'">
+    <Fieldset :legend="isNotFirstLine ? `${split.distance} km` : 'Départ'">
       <template #legend>
         <div class="flex items-center">
           <div
             :class="
               'font-bold' +
-              (row.refuel ? ' text-pink-800' : ' text-primary-800')
+              (split.refuel ? ' text-pink-800' : ' text-primary-800')
             "
             v-if="!edition || (!isNotFirstLine && edition)"
           >
-            {{ isNotFirstLine ? `${row.distance} km` : 'Départ' }}
+            {{ isNotFirstLine ? `${split.distance} km` : 'Départ' }}
           </div>
           <div v-else>
-            <InputDistance :distance="row.distance" @update="updateDistance" />
+            <InputDistance
+              :distance="split.distance"
+              @update="updateDistance"
+            />
           </div>
-          <div v-if="row.refuel && !edition" class="ml-3">
+          <div v-if="split.refuel && !edition" class="ml-3">
             <ColorTag color="pink" icon="pi pi-cart-arrow-down" size="xsmall">
               Ravitaillement
             </ColorTag>
@@ -35,12 +38,12 @@
           <div v-if="edition && isNotFirstLine" class="ml-3">
             <div class="flex flex-wrap gap-2 items-center justify-center">
               <ToggleSwitch
-                :id="'refuel' + row.id"
+                :id="'refuel' + split.id"
                 name="refuel"
                 v-model="newRowData.refuel"
               />
               <label
-                :for="'refuel' + row.id"
+                :for="'refuel' + split.id"
                 class="text-xs cursor-pointer"
                 @click="newRowData.refuel = !newRowData.refuel"
                 >Ravitaillement</label
@@ -54,14 +57,14 @@
         <div class="flex flex-col gap-2 items-center">
           <span class="flex text-xs font-semibold"> Heure de départ </span>
           <div v-if="!edition">
-            <ColorTag icon="pi pi-clock" color="primary" v-if="row.time">
-              {{ dateToFormattedTime(row.time) }}
+            <ColorTag icon="pi pi-clock" color="primary" v-if="split.time">
+              {{ dateToFormattedTime(split.time) }}
             </ColorTag>
           </div>
           <div v-else class="w-[90px]">
             <InputTime
-              :time="row.time"
-              :reference="row.time"
+              :time="split.time"
+              :reference="split.time"
               size="small"
               @update="updateStartTime"
             />
@@ -75,12 +78,13 @@
           <span class="flex text-xs font-semibold"> Depuis le départ </span>
           <div class="flex flex-row gap-2">
             <ColorTag color="brown">
-              <span class="xsmall">+</span><span>{{ row.cumulElevation }}</span
+              <span class="xsmall">+</span
+              ><span>{{ split.cumulElevation }}</span
               ><span class="xsmall">m</span>
             </ColorTag>
             <ColorTag color="brown">
               <span class="xsmall">-</span
-              ><span>{{ row.cumulNegativeElevation }}</span
+              ><span>{{ split.cumulNegativeElevation }}</span
               ><span class="xsmall">m</span>
             </ColorTag>
           </div>
@@ -93,19 +97,20 @@
           <div class="flex text-xs font-bold mb-1">Split</div>
           <div class="flex justify-center gap-2">
             <ColorTag color="primary">
-              {{ row.splitDistance }} <span class="xsmall">km</span></ColorTag
+              {{ split.splitDistance }} <span class="xsmall">km</span></ColorTag
             >
             <ColorTag color="amber">
-              <span class="xsmall">+</span><span>{{ row.splitElevation }}</span
+              <span class="xsmall">+</span
+              ><span>{{ split.splitElevation }}</span
               ><span class="xsmall">m</span>
             </ColorTag>
             <ColorTag color="amber">
               <span class="xsmall">-</span
-              ><span>{{ row.splitNegativeElevation }}</span
+              ><span>{{ split.splitNegativeElevation }}</span
               ><span class="xsmall">m</span>
             </ColorTag>
-            <SlopeTag :slope="row.splitSlopePercent">
-              {{ row.splitSlopePercent }} <span class="xsmall">%</span>
+            <SlopeTag :slope="split.splitSlopePercent">
+              {{ split.splitSlopePercent }} <span class="xsmall">%</span>
             </SlopeTag>
           </div>
           <div class="flex mt-1">
@@ -116,24 +121,26 @@
               <div class="flex">
                 <template v-if="!edition">
                   <ColorTag icon="pi pi-bolt" color="deep-purple" class="mr-2">
-                    {{ row.splitPace }}
+                    {{ split.splitPace }}
                     <span class="xsmall">min/km</span>
                   </ColorTag>
                   <ColorTag icon="pi pi-stopwatch" color="green">
-                    {{ minutesToFormattedDuration(row.splitDuration) }}
+                    {{ minutesToFormattedDuration(split.splitDuration) }}
                   </ColorTag>
                 </template>
                 <template v-else>
                   <InputPaceDuration
-                    :pace="row.splitPace"
-                    :distance="row.splitDistance"
+                    :pace="split.splitPace"
+                    :distance="split.splitDistance"
                     @update="updatePace"
                   />
                 </template>
               </div>
             </div>
             <template
-              v-if="(row.refuel && !edition) || (edition && newRowData.refuel)"
+              v-if="
+                (split.refuel && !edition) || (edition && newRowData.refuel)
+              "
             >
               <Divider layout="vertical" />
               <div class="flex flex-col gap-2 items-center">
@@ -142,12 +149,12 @@
                 </span>
                 <template v-if="!edition">
                   <ColorTag color="pink">
-                    {{ row.stopDuration }} <span class="xsmall">min</span>
+                    {{ split.stopDuration }} <span class="xsmall">min</span>
                   </ColorTag>
                 </template>
                 <template v-else>
                   <InputRefuelStopDuration
-                    :duration="row.stopDuration || 0"
+                    :duration="split.stopDuration || 0"
                     @update="updateStopDuration"
                   />
                 </template>
@@ -167,15 +174,15 @@
               </span>
               <div class="flex gap-2">
                 <ColorTag color="green">
-                  {{ minutesToFormattedDuration(row.cumulDuration) }}
+                  {{ minutesToFormattedDuration(split.cumulDuration) }}
                 </ColorTag>
                 <ColorTag icon="pi pi-clock" color="primary">
-                  {{ dateToFormattedTime(row.time) }}
+                  {{ dateToFormattedTime(split.time) }}
                 </ColorTag>
               </div>
             </div>
 
-            <template v-if="row.timeBarrier || edition">
+            <template v-if="split.timeBarrier || edition">
               <Divider layout="vertical" />
 
               <div class="flex flex-1 flex-col gap-2 items-center">
@@ -185,21 +192,23 @@
                 <div class="flex gap-2">
                   <template v-if="!edition">
                     <ColorTag
-                      :color="row.timeBarrierValid ? 'bright-green' : 'red'"
+                      :color="split.timeBarrierValid ? 'bright-green' : 'red'"
                     >
-                      {{ minutesToFormattedDuration(row.timeBarrierDuration) }}
+                      {{
+                        minutesToFormattedDuration(split.timeBarrierDuration)
+                      }}
                     </ColorTag>
                     <ColorTag
                       icon="pi pi-clock"
-                      :color="row.timeBarrierValid ? 'bright-green' : 'red'"
+                      :color="split.timeBarrierValid ? 'bright-green' : 'red'"
                     >
-                      {{ dateToFormattedTime(row.timeBarrier) }}
+                      {{ dateToFormattedTime(split.timeBarrier) }}
                     </ColorTag>
                   </template>
                   <template v-else>
                     <div class="w-[90px]">
                       <InputTime
-                        :time="row.timeBarrier"
+                        :time="split.timeBarrier"
                         :reference="race.startTime"
                         size="small"
                         @update="updateTimeBarrier"
@@ -230,12 +239,12 @@ import SlopeTag from '@/components/tags/SlopeTag.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceFilters } from '@/composables/Race/useRaceFilters';
 import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
-import { TableRowItem } from '@/types/TableRowItem';
+import { SplitItem } from '@/types/SplitItem';
 import { Button, Divider, Fieldset, ToggleSwitch } from 'primevue';
 import { computed, ref, watch } from 'vue';
 import AddSeparatorMobile from '../AddSeparatorMobile.vue';
 
-const props = defineProps<{ row: TableRowItem }>();
+const props = defineProps<{ split: SplitItem }>();
 const {
   updateSplitPace,
   updateSeparator,
@@ -254,20 +263,20 @@ const newRowData = ref<{
   timeBarrier: Date;
   startTime: Date;
 }>({
-  refuel: props.row.refuel,
-  pace: props.row.splitPace,
-  distance: props.row.distance,
-  stopDuration: props.row.stopDuration,
-  timeBarrier: props.row.timeBarrier,
-  startTime: props.row.time,
+  refuel: props.split.refuel,
+  pace: props.split.splitPace,
+  distance: props.split.distance,
+  stopDuration: props.split.stopDuration,
+  timeBarrier: props.split.timeBarrier,
+  startTime: props.split.time,
 });
 
 const isNotFirstLine = computed(() => {
-  return props.row.index !== 0;
+  return props.split.index !== 0;
 });
 
 const separator = computed(() => {
-  return separators.value.find((el) => el.distance === props.row.distance);
+  return separators.value.find((el) => el.distance === props.split.distance);
 });
 
 const editRow = () => {
@@ -278,8 +287,8 @@ const saveRow = () => {
   const { pace, distance, stopDuration, timeBarrier, startTime, refuel } =
     newRowData.value;
 
-  if (props.row.distance === 0) {
-    if (startTime !== props.row.time) updateRaceStartTime(startTime);
+  if (props.split.distance === 0) {
+    if (startTime !== props.split.time) updateRaceStartTime(startTime);
     uneditRow();
     return;
   }
@@ -291,7 +300,7 @@ const saveRow = () => {
     timeBarrier,
     refuel,
   };
-  if (props.row.splitPace !== pace) updateSplitPace(props.row.split, pace);
+  if (props.split.splitPace !== pace) updateSplitPace(props.split.split, pace);
   if (separator.value !== newSeparator)
     updateSeparator(separator.value, newSeparator);
 
@@ -301,12 +310,12 @@ const saveRow = () => {
 const uneditRow = () => {
   edition.value = false;
   newRowData.value = {
-    refuel: props.row.refuel,
-    pace: props.row.splitPace,
-    distance: props.row.distance,
-    stopDuration: props.row.stopDuration,
-    timeBarrier: props.row.timeBarrier,
-    startTime: props.row.time,
+    refuel: props.split.refuel,
+    pace: props.split.splitPace,
+    distance: props.split.distance,
+    stopDuration: props.split.stopDuration,
+    timeBarrier: props.split.timeBarrier,
+    startTime: props.split.time,
   };
 };
 

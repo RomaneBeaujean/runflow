@@ -4,6 +4,10 @@
 			"name": "Root",
 			"path": "."
 		},
+    	{
+			"name": "Views",
+			"path": "./src/views"
+		},
 		{
 			"name": "Components",
 			"path": "./src/components"
