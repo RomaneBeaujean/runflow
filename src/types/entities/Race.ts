@@ -1,5 +1,5 @@
 import { useGpxParser } from '@/composables/Race/useGpxParser';
-import { getTotalDuration } from '@/lib/Metrics';
+import { getTotalDuration } from '@/lib/gpx/Metrics';
 import { roundOneNumber } from '@/lib/utils';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';

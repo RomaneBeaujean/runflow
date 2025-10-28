@@ -292,8 +292,8 @@ const updatePace = (data: { pace: string }) => {
   }
 };
 
-const updateDistance = (data: { distance: number }) => {
-  newRowData.value.distance = data.distance;
+const updateDistance = (distance: number) => {
+  newRowData.value.distance = distance;
 };
 
 const updateTimeBarrier = (data: { time: Date }) => {

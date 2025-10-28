@@ -22,9 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import { useGpxParser } from '@/composables/Race/useGpxParser';
-import { ClimbDetector } from '@/lib/ClimbDetector';
-import { computeSeparators } from '@/lib/climbPasPro';
+import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
+import { GpxParse } from '@/lib/gpx/GpxParse';
 import { GpxPoint } from '@/types/GpxPoint';
 import { LineChart } from 'echarts/charts';
 import {
@@ -119,35 +118,33 @@ const separatorsSeries = computed(() => {
         })),
       },
     },
-    {
-      id: 'separators2',
-      type: 'line',
-      data: [],
-      markLine: {
-        animation: false,
-        symbol: 'none',
-        lineStyle: { color: 'red', width: 1 },
-        label: {
-          show: true,
-          position: 'start',
-          color: 'red',
-        },
-        data: separators2.value?.map((sep: number) => ({
-          xAxis: sep,
-        })),
-      },
-    },
+    // {
+    //   id: 'separators2',
+    //   type: 'line',
+    //   data: [],
+    //   markLine: {
+    //     animation: false,
+    //     symbol: 'none',
+    //     lineStyle: { color: 'red', type: 'dashed', width: 1 },
+    //     label: {
+    //       show: true,
+    //       position: 'start',
+    //       color: 'red',
+    //     },
+    //     data: separators2.value.map((sep: number) => ({
+    //       xAxis: sep,
+    //     })),
+    //   },
+    // },
   ];
 });
 
 onMounted(async () => {
-  const response = await fetch('/ventoux.xml');
+  const response = await fetch('/tgl.xml');
   const text = await response.text();
   xml.value = text;
-  const { gpxexactpoints } = useGpxParser(text);
-  points.value = gpxexactpoints;
-  separators1.value = computeSeparators(points.value, 10, 0.05, 0.5);
-  separators2.value = new ClimbDetector(text, 10, 10, 800).separators;
+  points.value = new GpxParse(xml.value).points;
+  separators1.value = new ClimbDetector(text).separators;
   updateChartData();
 });
 

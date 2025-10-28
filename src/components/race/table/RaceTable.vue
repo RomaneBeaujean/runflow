@@ -15,7 +15,6 @@
       <div class="header border-l-1 border-gray-200">Barrière horraire</div>
       <div class="header border-l-1 border-gray-200" v-if="editableMode"></div>
     </div>
-    <!-- Rows -->
     <template v-if="!isMobile">
       <template v-for="row in rows" :key="row.id">
         <div
@@ -26,19 +25,8 @@
         >
           <RaceTableRow :row="row" />
         </div>
-        <AddSeparator :initialdistance="row.distance + 1" />
+        <AddSeparator />
       </template>
-      <!-- <div
-        v-for="row in rows"
-        :key="row.id"
-        class="row relative"
-        :data-hovered="hoveredRow?.id == row.id ? true : null"
-        @mouseenter="() => onRowMouseEnter(row)"
-        @mouseleave="() => onRowMouseLeave()"
-      >
-        <RaceTableRow :row="row" />
-      </div>
-      <AddSeparator /> -->
     </template>
     <template v-else>
       <template v-for="row in rows">

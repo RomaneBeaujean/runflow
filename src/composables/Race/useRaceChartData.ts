@@ -4,7 +4,7 @@ import { useRace } from '@/composables/Race/useRace';
 import useRaceChartSplitHover from '@/composables/Race/useRaceChartSplitHover';
 import { useRaceMetrics } from '@/composables/Race/useRaceMetrics';
 import { useViewport } from '@/composables/useViewport';
-import { getSlopeColors } from '@/lib/slope';
+import { getSlopeColors } from '@/lib/gpx/slope';
 import { minutesToFormattedDuration } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';
@@ -152,7 +152,7 @@ export default function useRaceChartData() {
             rich: {
               b: { fontWeight: 'bold' }, // style pour "bold"
             },
-            lineHeight: isMobile.value ? 12 : 14,
+            lineHeight: isMobile.value ? 10 : 14,
             fontSize: isMobile.value ? 8 : 12,
             borderRadius: 4,
             padding: 4,
@@ -293,7 +293,7 @@ export default function useRaceChartData() {
         {
           xAxis: split.startDistance,
           label: {
-            position: 'insideBottom',
+            position: 'top',
             color: '#0C4A6E',
             rotate: 0,
             backgroundColor: '#E0F2FE',

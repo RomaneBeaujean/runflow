@@ -215,7 +215,7 @@
     </Fieldset>
 
     <div class="flex justify-center mt-2" v-if="editableMode">
-      <AddSeparator :initialdistance="row.distance + 1" />
+      <AddSeparatorMobile />
     </div>
   </div>
 </template>
@@ -233,7 +233,7 @@ import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 import { TableRowItem } from '@/types/TableRowItem';
 import { Button, Divider, Fieldset, ToggleSwitch } from 'primevue';
 import { computed, ref, watch } from 'vue';
-import AddSeparator from '../AddSeparatorMobile.vue';
+import AddSeparatorMobile from '../AddSeparatorMobile.vue';
 
 const props = defineProps<{ row: TableRowItem }>();
 const {

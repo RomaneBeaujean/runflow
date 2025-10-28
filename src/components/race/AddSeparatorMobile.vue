@@ -27,9 +27,7 @@
                   <div class="text-xs font-semibold">Distance (km)</div>
                   <InputDistance
                     :distance="newSeparatorDistance"
-                    @update="
-                      ({ distance }) => (newSeparatorDistance = distance)
-                    "
+                    @update="(distance) => (newSeparatorDistance = distance)"
                   />
                 </div>
                 <Divider layout="vertical" />
@@ -49,6 +47,7 @@
                   size="small"
                   label="Ajouter"
                   icon="pi pi-check"
+                  :disabled="isDisabled"
                   @click="save"
                 />
                 <Button
@@ -71,14 +70,22 @@ import InputDistance from '@/components/race/inputs/InputDistance.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { Separator } from '@/types/entities/Separator';
 import { Button, Divider, Panel, ToggleSwitch } from 'primevue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{ initialdistance?: number }>();
 
-const { addSeparator } = useRace();
+const { addSeparator, totalDistance } = useRace();
 const showAddSeparator = ref(false);
 const newSeparatorDistance = ref(props.initialdistance || 0);
 const newSeparatorRefuel = ref(false);
+
+const isDisabled = computed(() => {
+  const isValid =
+    newSeparatorDistance.value > 0 &&
+    newSeparatorDistance.value < totalDistance.value;
+
+  return !isValid;
+});
 
 const save = () => {
   const separator: Separator = {

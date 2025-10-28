@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import ColorTag from '@/components/tags/ColorTag.vue';
-import { getAveragePace } from '@/lib/Metrics';
+import { getAveragePace } from '@/lib/gpx/Metrics';
 import {
   dateToFormatted,
   dateToFormattedTime,

@@ -1,6 +1,6 @@
+import { durationFromPaceAndDistance } from '@/lib/time';
 import { Separator } from '@/types/entities/Separator';
 import { Split } from '@/types/Split';
-import { durationFromPaceAndDistance } from './time';
 
 export function getTotalDuration(
   splits: Split[],

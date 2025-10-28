@@ -133,7 +133,7 @@
 
 <script setup lang="ts">
 import { useGpxParser } from '@/composables/Race/useGpxParser';
-import { ClimbDetector } from '@/lib/ClimbDetector';
+import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
 import { useInjection } from '@/lib/useInjection';
 import { roundOneNumber } from '@/lib/utils';
 import type { AppStores } from '@/stores/AppLoader';
@@ -208,7 +208,7 @@ async function createCourse() {
   const gpxParser = useGpxParser(gpxFile.value.content);
 
   const transitions = automaticSeparators.value
-    ? new ClimbDetector(gpxFile.value.content, 10, 10, 800).separators
+    ? new ClimbDetector(gpxFile.value.content).separators
     : [roundOneNumber(gpxParser.gpxtotalDistance)];
 
   const splits = [];
