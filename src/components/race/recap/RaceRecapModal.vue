@@ -59,17 +59,44 @@
         </div>
       </Panel>
 
-      <div
-        id="canvas-container"
-        class="w-full h-[50vh] border-1 border-gray-400 bg-gray-200 rounded p-5 overflow-auto"
-        v-show="!loading"
-      ></div>
-      <div
-        v-show="loading"
-        class="w-full h-[50vh] border-1 border-gray-400 bg-gray-200 rounded p-5 overflow-auto flex justify-center items-center"
-      >
-        <ProgressSpinner />
+      <div class="flex justify-center gap-2 mb-2">
+        <Button
+          label="Zoom +"
+          variant="outlined"
+          size="small"
+          severity="secondary"
+          @click="zoomIn"
+        />
+        <Button
+          label="Zoom -"
+          variant="outlined"
+          size="small"
+          severity="secondary"
+          @click="zoomOut"
+        />
+        <Button
+          label="Reset"
+          variant="outlined"
+          size="small"
+          severity="secondary"
+          @click="resetZoom"
+        />
       </div>
+      <div
+        id="preview"
+        class="w-full h-[50vh] border-1 border-gray-400 bg-gray-200 rounded p-5 overflow-auto"
+      >
+        <div v-show="!loading">
+          <div ref="canvasContainer" id="canvas-container"></div>
+        </div>
+        <div
+          v-show="loading"
+          class="flex justify-center items-center w-full h-full"
+        >
+          <ProgressSpinner />
+        </div>
+      </div>
+
       <div style="position: fixed; top: 9999px">
         <RaceRecapTable :params="params" />
       </div>
@@ -103,6 +130,7 @@
 import SwitchToggle from '@/components/SwitchToggle.vue';
 import { useRaceRecap } from '@/composables/Race/useRaceRecap';
 import { ExcelRaceRecapExporter } from '@/lib/ExcelRaceRecapExporter';
+import Panzoom from '@panzoom/panzoom';
 import download from 'downloadjs';
 import * as htmlToImage from 'html-to-image';
 import { Button, Dialog, Panel, ProgressSpinner, SelectButton } from 'primevue';
@@ -114,6 +142,9 @@ const loading = ref(false);
 const previewCanvas = ref<HTMLCanvasElement | null>(null);
 const printFileType = ref<'excel' | 'color' | 'basic'>('color');
 const paramsCollapsed = ref<boolean>(true);
+const panzoomInstance = ref<any>(null);
+const canvasContainer = ref<HTMLDivElement | null>(null);
+
 const { showModal } = useRaceRecap();
 
 const options = [
@@ -139,9 +170,18 @@ const params = ref<RecapParams>({
 
 onMounted(() => {
   if (showModal.value) {
+    initializePanzoom();
     generatePreviewDebounced();
   }
 });
+watch(
+  () => showModal.value,
+  () => {
+    if (showModal.value) {
+      initializePanzoom();
+    }
+  }
+);
 
 watch([() => showModal.value, params.value], () => {
   if (showModal.value) {
@@ -149,16 +189,26 @@ watch([() => showModal.value, params.value], () => {
   }
 });
 
+const zoomIn = () => panzoomInstance.value?.zoomIn();
+const zoomOut = () => panzoomInstance.value?.zoomOut();
+const resetZoom = () => panzoomInstance.value?.reset();
+
+const initializePanzoom = async () => {
+  await nextTick();
+  panzoomInstance.value = Panzoom(canvasContainer.value);
+};
+
 const generatePreview = async () => {
   await nextTick();
   const node = document.getElementById('recap');
-  const container = document.getElementById('canvas-container');
+  const container = canvasContainer.value;
 
   if (!node || !container) return;
   container.innerHTML = '';
   try {
     const canvas = await htmlToImage.toCanvas(node);
     previewCanvas.value = canvas;
+    canvas.setAttribute('id', 'preview-canvas');
     container.appendChild(canvas);
   } catch (err) {
     console.error('Erreur génération canvas:', err);
@@ -170,7 +220,6 @@ const generatePreview = async () => {
 const generatePreviewDebounced = () => {
   clearTimeout(debounce.value);
   loading.value = true;
-  console.log('lunch debounce');
   debounce.value = setTimeout(() => {
     generatePreview();
   }, 1000);
@@ -209,6 +258,15 @@ const downloadFile = () => {
   .p-dialog-footer {
     padding-top: 20px;
   }
+}
+
+#preview > div {
+  overflow: unset !important;
+}
+
+#canvas-container {
+  width: auto !important;
+  height: auto !important;
 }
 
 #canvas-container canvas {
