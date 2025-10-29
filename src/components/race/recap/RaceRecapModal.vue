@@ -59,36 +59,15 @@
         </div>
       </Panel>
 
-      <div class="flex justify-center gap-2 mb-2">
-        <Button
-          label="Zoom +"
-          variant="outlined"
-          size="small"
-          severity="secondary"
-          @click="zoomIn"
-        />
-        <Button
-          label="Zoom -"
-          variant="outlined"
-          size="small"
-          severity="secondary"
-          @click="zoomOut"
-        />
-        <Button
-          label="Reset"
-          variant="outlined"
-          size="small"
-          severity="secondary"
-          @click="resetZoom"
-        />
-      </div>
       <div
         id="preview"
-        class="w-full h-[50vh] border-1 border-gray-400 bg-gray-200 rounded p-5 overflow-auto"
+        class="w-full h-[50vh] p-3 border-1 border-gray-400 bg-gray-200 rounded overflow-auto"
       >
-        <div v-show="!loading">
-          <div ref="canvasContainer" id="canvas-container"></div>
-        </div>
+        <div
+          v-show="!loading"
+          ref="canvasContainer"
+          id="canvas-container"
+        ></div>
         <div
           v-show="loading"
           class="flex justify-center items-center w-full h-full"
@@ -98,7 +77,7 @@
       </div>
 
       <div style="position: fixed; top: 9999px">
-        <RaceRecapTable :params="params" />
+        <RaceRecapTable :params="params" :print="printFileType" />
       </div>
     </div>
 
@@ -130,7 +109,6 @@
 import SwitchToggle from '@/components/SwitchToggle.vue';
 import { useRaceRecap } from '@/composables/Race/useRaceRecap';
 import { ExcelRaceRecapExporter } from '@/lib/ExcelRaceRecapExporter';
-import Panzoom from '@panzoom/panzoom';
 import download from 'downloadjs';
 import * as htmlToImage from 'html-to-image';
 import { Button, Dialog, Panel, ProgressSpinner, SelectButton } from 'primevue';
@@ -140,9 +118,8 @@ import RaceRecapTable, { RecapParams } from './RaceRecapTable.vue';
 const debounce = ref<ReturnType<typeof setTimeout>>(null);
 const loading = ref(false);
 const previewCanvas = ref<HTMLCanvasElement | null>(null);
-const printFileType = ref<'excel' | 'color' | 'basic'>('color');
+const printFileType = ref<'excel' | 'color' | 'black'>('black');
 const paramsCollapsed = ref<boolean>(true);
-const panzoomInstance = ref<any>(null);
 const canvasContainer = ref<HTMLDivElement | null>(null);
 
 const { showModal } = useRaceRecap();
@@ -150,7 +127,7 @@ const { showModal } = useRaceRecap();
 const options = [
   { name: 'Excel', value: 'excel' },
   { name: 'Couleur', value: 'color' },
-  { name: 'Noir/Blanc', value: 'basic' },
+  { name: 'Noir/Blanc', value: 'black' },
 ];
 
 const params = ref<RecapParams>({
@@ -170,33 +147,33 @@ const params = ref<RecapParams>({
 
 onMounted(() => {
   if (showModal.value) {
-    initializePanzoom();
-    generatePreviewDebounced();
+    generatePreview();
   }
 });
+
 watch(
-  () => showModal.value,
+  () => printFileType.value,
   () => {
     if (showModal.value) {
-      initializePanzoom();
+      generatePreviewDebounced();
     }
   }
 );
 
-watch([() => showModal.value, params.value], () => {
+watch(
+  () => showModal.value,
+  () => {
+    if (showModal.value) {
+      generatePreview();
+    }
+  }
+);
+
+watch(params.value, () => {
   if (showModal.value) {
     generatePreviewDebounced();
   }
 });
-
-const zoomIn = () => panzoomInstance.value?.zoomIn();
-const zoomOut = () => panzoomInstance.value?.zoomOut();
-const resetZoom = () => panzoomInstance.value?.reset();
-
-const initializePanzoom = async () => {
-  await nextTick();
-  panzoomInstance.value = Panzoom(canvasContainer.value);
-};
 
 const generatePreview = async () => {
   await nextTick();
@@ -260,16 +237,11 @@ const downloadFile = () => {
   }
 }
 
-#preview > div {
-  overflow: unset !important;
+#preview #canvas-container {
+  height: 100%;
 }
 
-#canvas-container {
-  width: auto !important;
-  height: auto !important;
-}
-
-#canvas-container canvas {
+#preview #canvas-container canvas {
   max-height: 100%;
   width: auto;
   display: block;

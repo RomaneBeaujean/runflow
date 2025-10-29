@@ -1,40 +1,9 @@
 <template>
-  <div id="recap" class="inline-flex flex-col items-center">
-    <div class="recap-header">
-      <div class="text-xl flex justify-center font-bold p-2">
-        {{ race.name }} - Récapitulatif
-      </div>
-      <div class="flex justify-center">
-        <div class="flex flex-col gap-2 items-center justify-center">
-          <!-- Date -->
-          <div
-            class="text-xs text-neutral-600"
-            v-if="race.date || race.startTime"
-          >
-            <span v-if="race.date"> Le {{ dateToFormatted(race.date) }} </span>
-            <span v-if="race.startTime">
-              à {{ dateToFormattedTime(race.startTime) }}
-            </span>
-          </div>
-
-          <div class="flex flex-wrap gap-2">
-            <ColorTag color="primary"
-              >{{ race.totalDistance }} <small>km</small></ColorTag
-            >
-            <ColorTag color="amber"
-              >{{ race.totalElevation }}m <small>d+</small></ColorTag
-            >
-            <ColorTag color="deep-purple" icon="pi pi-bolt">
-              Allure moyenne: {{ averagePace }} <small>min/km</small>
-            </ColorTag>
-            <ColorTag color="green" icon="pi pi-stopwatch">
-              Durée totale: {{ totalDuration }}
-            </ColorTag>
-          </div>
-        </div>
-      </div>
-    </div>
-    <Divider />
+  <div
+    id="recap"
+    class="inline-flex flex-col items-center"
+    :data-color="print === 'color'"
+  >
     <div class="table">
       <div class="row header-row">
         <div class="header"></div>
@@ -43,7 +12,12 @@
           v-if="params.refuel"
         ></div>
         <div class="header border-l-1 border-gray-200">Distance</div>
-        <div class="header" v-if="params.cumulElevation">D+ total</div>
+        <div
+          class="header border-l-1 border-gray-200"
+          v-if="params.cumulElevation"
+        >
+          D+ total
+        </div>
         <div class="header" v-if="params.cumulNegativeElevation">D- total</div>
         <div class="header border-l-1 border-gray-200">Longueur split</div>
         <div class="header" v-if="params.splitElevation">D+ split</div>
@@ -87,9 +61,13 @@
             v-if="params.refuel"
           >
             <span v-if="split.refuel">
-              <ColorTag color="pink" icon="pi pi-cart-arrow-down"
-                >Ravito</ColorTag
+              <ColorTag
+                color="pink"
+                icon="pi pi-cart-arrow-down"
+                v-if="print === 'color'"
+                >Ravitaillement</ColorTag
               >
+              <span v-else class="text-xs font-bold">Ravitaillement</span>
             </span>
           </div>
           <!-- Distance -->
@@ -97,72 +75,119 @@
             {{ split.distance }} <span class="xsmall">km</span>
           </div>
           <!-- Dénivelé cumulé positif -->
-          <div class="cell" v-if="params.cumulElevation">
+          <div
+            class="cell border-l-1 border-gray-200"
+            v-if="params.cumulElevation"
+          >
             <template v-if="idx !== 0">
-              <ColorTag color="brown">
+              <ColorTag color="brown" v-if="print === 'color'">
                 <span class="xsmall">+</span>{{ split.cumulElevation }}
                 <span class="xsmall">m</span>
               </ColorTag>
+              <span v-else>
+                <span class="xsmall">+</span>{{ split.cumulElevation }}
+                <span class="xsmall">m</span>
+              </span>
             </template>
           </div>
           <!-- Dénivelé cumulé négatif -->
           <div class="cell" v-if="params.cumulNegativeElevation">
             <template v-if="idx !== 0">
-              <ColorTag color="brown">
+              <ColorTag color="brown" v-if="print === 'color'">
                 <span class="xsmall">-</span>{{ split.cumulNegativeElevation }}
                 <span class="xsmall">m</span>
               </ColorTag>
+              <span v-else>
+                <span class="xsmall">-</span>{{ split.cumulNegativeElevation }}
+                <span class="xsmall">m</span>
+              </span>
             </template>
           </div>
           <!-- Longeur split -->
           <div class="cell border-l-1 border-gray-200">
             <div v-if="idx !== 0">
-              <ColorTag color="primary" class="font-semibold">
+              <ColorTag
+                color="primary"
+                class="font-semibold"
+                v-if="print === 'color'"
+              >
                 {{ split.splitDistance }} <span class="xsmall">km</span>
               </ColorTag>
+              <span v-else class="font-semibold">
+                {{ split.splitDistance }} <span class="xsmall">km</span>
+              </span>
             </div>
           </div>
           <!-- Dénivelé split positif -->
           <div class="cell" v-if="params.splitElevation">
             <template v-if="idx !== 0">
-              <ColorTag color="amber">
+              <ColorTag color="amber" v-if="print === 'color'">
                 <span class="xsmall">+</span> {{ split.splitElevation }}
                 <span class="xsmall">m</span>
               </ColorTag>
+              <span v-else>
+                <span class="xsmall">+</span> {{ split.splitElevation }}
+                <span class="xsmall">m</span>
+              </span>
             </template>
           </div>
           <!-- Dénivelé split négatif -->
           <div class="cell" v-if="params.splitNegativeElevation">
             <template v-if="idx !== 0">
-              <ColorTag color="amber">
+              <ColorTag color="amber" v-if="print === 'color'">
                 <span class="xsmall">-</span> {{ split.splitNegativeElevation }}
                 <span class="xsmall">m</span>
               </ColorTag>
+              <span v-else>
+                <span class="xsmall">-</span> {{ split.splitNegativeElevation }}
+                <span class="xsmall">m</span>
+              </span>
             </template>
           </div>
           <!-- Pente split -->
           <div class="cell" v-if="params.splitSlope">
             <template v-if="idx !== 0">
-              <SlopeTag :slope="split.splitSlopePercent">
+              <SlopeTag
+                :slope="split.splitSlopePercent"
+                v-if="print === 'color'"
+              >
                 {{ split.splitSlopePercent }} <span class="xsmall">%</span>
               </SlopeTag>
+              <span v-else>
+                {{ split.splitSlopePercent }} <span class="xsmall">%</span>
+              </span>
             </template>
           </div>
           <!-- Allure split -->
           <div class="cell" v-if="params.splitPace">
             <template v-if="idx !== 0">
-              <ColorTag icon="pi pi-bolt" color="deep-purple">
+              <ColorTag
+                icon="pi pi-bolt"
+                color="deep-purple"
+                v-if="print === 'color'"
+              >
                 {{ split.splitPace }}
                 <span class="xsmall">min/km</span>
               </ColorTag>
+              <span v-else>
+                {{ split.splitPace }}
+                <span class="xsmall">min/km</span>
+              </span>
             </template>
           </div>
           <!-- Durée split -->
           <div class="cell" v-if="params.splitDuration">
             <template v-if="idx !== 0">
-              <ColorTag icon="pi pi-stopwatch" color="green">
+              <ColorTag
+                icon="pi pi-stopwatch"
+                color="green"
+                v-if="print === 'color'"
+              >
                 {{ minutesToFormattedDuration(split.splitDuration) }}
               </ColorTag>
+              <span v-else>
+                {{ minutesToFormattedDuration(split.splitDuration) }}
+              </span>
             </template>
           </div>
           <!-- Temps d'arrêt ravito -->
@@ -170,29 +195,44 @@
             class="cell border-l-1 border-gray-200"
             v-if="params.stopRefuelDuration"
           >
-            <template v-if="idx !== 0 && split.splitDuration > 0">
-              <ColorTag color="pink">
+            <template v-if="idx !== 0 && split.stopDuration > 0">
+              <ColorTag color="pink" v-if="print === 'color'">
                 {{ split.stopDuration }} <span class="xsmall">min</span>
               </ColorTag>
+              <span v-else>
+                {{ split.stopDuration }} <span class="xsmall">min</span>
+              </span>
             </template>
           </div>
           <!-- Heure -->
           <div class="cell border-l-1 border-gray-200" v-if="params.time">
-            <ColorTag
-              icon="pi pi-clock"
-              color="primary"
-              class="mb-2"
-              v-if="split.time"
-            >
-              {{ dateToFormattedTime(split.time) }}
-            </ColorTag>
+            <template v-if="split.time">
+              <ColorTag
+                icon="pi pi-clock"
+                color="primary"
+                class="mb-2"
+                v-if="print === 'color'"
+              >
+                {{ dateToFormattedTime(split.time) }}
+              </ColorTag>
+              <span v-else>
+                {{ dateToFormattedTime(split.time) }}
+              </span>
+            </template>
           </div>
           <!-- Temps écoulé -->
           <div class="cell">
             <template v-if="idx !== 0">
-              <ColorTag icon="pi pi-stopwatch" color="green">
+              <ColorTag
+                icon="pi pi-stopwatch"
+                color="green"
+                v-if="print === 'color'"
+              >
                 {{ minutesToFormattedDuration(split.cumulDuration) }}
               </ColorTag>
+              <span v-else>
+                {{ minutesToFormattedDuration(split.cumulDuration) }}
+              </span>
             </template>
           </div>
           <!-- Barrière horraire heure-->
@@ -200,14 +240,17 @@
             class="cell border-l-1 border-gray-200 w-[24px]"
             v-if="params.timeBarrierTime"
           >
-            <template v-if="idx !== 0">
+            <template v-if="idx !== 0 && split.timeBarrier">
               <ColorTag
-                v-if="split.timeBarrier"
+                v-if="print === 'color'"
                 icon="pi pi-clock"
                 :color="split.timeBarrierValid ? 'bright-green' : 'red'"
               >
                 {{ dateToFormattedTime(split.timeBarrier) }}
               </ColorTag>
+              <span v-else>
+                {{ dateToFormattedTime(split.timeBarrier) }}
+              </span>
             </template>
           </div>
           <!-- Barrière horraire durée-->
@@ -215,14 +258,17 @@
             class="cell border-l-1 border-gray-200 w-[24px]"
             v-if="params.timeBarrierDuration"
           >
-            <template v-if="idx !== 0">
+            <template v-if="idx !== 0 && split.timeBarrier">
               <ColorTag
-                v-if="split.timeBarrier"
+                v-if="print === 'color'"
                 icon="pi pi-stopwatch"
                 :color="split.timeBarrierValid ? 'bright-green' : 'red'"
               >
                 {{ minutesToFormattedDuration(split.timeBarrierDuration) }}
               </ColorTag>
+              <span v-else>
+                {{ minutesToFormattedDuration(split.timeBarrierDuration) }}
+              </span>
             </template>
           </div>
         </div>
@@ -237,12 +283,7 @@ import SlopeTag from '@/components/tags/SlopeTag.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceMetrics } from '@/composables/Race/useRaceMetrics';
 import useRaceSplits from '@/composables/Race/useRaceSplits';
-import {
-  dateToFormatted,
-  dateToFormattedTime,
-  minutesToFormattedDuration,
-} from '@/lib/time';
-import { Divider } from 'primevue';
+import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 import { computed } from 'vue';
 
 export interface RecapParams {
@@ -260,7 +301,10 @@ export interface RecapParams {
   splitDuration: boolean;
 }
 
-const props = defineProps<{ params: RecapParams }>();
+const props = defineProps<{
+  params: RecapParams;
+  print: 'color' | 'excel' | 'black';
+}>();
 
 const { averagePace, getCumulDurationToDistance } = useRaceMetrics();
 const { race, splits, totalDistance } = useRace();
@@ -274,7 +318,7 @@ const totalDuration = computed(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 #recap {
   background: white;
   padding: 8px;
@@ -303,8 +347,10 @@ const totalDuration = computed(() => {
   display: table-row;
 }
 
-.row:nth-child(even) {
-  background-color: #f7f7f7;
+#recap [data-color] {
+  .row:nth-child(even) {
+    background-color: #f7f7f7;
+  }
 }
 
 .cell {
