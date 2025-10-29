@@ -1,5 +1,5 @@
 <template>
-  <div id="recap" class="bg-amber-500 inline-flex flex-col items-center">
+  <div id="recap" class="inline-flex flex-col items-center">
     <div class="recap-header">
       <div class="text-xl flex justify-center font-bold p-2">
         {{ race.name }} - Récapitulatif
@@ -60,7 +60,7 @@
         <div class="header border-l-1 border-gray-200" v-if="params.time">
           Heure
         </div>
-        <div class="header" v-if="params.totalDuration">Temps écoulé</div>
+        <div class="header">Temps écoulé</div>
         <div
           class="header border-l-1 border-gray-200"
           v-if="params.timeBarrierTime"
@@ -170,7 +170,7 @@
             class="cell border-l-1 border-gray-200"
             v-if="params.stopRefuelDuration"
           >
-            <template v-if="idx !== 0">
+            <template v-if="idx !== 0 && split.splitDuration > 0">
               <ColorTag color="pink">
                 {{ split.stopDuration }} <span class="xsmall">min</span>
               </ColorTag>
@@ -188,7 +188,7 @@
             </ColorTag>
           </div>
           <!-- Temps écoulé -->
-          <div class="cell" v-if="params.totalDuration">
+          <div class="cell">
             <template v-if="idx !== 0">
               <ColorTag icon="pi pi-stopwatch" color="green">
                 {{ minutesToFormattedDuration(split.cumulDuration) }}
@@ -249,7 +249,6 @@ export interface RecapParams {
   cumulElevation: boolean;
   cumulNegativeElevation: boolean;
   time: boolean;
-  totalDuration: boolean;
   refuel: boolean;
   stopRefuelDuration: boolean;
   timeBarrierTime: boolean;

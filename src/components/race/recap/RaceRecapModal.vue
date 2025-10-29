@@ -3,75 +3,96 @@
     v-model:visible="showModal"
     header="Télécharger le récapitulatif"
     modal
-    :style="{ width: '80%', height: '80%' }"
+    class="recap-modal"
   >
     <div class="flex flex-col gap-2">
-      <Fieldset legend="Paramètres à afficher">
-        <div class="flex">
-          <div class="flex-1">
-            <SwitchToggle label="Ravitaillement" v-model="params.refuel" />
-            <SwitchToggle
-              label="Temps d'arrêt (ravito)"
-              v-model="params.stopRefuelDuration"
-            />
-            <SwitchToggle label="D+ total" v-model="params.cumulElevation" />
-            <SwitchToggle
-              label="D- total"
-              v-model="params.cumulNegativeElevation"
-            />
-          </div>
-          <Divider layout="vertical" />
+      <div class="flex justify-center">
+        <SelectButton
+          v-model="printFileType"
+          :options="options"
+          optionLabel="name"
+          optionValue="value"
+          size="small"
+        />
+      </div>
 
-          <div class="flex-1">
-            <SwitchToggle label="D+ split" v-model="params.splitElevation" />
-            <SwitchToggle
-              label="D- split"
-              v-model="params.splitNegativeElevation"
-            />
-            <SwitchToggle label="Pente split" v-model="params.splitSlope" />
-            <SwitchToggle label="Allure split" v-model="params.splitPace" />
-            <SwitchToggle label="Durée split" v-model="params.splitDuration" />
+      <Panel toggleable v-model:collapsed="paramsCollapsed">
+        <template #header>
+          <div
+            class="flex flex-row flex-1 w-full h-full cursor-pointer"
+            @click="paramsCollapsed = !paramsCollapsed"
+          >
+            <div class="flex items-center gap-2 cursor-pointer">
+              <i class="pi pi-chart-bar"></i>
+              <span class="font-bold">Paramètres à afficher</span>
+            </div>
           </div>
-
-          <Divider layout="vertical" />
-
-          <div class="flex-1">
-            <SwitchToggle label="Heure" v-model="params.time" />
-            <SwitchToggle label="Temps écoulé" v-model="params.totalDuration" />
-            <SwitchToggle
-              label="Barrière horraire (heure)"
-              v-model="params.timeBarrierTime"
-            />
-            <SwitchToggle
-              label="Barrière horraire (temps écoulé)"
-              v-model="params.timeBarrierDuration"
-            />
-          </div>
+        </template>
+        <div class="flex flex-col">
+          <SwitchToggle label="Ravitaillement" v-model="params.refuel" />
+          <SwitchToggle
+            label="Temps d'arrêt (ravito)"
+            v-model="params.stopRefuelDuration"
+          />
+          <SwitchToggle label="D+ total" v-model="params.cumulElevation" />
+          <SwitchToggle
+            label="D- total"
+            v-model="params.cumulNegativeElevation"
+          />
+          <SwitchToggle label="D+ split" v-model="params.splitElevation" />
+          <SwitchToggle
+            label="D- split"
+            v-model="params.splitNegativeElevation"
+          />
+          <SwitchToggle label="Pente split" v-model="params.splitSlope" />
+          <SwitchToggle label="Allure split" v-model="params.splitPace" />
+          <SwitchToggle label="Durée split" v-model="params.splitDuration" />
+          <SwitchToggle label="Heure" v-model="params.time" />
+          <SwitchToggle
+            label="Barrière horraire (heure)"
+            v-model="params.timeBarrierTime"
+          />
+          <SwitchToggle
+            label="Barrière horraire (temps écoulé)"
+            v-model="params.timeBarrierDuration"
+          />
         </div>
-      </Fieldset>
+      </Panel>
 
-      <Fieldset legend="Prévisualisation">
-        <div class="max-w-[100%] overflow-auto bg-gray-200 p-5 rounded">
-          <RaceRecapTable :params="params" />
-        </div>
-      </Fieldset>
+      <div
+        id="canvas-container"
+        class="w-full h-[50vh] border-1 border-gray-400 bg-gray-200 rounded p-5 overflow-auto"
+        v-show="!loading"
+      ></div>
+      <div
+        v-show="loading"
+        class="w-full h-[50vh] border-1 border-gray-400 bg-gray-200 rounded p-5 overflow-auto flex justify-center items-center"
+      >
+        <ProgressSpinner />
+      </div>
+      <div style="position: fixed; top: 9999px">
+        <RaceRecapTable :params="params" />
+      </div>
     </div>
 
     <template #footer>
-      <div class="mt-5 flex gap-2">
-        <Button label="Annuler" text severity="secondary" @click="closeModal" />
+      <div>
         <Button
-          label="Télécharger (Excel)"
-          icon="pi file-excel"
+          label="Annuler"
+          icon="pi pi-times"
           variant="outlined"
+          size="small"
           severity="secondary"
-          @click="downloadExcel"
+          @click="closeModal"
         />
+      </div>
+      <div>
         <Button
           label="Télécharger"
           icon="pi pi-download"
           variant="outlined"
-          @click="downloadRecap"
+          size="small"
+          @click="downloadFile"
         />
       </div>
     </template>
@@ -84,17 +105,27 @@ import { useRaceRecap } from '@/composables/Race/useRaceRecap';
 import { ExcelRaceRecapExporter } from '@/lib/ExcelRaceRecapExporter';
 import download from 'downloadjs';
 import * as htmlToImage from 'html-to-image';
-import { Button, Dialog, Divider, Fieldset } from 'primevue';
-import { ref } from 'vue';
+import { Button, Dialog, Panel, ProgressSpinner, SelectButton } from 'primevue';
+import { nextTick, onMounted, ref, watch } from 'vue';
 import RaceRecapTable, { RecapParams } from './RaceRecapTable.vue';
 
+const debounce = ref<ReturnType<typeof setTimeout>>(null);
+const loading = ref(false);
+const previewCanvas = ref<HTMLCanvasElement | null>(null);
+const printFileType = ref<'excel' | 'color' | 'basic'>('color');
+const paramsCollapsed = ref<boolean>(true);
 const { showModal } = useRaceRecap();
+
+const options = [
+  { name: 'Excel', value: 'excel' },
+  { name: 'Couleur', value: 'color' },
+  { name: 'Noir/Blanc', value: 'basic' },
+];
 
 const params = ref<RecapParams>({
   cumulElevation: true,
   cumulNegativeElevation: false,
   time: true,
-  totalDuration: true,
   timeBarrierTime: true,
   timeBarrierDuration: false,
   splitElevation: true,
@@ -106,20 +137,91 @@ const params = ref<RecapParams>({
   stopRefuelDuration: true,
 });
 
+onMounted(() => {
+  if (showModal.value) {
+    generatePreviewDebounced();
+  }
+});
+
+watch([() => showModal.value, params.value], () => {
+  if (showModal.value) {
+    generatePreviewDebounced();
+  }
+});
+
+const generatePreview = async () => {
+  await nextTick();
+  const node = document.getElementById('recap');
+  const container = document.getElementById('canvas-container');
+
+  if (!node || !container) return;
+  container.innerHTML = '';
+  try {
+    const canvas = await htmlToImage.toCanvas(node);
+    previewCanvas.value = canvas;
+    container.appendChild(canvas);
+  } catch (err) {
+    console.error('Erreur génération canvas:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const generatePreviewDebounced = () => {
+  clearTimeout(debounce.value);
+  loading.value = true;
+  console.log('lunch debounce');
+  debounce.value = setTimeout(() => {
+    generatePreview();
+  }, 1000);
+};
+
 const closeModal = () => {
   showModal.value = false;
+  loading.value = false;
 };
 
-const downloadRecap = () => {
-  htmlToImage
-    .toPng(document.getElementById('recap'))
-    .then((dataUrl) => download(dataUrl, 'recap.png'));
-};
-
-const downloadExcel = () => {
-  const exporter = new ExcelRaceRecapExporter(params.value);
-  exporter.exportExcel();
+const downloadFile = () => {
+  if (!previewCanvas.value) return;
+  if (printFileType.value == 'excel') {
+    const exporter = new ExcelRaceRecapExporter(params.value);
+    exporter.exportExcel();
+  } else {
+    previewCanvas.value.toBlob((blob) => {
+      if (!blob) return;
+      download(blob, `recap-${printFileType.value}.png`);
+    });
+  }
 };
 </script>
 
-<style scoped></style>
+<style lang="scss">
+.p-dialog.recap-modal {
+  width: 80vw;
+  height: 80vh;
+  max-width: 900px;
+
+  .p-dialog-content {
+    height: 100%;
+    font-size: 14px;
+  }
+
+  .p-dialog-footer {
+    padding-top: 20px;
+  }
+}
+
+#canvas-container canvas {
+  max-height: 100%;
+  width: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .p-dialog {
+    width: calc(100vw - 32px) !important; /* 8px de chaque côté */
+    height: calc(100vh - 32px) !important;
+  }
+}
+</style>
