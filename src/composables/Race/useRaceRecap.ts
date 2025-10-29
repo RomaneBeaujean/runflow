@@ -1,9 +1,11 @@
 import { ref } from 'vue';
 
-const showModal = ref(false);
+const showTableModal = ref(false);
+const showChartModal = ref(false);
 
 export function useRaceRecap() {
   return {
-    showModal,
+    showTableModal,
+    showChartModal,
   };
 }

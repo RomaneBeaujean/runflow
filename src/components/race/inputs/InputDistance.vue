@@ -8,7 +8,7 @@
     :min="0"
     :max="totalDistance - 0.1"
     :step="0.1"
-    style="width: 70px"
+    style="width: 80px"
     size="small"
   />
 </template>

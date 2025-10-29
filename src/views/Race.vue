@@ -13,7 +13,8 @@
   <div v-else class="flex justify-center items-center h-40 text-gray-500">
     <ProgressSpinner />
   </div>
-  <RaceRecapModal />
+  <RaceRecapChartModal />
+  <RaceRecapTableModal />
 </template>
 
 <script setup lang="ts">
@@ -23,7 +24,8 @@ import { computed, onMounted, watch } from 'vue';
 
 import RaceChart from '@/components/race/chart/RaceChart.vue';
 import RaceHeader from '@/components/race/header/RaceHeader.vue';
-import RaceRecapModal from '@/components/race/recap/RaceRecapModal.vue';
+import RaceRecapChartModal from '@/components/race/recap/RaceRecapChartModal.vue';
+import RaceRecapTableModal from '@/components/race/recap/RaceRecapTableModal.vue';
 import RaceSplits from '@/components/race/splits/RaceSplits.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceFilters } from '@/composables/Race/useRaceFilters';

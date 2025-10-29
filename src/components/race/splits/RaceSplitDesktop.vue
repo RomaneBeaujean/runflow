@@ -7,7 +7,7 @@
     <span v-if="split.refuel && !edition">
       <ColorTag color="pink">Ravitaillement</ColorTag>
     </span>
-    <template v-if="isNotFirstLine && edition">
+    <template v-if="isNotFirstLine && edition && isNotFirstLine">
       <div class="flex flex-wrap gap-2 items-center justify-center">
         <ToggleSwitch
           :id="'refuel' + split.id"
@@ -24,12 +24,10 @@
     </template>
   </div>
   <div class="cell font-semibold whitespace-nowrap border-l-1 border-gray-200">
-    <template v-if="!edition">
+    <template v-if="!edition || !isNotLastLine || !isNotFirstLine">
       {{ split.distance }} <span class="xsmall">km</span>
     </template>
-    <template
-      v-if="edition && isNotFirstLine && split.distance !== totalDistance"
-    >
+    <template v-if="edition && isNotFirstLine && isNotLastLine">
       <InputDistance :distance="split.distance" @update="updateDistance" />
     </template>
   </div>
@@ -182,6 +180,7 @@
         size="small"
         text
         :disabled="split.distance === 0 || split.distance === totalDistance"
+        @click="deleteRow"
       />
     </div>
     <template v-else>
@@ -218,6 +217,7 @@ const {
   updateSplitPace,
   updateSeparator,
   updateRaceStartTime,
+  deleteSeparator,
   separators,
   race,
 } = useRace();
@@ -246,9 +246,17 @@ const isNotFirstLine = computed(() => {
   return props.split.index !== 0;
 });
 
+const isNotLastLine = computed(() => {
+  return props.split.distance < totalDistance.value;
+});
+
 const separator = computed(() => {
   return separators.value.find((el) => el.distance === props.split.distance);
 });
+
+const deleteRow = () => {
+  deleteSeparator(props.split.distance);
+};
 
 const editRow = () => {
   edition.value = true;

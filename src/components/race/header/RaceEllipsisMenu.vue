@@ -15,7 +15,7 @@ import { ref } from 'vue';
 const stores = useInjection<AppStores>('stores');
 const props = defineProps<{ race: Race; edit: () => void }>();
 const menu = ref(null);
-const { showModal } = useRaceRecap();
+const { showTableModal, showChartModal } = useRaceRecap();
 
 const items: MenuItem[] = [
   {
@@ -33,10 +33,17 @@ const items: MenuItem[] = [
     },
   },
   {
-    label: 'Télécharger le récapitulatif',
+    label: 'Télécharger le tableau récapitulatif',
     icon: 'pi pi-download',
     command: () => {
-      showModal.value = true;
+      showTableModal.value = true;
+    },
+  },
+  {
+    label: 'Télécharger le profil de la course',
+    icon: 'pi pi-download',
+    command: () => {
+      showChartModal.value = true;
     },
   },
 ];

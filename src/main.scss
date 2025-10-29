@@ -73,9 +73,10 @@ input {
 
 .p-inputnumber-increment-button,
 .p-inputnumber-decrement-button {
-  width: 16px !important;
+  width: 32px !important;
 }
 
 .p-inputnumber-input {
-  padding-right: 16px !important;
+  padding-right: 32px !important;
+  -webkit-appearance: textfield !important;
 }

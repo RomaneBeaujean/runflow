@@ -12,6 +12,15 @@
         <Button icon="pi pi-times" @click="uneditRow" rounded />
       </div>
     </div>
+    <div class="absolute bottom-0 right-0 translate-y-[-50%] bg-white">
+      <Button
+        icon="pi pi-trash"
+        text
+        rounded
+        v-if="isNotFirstLine && isNotLastLine"
+        @click="deleteRow"
+      />
+    </div>
     <Fieldset :legend="isNotFirstLine ? `${split.distance} km` : 'Départ'">
       <template #legend>
         <div class="flex items-center">
@@ -20,7 +29,7 @@
               'font-bold' +
               (split.refuel ? ' text-pink-800' : ' text-primary-800')
             "
-            v-if="!edition || (!isNotFirstLine && edition)"
+            v-if="!edition || !isNotFirstLine || !isNotLastLine"
           >
             {{ isNotFirstLine ? `${split.distance} km` : 'Départ' }}
           </div>
@@ -60,6 +69,7 @@
             <ColorTag icon="pi pi-clock" color="primary" v-if="split.time">
               {{ dateToFormattedTime(split.time) }}
             </ColorTag>
+            <span class="text-xs" v-else> Non renseigné </span>
           </div>
           <div v-else class="w-[90px]">
             <InputTime
@@ -176,7 +186,7 @@
                 <ColorTag color="green">
                   {{ minutesToFormattedDuration(split.cumulDuration) }}
                 </ColorTag>
-                <ColorTag icon="pi pi-clock" color="primary">
+                <ColorTag icon="pi pi-clock" color="primary" v-if="split.time">
                   {{ dateToFormattedTime(split.time) }}
                 </ColorTag>
               </div>
@@ -249,8 +259,10 @@ const {
   updateSplitPace,
   updateSeparator,
   updateRaceStartTime,
+  deleteSeparator,
   separators,
   race,
+  totalDistance,
 } = useRace();
 const { editableMode } = useRaceFilters();
 
@@ -275,9 +287,17 @@ const isNotFirstLine = computed(() => {
   return props.split.index !== 0;
 });
 
+const isNotLastLine = computed(() => {
+  return props.split.distance < totalDistance.value;
+});
+
 const separator = computed(() => {
   return separators.value.find((el) => el.distance === props.split.distance);
 });
+
+const deleteRow = () => {
+  deleteSeparator(props.split.distance);
+};
 
 const editRow = () => {
   edition.value = true;
