@@ -1,11 +1,11 @@
 // src/composables/useRace.ts
+import { GpxParse } from '@/lib/gpx/GpxParse';
 import { roundOneNumber } from '@/lib/utils';
 import { Race } from '@/types/entities/Race';
 import { Separator } from '@/types/entities/Separator';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { computed, ref, watch } from 'vue';
-import { useGpxParser } from './useGpxParser';
 import { useGpxSplits } from './useGpxSplits';
 
 const startTime = ref<Date | null>(null);
@@ -20,9 +20,9 @@ export function useRace() {
   const initRace = (r: Race) => {
     race.value = r;
 
-    const { gpxpoints, gpxtotalDistance } = useGpxParser(r.gpxContent);
-    points.value = gpxpoints;
-    totalDistance.value = roundOneNumber(gpxtotalDistance);
+    const parser = new GpxParse(r.gpxContent);
+    points.value = parser.smoothedPoints;
+    totalDistance.value = roundOneNumber(parser.totalDistance);
     separators.value = r.separators || [];
     splits.value = r.splits || [];
     startTime.value = r.startTime || null;

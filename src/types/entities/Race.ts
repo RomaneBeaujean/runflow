@@ -1,4 +1,4 @@
-import { useGpxParser } from '@/composables/Race/useGpxParser';
+import { GpxParse } from '@/lib/gpx/GpxParse';
 import { getTotalDuration } from '@/lib/gpx/Metrics';
 import { roundOneNumber } from '@/lib/utils';
 import { GpxPoint } from '@/types/GpxPoint';
@@ -28,12 +28,12 @@ export class Race {
     this.startTime = data?.startTime ? new Date(data.startTime) : null;
     this.date = data?.date ? new Date(data.date) : null;
     if (this.gpxContent) {
-      const { gpxpoints, gpxtotalDistance, gpxtotalElevation } = useGpxParser(
+      const { smoothedPoints, totalDistance, totalElevation } = new GpxParse(
         this.gpxContent
       );
-      this.points = gpxpoints;
-      this.totalDistance = roundOneNumber(gpxtotalDistance);
-      this.totalElevation = Math.round(gpxtotalElevation);
+      this.points = smoothedPoints;
+      this.totalDistance = roundOneNumber(totalDistance);
+      this.totalElevation = Math.round(totalElevation);
     }
   }
 

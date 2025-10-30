@@ -4,6 +4,7 @@ import { roundOneNumber, roundThreeNumber } from '../utils';
 
 export class GpxParse {
   public points: GpxPoint[];
+  public smoothedPoints: GpxPoint[];
   public smoothedPointsMeters: GpxPoint[];
   public totalDistance: number;
 
@@ -36,7 +37,7 @@ export class GpxParse {
       };
     });
 
-    this.smoothedPointsMeters = smoothPointsByDistance(gpxPointsMeters, 50);
+    this.smoothedPointsMeters = smoothPointsByDistance(gpxPointsMeters, 500);
 
     this.points = gpxPointsMeters.map((p) => {
       return {
@@ -47,7 +48,20 @@ export class GpxParse {
       };
     });
 
+    this.smoothedPoints = this.smoothedPointsMeters.map((p) => {
+      return {
+        distance: roundThreeNumber(p.distance / 1000),
+        elevation: roundOneNumber(p.elevation),
+        cumulElevation: roundOneNumber(p.cumulElevation),
+        cumulNegativeElevation: roundOneNumber(p.cumulNegativeElevation),
+      };
+    });
+
     this.totalDistance = roundOneNumber(track?.distance.total / 1000);
+  }
+
+  getSmoothedPoints(smoothSizeMeters: number) {
+    return smoothPointsByDistance(this.smoothedPointsMeters, smoothSizeMeters);
   }
 
   get totalElevation() {

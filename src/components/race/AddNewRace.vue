@@ -132,8 +132,8 @@
 </template>
 
 <script setup lang="ts">
-import { useGpxParser } from '@/composables/Race/useGpxParser';
 import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
+import { GpxParse } from '@/lib/gpx/GpxParse';
 import { useInjection } from '@/lib/useInjection';
 import { roundOneNumber } from '@/lib/utils';
 import type { AppStores } from '@/stores/AppLoader';
@@ -188,8 +188,8 @@ const addFile = async (event: FileUploadSelectEvent) => {
 
 const totalDistance = computed(() => {
   if (!gpxFile.value) return;
-  const parser = useGpxParser(gpxFile.value.content);
-  return parser.gpxtotalDistance;
+  const parser = new GpxParse(gpxFile.value.content);
+  return parser.totalDistance;
 });
 
 function close() {
@@ -205,11 +205,11 @@ function close() {
 async function createCourse() {
   if (!gpxFile.value || !raceName.value) return;
 
-  const gpxParser = useGpxParser(gpxFile.value.content);
+  const gpxParser = new GpxParse(gpxFile.value.content);
 
   const transitions = automaticSeparators.value
     ? new ClimbDetector(gpxFile.value.content).separators
-    : [roundOneNumber(gpxParser.gpxtotalDistance)];
+    : [roundOneNumber(gpxParser.totalDistance)];
 
   const splits = [];
 
@@ -222,7 +222,7 @@ async function createCourse() {
 
   const separators = splits
     .map((el) => el.endDistance)
-    .filter((el) => el !== gpxParser.gpxtotalDistance)
+    .filter((el) => el !== gpxParser.totalDistance)
     .map((it) => new Separator({ distance: it }));
 
   const id = await stores.races.addRace({

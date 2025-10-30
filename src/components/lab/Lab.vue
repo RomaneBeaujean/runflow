@@ -83,6 +83,7 @@ const chartOptions = ref({
 
 const xml = ref<string>('');
 const points = ref<GpxPoint[]>([]);
+const points2 = ref<GpxPoint[]>([]);
 const separators1 = ref<number[]>([]);
 const separators2 = ref<number[]>([]);
 const series = computed(() => {
@@ -94,6 +95,14 @@ const series = computed(() => {
       type: 'line',
       data: points.value.map((p) => [p.distance, p.elevation]),
       lineStyle: { color: 'grey', width: 1 },
+    },
+    {
+      id: 'smoothed-points',
+      smooth: false,
+      showSymbol: false,
+      type: 'line',
+      data: points2.value.map((p) => [p.distance, p.elevation]),
+      lineStyle: { color: 'red', width: 2 },
     },
   ];
 });
@@ -140,10 +149,11 @@ const separatorsSeries = computed(() => {
 });
 
 onMounted(async () => {
-  const response = await fetch('/tgl.xml');
+  const response = await fetch('/bertagne.xml');
   const text = await response.text();
   xml.value = text;
   points.value = new GpxParse(xml.value).points;
+  points2.value = new GpxParse(xml.value).smoothedPoints;
   separators1.value = new ClimbDetector(text).separators;
   updateChartData();
 });
