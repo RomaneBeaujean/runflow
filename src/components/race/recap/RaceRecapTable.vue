@@ -1,5 +1,5 @@
 <template>
-  <div id="recap" class="inline-flex flex-col items-center">
+  <div id="tableRecap" class="inline-flex flex-col items-center">
     <div class="table">
       <div class="row header-row">
         <div class="header">Distance</div>
@@ -26,92 +26,124 @@
         <div class="row">
           <!-- Distance -->
           <div class="cell font-semibold">
-            {{ split.distance }} <span class="xsmall">km</span>
+            <div class="inside-cell">
+              {{ split.distance }} <span class="xsmall">km</span>
+            </div>
           </div>
           <!-- Ravitaillement -->
           <div class="cell w-[24px]" v-if="params.refuel">
-            <span v-if="split.refuel">
-              <i class="pi pi-cart-arrow-down"></i>
-            </span>
+            <div class="inside-cell">
+              <span v-if="split.refuel">
+                <i class="pi pi-cart-arrow-down"></i>
+              </span>
+            </div>
           </div>
           <!-- Dénivelé cumulé positif -->
           <div class="cell" v-if="params.cumulElevation">
-            <span v-if="idx !== 0">
-              +{{ split.cumulElevation }} <span class="xsmall">m</span>
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0">
+                +{{ split.cumulElevation }} <span class="xsmall">m</span>
+              </span>
+            </div>
           </div>
           <!-- Dénivelé cumulé négatif -->
           <div class="cell" v-if="params.cumulNegativeElevation">
-            <span v-if="idx !== 0">
-              -{{ split.cumulNegativeElevation }} <span class="xsmall">m</span>
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0">
+                -{{ split.cumulNegativeElevation }}
+                <span class="xsmall">m</span>
+              </span>
+            </div>
           </div>
           <!-- Longeur split -->
           <div class="cell">
-            <span v-if="idx !== 0"
-              >{{ split.splitDistance }} <span class="xsmall">km</span></span
-            >
+            <div class="inside-cell">
+              <span v-if="idx !== 0"
+                >{{ split.splitDistance }} <span class="xsmall">km</span></span
+              >
+            </div>
           </div>
           <!-- Dénivelé split positif -->
           <div class="cell" v-if="params.splitElevation">
-            <span v-if="idx !== 0">
-              + {{ split.splitElevation }} <span class="xsmall">m</span>
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0">
+                + {{ split.splitElevation }} <span class="xsmall">m</span>
+              </span>
+            </div>
           </div>
           <!-- Dénivelé split négatif -->
           <div class="cell" v-if="params.splitNegativeElevation">
-            <span v-if="idx !== 0">
-              -{{ split.splitNegativeElevation }} <span class="xsmall">m</span>
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0">
+                -{{ split.splitNegativeElevation }}
+                <span class="xsmall">m</span>
+              </span>
+            </div>
           </div>
           <!-- Pente split -->
           <div class="cell" v-if="params.splitSlope">
-            <span v-if="idx !== 0">
-              {{ split.splitSlopePercent }} <span class="xsmall">%</span>
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0">
+                {{ split.splitSlopePercent }} <span class="xsmall">%</span>
+              </span>
+            </div>
           </div>
           <!-- Allure split -->
           <div class="cell" v-if="params.splitPace">
-            <span v-if="idx !== 0">
-              {{ split.splitPace }}
-              <span class="xsmall">min/km</span>
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0">
+                {{ split.splitPace }}
+                <span class="xsmall">min/km</span>
+              </span>
+            </div>
           </div>
           <!-- Durée split -->
           <div class="cell" v-if="params.splitDuration">
-            <span v-if="idx !== 0">
-              {{ minutesToFormattedDuration(split.splitDuration) }}
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0">
+                {{ minutesToFormattedDuration(split.splitDuration) }}
+              </span>
+            </div>
           </div>
           <!-- Temps d'arrêt ravito -->
           <div class="cell" v-if="params.stopRefuelDuration">
-            <span v-if="idx !== 0 && split.stopDuration > 0">
-              {{ split.stopDuration }} <span class="xsmall">min</span>
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0 && split.stopDuration > 0">
+                {{ split.stopDuration }} <span class="xsmall">min</span>
+              </span>
+            </div>
           </div>
           <!-- Heure -->
           <div class="cell" v-if="params.time">
-            <span v-if="split.time">
-              {{ dateToFormattedTime(split.time) }}
-            </span>
+            <div class="inside-cell">
+              <span v-if="split.time">
+                {{ dateToFormattedTime(split.time) }}
+              </span>
+            </div>
           </div>
           <!-- Temps écoulé -->
           <div class="cell">
-            <span v-if="idx !== 0">
-              {{ minutesToFormattedDuration(split.cumulDuration) }}
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0">
+                {{ minutesToFormattedDuration(split.cumulDuration) }}
+              </span>
+            </div>
           </div>
           <!-- Barrière horraire heure-->
           <div class="cell w-[24px]" v-if="params.timeBarrierTime">
-            <span v-if="idx !== 0 && split.timeBarrier">
-              {{ dateToFormattedTime(split.timeBarrier) }}
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0 && split.timeBarrier">
+                {{ dateToFormattedTime(split.timeBarrier) }}
+              </span>
+            </div>
           </div>
           <!-- Barrière horraire durée-->
           <div class="cell w-[24px]" v-if="params.timeBarrierDuration">
-            <span v-if="idx !== 0 && split.timeBarrier">
-              {{ minutesToFormattedDuration(split.timeBarrierDuration) }}
-            </span>
+            <div class="inside-cell">
+              <span v-if="idx !== 0 && split.timeBarrier">
+                {{ minutesToFormattedDuration(split.timeBarrierDuration) }}
+              </span>
+            </div>
           </div>
         </div>
       </template>
@@ -146,7 +178,7 @@ const { splitItems } = useRaceSplits();
 </script>
 
 <style scoped lang="scss">
-#recap {
+#tableRecap {
   background: white;
   padding: 8px;
   font-size: 12px;
@@ -157,12 +189,12 @@ const { splitItems } = useRaceSplits();
   border-collapse: collapse;
   table-layout: auto;
   border-collapse: collapse;
-  width: max-content; /* optionnel, et très utile */
+  width: max-content;
 }
 
 .header {
   display: table-cell;
-  padding: 8px 12px;
+  padding: 8px 4px;
   border-bottom: 1px solid #ddd;
   border-right: 1px solid #ddd;
   vertical-align: middle;
@@ -177,13 +209,18 @@ const { splitItems } = useRaceSplits();
 
 .cell {
   display: table-cell;
-  padding: 8px 12px;
   border-bottom: 1px solid #ddd;
   border-right: 1px solid #ddd;
-  vertical-align: middle;
-  text-align: center;
   font-size: 14px;
   font-weight: 600;
+  padding: 4px 8px;
+}
+
+.inside-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
 .xsmall {

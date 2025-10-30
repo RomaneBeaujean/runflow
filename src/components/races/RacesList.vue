@@ -7,7 +7,7 @@
       @click="goToCourse(race.id)"
     >
       <div class="flex flex-1 flex-col gap-2">
-        <div class="text-base font-semibold">
+        <div class="text-base font-semibold truncate">
           {{ race.name }}
         </div>
         <div

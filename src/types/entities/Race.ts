@@ -40,4 +40,12 @@ export class Race {
   get totalDuration() {
     return getTotalDuration(this.splits, this.separators);
   }
+
+  get maxElevation() {
+    return Math.max(...this.points.map((el) => el.elevation));
+  }
+
+  get minElevation() {
+    return Math.min(...this.points.map((el) => el.elevation));
+  }
 }

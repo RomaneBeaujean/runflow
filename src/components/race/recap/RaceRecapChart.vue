@@ -1,7 +1,11 @@
 <template>
-  <div id="recap" style="height: 800px; width: 2000px">
-    <VChart ref="recapChartRef" :option="chartOptions" autoresize="" />
-  </div>
+  <VChart
+    id="chartRecap"
+    ref="recapChartRef"
+    :option="chartOptions"
+    autoresize
+    :style="computedStyle"
+  />
 </template>
 
 <script setup lang="ts">
@@ -60,10 +64,28 @@ const {
   getFormattedTimeToDistance,
 } = useRaceMetrics();
 
-const { totalDistance, splits, separators } = useRace();
+const { totalDistance, splits, separators, race } = useRace();
 
 const props = defineProps<{ params: RecapChartParams }>();
 const recapChartRef = ref(null);
+
+const computedWidth = computed(() => {
+  const distanceTotalKm = totalDistance.value;
+  const maxElevationMeters = race.value.maxElevation;
+  const step = 200;
+  const maxElevationRounded = Math.ceil(maxElevationMeters / step) * step;
+  const diffElevation = maxElevationRounded;
+  const scaleY = 450 / diffElevation; // px/km;
+  return distanceTotalKm * (scaleY * 100);
+});
+
+const computedStyle = computed(() => {
+  return {
+    height: '450px',
+    width: `${computedWidth.value}px`,
+    backgroundColor: 'white',
+  };
+});
 
 const splitMarkArea = (split: Split) => {
   if (!split) return [];
@@ -78,8 +100,6 @@ const splitMarkArea = (split: Split) => {
   const { color, background } = getSlopeColors(
     getSplitSlopePercent(split).major
   );
-
-  const maxY = Math.max(...getPointsFromSplit(split).map((el) => el.elevation));
 
   const splitDuration = minutesToFormattedDuration(getSplitDuration(split));
 

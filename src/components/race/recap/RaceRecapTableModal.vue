@@ -94,23 +94,11 @@
 
       <div
         id="preview"
-        class="w-full h-[500px] p-3 border-1 border-gray-400 bg-gray-200 rounded overflow-auto"
+        class="w-full max-h-[500px] p-3 border-1 border-gray-400 bg-gray-200 rounded overflow-auto"
       >
-        <div
-          v-show="!loading"
-          ref="canvasContainer"
-          id="canvas-container"
-        ></div>
-        <div
-          v-show="loading"
-          class="flex justify-center items-center w-full h-full"
-        >
-          <ProgressSpinner />
+        <div style="pointer-events: none">
+          <RaceRecapTable :params="params" />
         </div>
-      </div>
-
-      <div style="position: fixed; top: 9999px">
-        <RaceRecapTable :params="params" />
       </div>
     </div>
 
@@ -146,24 +134,14 @@ import { useRaceRecap } from '@/composables/Race/useRaceRecap';
 import { useViewport } from '@/composables/useViewport';
 import { ExcelRaceRecapExporter } from '@/lib/ExcelRaceRecapExporter';
 import download from 'downloadjs';
-import * as htmlToImage from 'html-to-image';
-import {
-  Button,
-  Dialog,
-  Divider,
-  Panel,
-  ProgressSpinner,
-  SplitButton,
-} from 'primevue';
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import html2canvas from 'html2canvas';
+import { Button, Dialog, Divider, Panel, SplitButton } from 'primevue';
+import { computed, ref } from 'vue';
 import RaceRecapTable, { RecapParams } from './RaceRecapTable.vue';
 
-const debounce = ref<ReturnType<typeof setTimeout>>(null);
-const loading = ref(false);
 const previewCanvas = ref<HTMLCanvasElement | null>(null);
 const printFileType = ref<'excel' | 'image'>('image');
 const paramsCollapsed = ref<boolean>(true);
-const canvasContainer = ref<HTMLDivElement | null>(null);
 
 const { isMobile } = useViewport();
 const { race } = useRace();
@@ -202,78 +180,21 @@ const params = ref<RecapParams>({
   stopRefuelDuration: false,
 });
 
-onMounted(() => {
-  if (showTableModal.value) {
-    generatePreview();
-  }
-});
-
-watch(
-  () => printFileType.value,
-  () => {
-    if (showTableModal.value) {
-      generatePreviewDebounced();
-    }
-  }
-);
-
-watch(
-  () => showTableModal.value,
-  () => {
-    if (showTableModal.value) {
-      generatePreview();
-    }
-  }
-);
-
-watch(params.value, () => {
-  if (showTableModal.value) {
-    generatePreviewDebounced();
-  }
-});
-
-const generatePreview = async () => {
-  await nextTick();
-  const node = document.getElementById('recap');
-  const container = canvasContainer.value;
-
-  if (!node || !container) return;
-  container.innerHTML = '';
-  try {
-    const canvas = await htmlToImage.toCanvas(node);
-    previewCanvas.value = canvas;
-    canvas.setAttribute('id', 'preview-canvas');
-    container.appendChild(canvas);
-  } catch (err) {
-    console.error('Erreur génération canvas:', err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const generatePreviewDebounced = () => {
-  clearTimeout(debounce.value);
-  loading.value = true;
-  debounce.value = setTimeout(() => {
-    generatePreview();
-  }, 1000);
-};
-
 const closeModal = () => {
   showTableModal.value = false;
-  loading.value = false;
 };
 
-const downloadFile = () => {
-  if (!previewCanvas.value) return;
+const downloadFile = async () => {
   if (printFileType.value == 'excel') {
     const exporter = new ExcelRaceRecapExporter(params.value);
     exporter.exportExcel();
   } else {
-    previewCanvas.value.toBlob((blob) => {
-      if (!blob) return;
-      download(blob, `recap-${race.value.name}.png`);
+    const node = document.getElementById('tableRecap');
+    const canvas = await html2canvas(node, {
+      backgroundColor: 'white',
     });
+    const dataUrl = canvas.toDataURL('image/png');
+    download(dataUrl, `Profil - ${race.value.name}`);
   }
 };
 </script>
@@ -292,18 +213,6 @@ const downloadFile = () => {
   .p-dialog-footer {
     padding-top: 20px;
   }
-}
-
-#preview #canvas-container {
-  height: 100%;
-}
-
-#preview #canvas-container canvas {
-  max-height: 100%;
-  max-width: 1000px;
-  width: auto;
-  display: block;
-  margin: 0 auto;
 }
 
 @media (max-width: 768px) {
