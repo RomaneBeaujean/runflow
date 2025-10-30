@@ -1,7 +1,9 @@
 import { getAveragePace } from '@/lib/gpx/Metrics';
 import {
+  dateToFormattedTime,
   durationFromPaceAndDistance,
   minutesToFormattedDuration,
+  parseDate,
 } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';
@@ -9,7 +11,7 @@ import { Split } from '@/types/Split';
 import { computed } from 'vue';
 import { useRace } from './useRace';
 
-const { points, separators, splits, totalDistance } = useRace();
+const { points, separators, splits, totalDistance, race } = useRace();
 
 export function useRaceMetrics() {
   function getCumulElevationToDistance(distance: number) {
@@ -20,6 +22,16 @@ export function useRaceMetrics() {
   function getCumulNegativeElevationToDistance(distance: number) {
     const point = points.value.find((el) => el.distance === distance);
     return Math.round(point?.cumulNegativeElevation ?? 0);
+  }
+
+  function getFormattedTimeToDistance(distance: number) {
+    const time = race.value.startTime
+      ? new Date(
+          parseDate(race.value.startTime).getTime() +
+            getCumulDurationToDistance(distance) * 60 * 1000
+        )
+      : null;
+    return dateToFormattedTime(time);
   }
 
   function getPointFromDistance(distance: number) {
@@ -157,6 +169,7 @@ export function useRaceMetrics() {
     getCumulElevationToDistance,
     getCumulDurationToDistance,
     getSplitSlopePercent,
+    getFormattedTimeToDistance,
     averagePace,
   };
 }

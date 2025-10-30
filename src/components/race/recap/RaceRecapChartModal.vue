@@ -3,7 +3,81 @@
     <template #header>
       <span class="font-bold">Télécharger le profil de la course</span>
     </template>
-    <div class="flex flex-col gap-2"></div>
+    <div class="flex flex-col gap-2">
+      <Panel toggleable v-model:collapsed="paramsCollapsed">
+        <template #header>
+          <div
+            class="flex flex-row flex-1 w-full h-full cursor-pointer"
+            @click="paramsCollapsed = !paramsCollapsed"
+          >
+            <div class="flex items-center gap-2 cursor-pointer">
+              <i class="pi pi-chart-bar"></i>
+              <span class="font-bold">Paramètres à afficher</span>
+            </div>
+          </div>
+        </template>
+        <div class="flex">
+          <div class="flex-1">
+            <SwitchToggle
+              :display="isMobile ? 'col' : 'row'"
+              label="Heure"
+              v-model="params.time"
+            />
+            <SwitchToggle
+              :display="isMobile ? 'col' : 'row'"
+              label="Temps écoulé"
+              v-model="params.totalDuration"
+            />
+          </div>
+
+          <Divider layout="vertical" />
+
+          <div class="flex-1">
+            <SwitchToggle
+              :display="isMobile ? 'col' : 'row'"
+              label="Allure split"
+              v-model="params.splitPace"
+            />
+            <SwitchToggle
+              :display="isMobile ? 'col' : 'row'"
+              label="Durée split"
+              v-model="params.splitDuration"
+            />
+            <SwitchToggle
+              :display="isMobile ? 'col' : 'row'"
+              label="Dénivelé split"
+              v-model="params.splitElevation"
+            />
+            <SwitchToggle
+              :display="isMobile ? 'col' : 'row'"
+              label="Pente split"
+              v-model="params.splitSlope"
+            />
+          </div>
+        </div>
+      </Panel>
+
+      <div
+        id="preview"
+        class="w-full h-[500px] p-3 border-1 border-gray-400 bg-gray-200 rounded overflow-auto"
+      >
+        <div
+          v-show="!loading"
+          ref="canvasContainer"
+          id="canvas-container"
+        ></div>
+        <div
+          v-show="loading"
+          class="flex justify-center items-center w-full h-full"
+        >
+          <ProgressSpinner />
+        </div>
+      </div>
+
+      <div style="position: fixed; top: 9999px">
+        <RaceRecapChart :params="params" />
+      </div>
+    </div>
 
     <template #footer>
       <div>
@@ -30,16 +104,80 @@
 </template>
 
 <script setup lang="ts">
+import SwitchToggle from '@/components/SwitchToggle.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceRecap } from '@/composables/Race/useRaceRecap';
+import { useViewport } from '@/composables/useViewport';
 import download from 'downloadjs';
-import { Button, Dialog } from 'primevue';
-import { ref } from 'vue';
+import * as htmlToImage from 'html-to-image';
+import { Button, Dialog, Divider, Panel, ProgressSpinner } from 'primevue';
+import { nextTick, onMounted, ref, watch } from 'vue';
+import RaceRecapChart, { RecapChartParams } from './RaceRecapChart.vue';
 
-const previewCanvas = ref<HTMLCanvasElement | null>(null);
-const loading = ref(false);
 const { race } = useRace();
 const { showChartModal } = useRaceRecap();
+const { isMobile } = useViewport();
+const debounce = ref<ReturnType<typeof setTimeout>>(null);
+const loading = ref(false);
+const previewCanvas = ref<HTMLCanvasElement | null>(null);
+const paramsCollapsed = ref<boolean>(true);
+const canvasContainer = ref<HTMLDivElement | null>(null);
+
+const params = ref<RecapChartParams>({
+  time: true,
+  totalDuration: true,
+  splitPace: true,
+  splitDuration: true,
+  splitElevation: true,
+  splitSlope: true,
+});
+
+onMounted(() => {
+  if (showChartModal.value) {
+    generatePreview();
+  }
+});
+
+watch(
+  () => showChartModal.value,
+  () => {
+    if (showChartModal.value) {
+      generatePreview();
+    }
+  }
+);
+
+watch(params.value, () => {
+  if (showChartModal.value) {
+    generatePreviewDebounced();
+  }
+});
+
+const generatePreview = async () => {
+  await nextTick();
+  const node = document.getElementById('recap');
+  const container = canvasContainer.value;
+  if (!node || !container) return;
+  container.innerHTML = '';
+  try {
+    const canvas = await htmlToImage.toCanvas(node);
+    previewCanvas.value = canvas;
+    canvas.setAttribute('id', 'preview-canvas');
+    container.appendChild(canvas);
+  } catch (err) {
+    console.error('Erreur génération canvas:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const generatePreviewDebounced = () => {
+  clearTimeout(debounce.value);
+  loading.value = true;
+  debounce.value = setTimeout(() => {
+    generatePreview();
+  }, 1000);
+};
 
 const closeModal = () => {
   showChartModal.value = false;
