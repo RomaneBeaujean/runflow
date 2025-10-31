@@ -240,6 +240,7 @@
 </template>
 
 <script setup lang="ts">
+import AddSeparatorMobile from '@/components/race/AddSeparatorMobile.vue';
 import InputDistance from '@/components/race/inputs/InputDistance.vue';
 import InputPaceDuration from '@/components/race/inputs/InputPaceDuration.vue';
 import InputRefuelStopDuration from '@/components/race/inputs/InputRefuelStopDuration.vue';
@@ -252,7 +253,6 @@ import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 import { SplitItem } from '@/types/SplitItem';
 import { Button, Divider, Fieldset, ToggleSwitch } from 'primevue';
 import { computed, ref, watch } from 'vue';
-import AddSeparatorMobile from '../AddSeparatorMobile.vue';
 
 const props = defineProps<{ split: SplitItem }>();
 const {

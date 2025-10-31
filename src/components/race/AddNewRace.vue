@@ -132,6 +132,9 @@
 </template>
 
 <script setup lang="ts">
+import InputPaceDuration from '@/components/race/inputs/InputPaceDuration.vue';
+import InputTime from '@/components/race/inputs/InputTime.vue';
+import ColorTag from '@/components/tags/ColorTag.vue';
 import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
 import { GpxParse } from '@/lib/gpx/GpxParse';
 import { useInjection } from '@/lib/useInjection';
@@ -150,9 +153,6 @@ import {
 } from 'primevue';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import ColorTag from '../tags/ColorTag.vue';
-import InputPaceDuration from './inputs/InputPaceDuration.vue';
-import InputTime from './inputs/InputTime.vue';
 
 const collapsed = ref<boolean>(true);
 const stores = useInjection<AppStores>('stores');

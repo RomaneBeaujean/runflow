@@ -128,6 +128,9 @@
 </template>
 
 <script setup lang="ts">
+import RaceRecapTable, {
+  RecapParams,
+} from '@/components/race/recap/RaceRecapTable.vue';
 import SwitchToggle from '@/components/SwitchToggle.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceRecap } from '@/composables/Race/useRaceRecap';
@@ -137,7 +140,6 @@ import download from 'downloadjs';
 import html2canvas from 'html2canvas';
 import { Button, Dialog, Divider, Panel, SplitButton } from 'primevue';
 import { computed, ref } from 'vue';
-import RaceRecapTable, { RecapParams } from './RaceRecapTable.vue';
 
 const previewCanvas = ref<HTMLCanvasElement | null>(null);
 const printFileType = ref<'excel' | 'image'>('image');

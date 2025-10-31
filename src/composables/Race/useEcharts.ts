@@ -12,6 +12,7 @@ import {
   MarkPointComponent,
   TitleComponent,
   TooltipComponent,
+  VisualMapComponent,
 } from 'echarts/components';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
@@ -23,6 +24,7 @@ use([
   LineChart,
   GridComponent,
   TooltipComponent,
+  VisualMapComponent,
   LegendComponent,
   TitleComponent,
   MarkLineComponent,

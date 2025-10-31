@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceMetrics } from '@/composables/Race/useRaceMetrics';
-import { getSlopeColors } from '@/lib/gpx/slope';
+import { getSlopeColors } from '@/lib/gpx/SlopeMetrix';
 import { minutesToFormattedDuration } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';

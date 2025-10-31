@@ -20,6 +20,15 @@
           Activer l'édition des splits
         </div>
       </div>
+      <div class="flex items-center gap-2">
+        <ToggleSwitch v-model="slopeVisual" />
+        <div
+          class="text-xs cursor-pointer font-semibold text-primary-800"
+          @click="slopeVisual = !slopeVisual"
+        >
+          Colorer la courbe (% pente)
+        </div>
+      </div>
     </div>
   </Drawer>
 </template>
@@ -30,7 +39,7 @@ import { Button, Drawer, ToggleSwitch } from 'primevue';
 import { ref } from 'vue';
 
 const opened = ref(false);
-const { sticky, editableMode } = useRaceFilters();
+const { sticky, editableMode, slopeVisual } = useRaceFilters();
 </script>
 
 <style scoped lang="scss"></style>

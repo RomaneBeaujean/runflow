@@ -92,6 +92,9 @@
 </template>
 
 <script setup lang="ts">
+import RaceRecapChart, {
+  RecapChartParams,
+} from '@/components/race/recap/RaceRecapChart.vue';
 import SwitchToggle from '@/components/SwitchToggle.vue';
 import { useRace } from '@/composables/Race/useRace';
 import { useRaceRecap } from '@/composables/Race/useRaceRecap';
@@ -100,7 +103,6 @@ import download from 'downloadjs';
 import html2canvas from 'html2canvas';
 import { Button, Dialog, Divider, Panel } from 'primevue';
 import { ref } from 'vue';
-import RaceRecapChart, { RecapChartParams } from './RaceRecapChart.vue';
 
 const { race } = useRace();
 const { showChartModal } = useRaceRecap();

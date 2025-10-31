@@ -44,14 +44,14 @@
 </template>
 
 <script setup lang="ts">
+import AddSeparator from '@/components/race/AddSeparator.vue';
+import RaceSplitDesktop from '@/components/race/splits/RaceSplitDesktop.vue';
+import RaceSplitMobile from '@/components/race/splits/RaceSplitMobile.vue';
 import useRaceChartSplitHover from '@/composables/Race/useRaceChartSplitHover';
 import { useRaceFilters } from '@/composables/Race/useRaceFilters';
 import useRaceSplits from '@/composables/Race/useRaceSplits';
 import { useViewport } from '@/composables/useViewport';
 import { SplitItem } from '@/types/SplitItem';
-import AddSeparator from '../AddSeparator.vue';
-import RaceSplitDesktop from './RaceSplitDesktop.vue';
-import RaceSplitMobile from './RaceSplitMobile.vue';
 
 const { editableMode } = useRaceFilters();
 const { isMobile } = useViewport();

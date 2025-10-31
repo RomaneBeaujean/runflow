@@ -1,98 +1,36 @@
+import { GpxParse } from '@/lib/gpx/GpxParse';
+import {
+  getPoints,
+  getSlope,
+  getSlopeDiff,
+  getSlopeType,
+} from '@/lib/gpx/Metrics';
+import { chunkerizeSegments } from '@/lib/gpx/Segments';
+import { ComputeSegmentSlope } from '@/lib/gpx/SlopeMetrix';
+import { roundOneNumber } from '@/lib/utils';
 import { GpxPoint } from '@/types/GpxPoint';
-import { roundOneNumber } from '../utils';
-import { GpxParse } from './GpxParse';
+import { GpxSegment } from '@/types/GpxSegment';
+import { SlopeTransition, SlopeType } from '@/types/Slope';
 
 export interface SegmentTransition {
   type: 'summit' | 'valley';
   distance: number;
 }
 
-export interface SlopeTransition {
-  transitionType: 'summit' | 'valley';
-  distance: number;
-}
-
-export interface GpxSegment {
-  startDistance: number;
-  endDistance: number;
-  distance: number;
-  slope: number;
-  slopeType: SlopeType;
-  points: GpxPoint[];
-}
-
-export type SlopeType = 'up' | 'down' | 'flat';
-
-export interface SlidingSlopePoint {
-  distance: number;
-  point: GpxPoint;
-  slope: number;
-  slopeType: SlopeType;
-}
-
 export class ClimbDetector {
-  public slidingSlopePoints: SlidingSlopePoint[];
   public separators: number[];
 
   constructor(xml: string) {
     const parsed = new GpxParse(xml);
     const smoothedPointsMeters = parsed.smoothedPointsMeters;
     const chunks = chunkerizeSegments(smoothedPointsMeters, 100);
-    const segments = computedSegmentSlope(chunks);
+    const segments = ComputeSegmentSlope(chunks);
     const merged = mergeSegments(segments);
     const transitions = detectRollingSlopeTransitions(merged);
     this.separators = transitions.map((el) =>
       roundOneNumber(el.distance / 1000)
     );
   }
-}
-
-function chunkerizeSegments(
-  points: GpxPoint[],
-  segmentLength: number
-): GpxPoint[][] {
-  if (!points.length) {
-    return [];
-  }
-
-  const segments: GpxPoint[][] = [];
-  let currentSegment: GpxPoint[] = [];
-  let segmentStartDistance = points[0].distance;
-
-  for (const point of points) {
-    currentSegment.push(point);
-
-    if (point.distance - segmentStartDistance >= segmentLength) {
-      segments.push(currentSegment);
-      currentSegment = [point];
-      segmentStartDistance = point.distance;
-    }
-  }
-
-  if (currentSegment.length > 1) {
-    segments.push(currentSegment);
-  }
-
-  return segments;
-}
-
-function computedSegmentSlope(segments: GpxPoint[][]): GpxSegment[] {
-  return segments.map((seg) => {
-    const lastPoint = seg[seg.length - 1];
-    const firstPoint = seg[0];
-    const elevation = lastPoint.cumulElevation - firstPoint.cumulElevation;
-    const distance = lastPoint.distance - firstPoint.distance;
-    const slope = distance > 0 ? (elevation / distance) * 100 : 0;
-
-    return {
-      startDistance: firstPoint.distance,
-      endDistance: lastPoint.distance,
-      distance: getDistance(seg),
-      slope,
-      slopeType: getSlopeType(slope),
-      points: seg,
-    };
-  });
 }
 
 function mergeSegments(segments: GpxSegment[], slopeDiffThreshold = 3) {
@@ -205,62 +143,3 @@ const mergeTwoSegments = (segA: GpxSegment, segB: GpxSegment): GpxSegment => {
     points,
   };
 };
-
-const getElevation = (points: GpxPoint[]) => {
-  const firstPoint = points[0];
-  const lastPoint = points[points.length - 1];
-  const elevation = lastPoint.cumulElevation - firstPoint.cumulElevation;
-  return elevation;
-};
-
-const getDistance = (points: GpxPoint[]) => {
-  const firstPoint = points[0];
-  const lastPoint = points[points.length - 1];
-  const distance = lastPoint.distance - firstPoint.distance;
-  return distance;
-};
-
-const getSlope = (points: GpxPoint[]) => {
-  const elevation = getElevation(points);
-  const distance = getDistance(points);
-  return (elevation / distance) * 100;
-};
-
-const getSlopeType = (slope: number): SlopeType => {
-  if (slope >= 1) return 'up';
-  if (slope <= -1) return 'down';
-  return 'flat';
-};
-
-const getSlopeDiff = (slopeA: number, slopeB: number) => {
-  const averageDiff = Math.max(slopeA, slopeB) - Math.min(slopeA, slopeB);
-  return averageDiff;
-};
-
-const getPoints = (segments: GpxSegment[]) => {
-  return segments.reduce((s, c) => {
-    return [...s, ...c.points];
-  }, []);
-};
-
-// function detectExactTransitionDistance(
-//   points: SlidingSlopePoint[],
-//   transitionType: 'summit' | 'valley'
-// ): number {
-//   if (points.length === 0) return 0;
-//   if (transitionType === 'summit') {
-//     // retourne le point avec la plus grande altitude
-//     return points.reduce(
-//       (maxPoint, p) =>
-//         p.point.elevation >= maxPoint.point.elevation ? p : maxPoint,
-//       points[0]
-//     ).distance;
-//   } else {
-//     // retourne le point avec la plus petite altitude
-//     return points.reduce(
-//       (minPoint, p) =>
-//         p.point.elevation <= minPoint.point.elevation ? p : minPoint,
-//       points[0]
-//     ).distance;
-//   }
-// }
