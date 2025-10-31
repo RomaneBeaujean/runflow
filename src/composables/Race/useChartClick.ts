@@ -5,14 +5,11 @@ import { ref } from 'vue';
 import { useViewport } from '../useViewport';
 import { useEcharts } from './useEcharts';
 import { useRaceFilters } from './useRaceFilters';
+import { useRaceMetrics } from './useRaceMetrics';
 
-const {
-  getTargetDistance,
-  getClosestSeparator,
-  getPositionFromDistance,
-  getClosestPoint,
-  getPositionFromPoint,
-} = useEcharts();
+const { getClosestPoint, getClosestSeparator } = useRaceMetrics();
+const { getTargetDistance, getPositionFromDistance, getPositionFromPoint } =
+  useEcharts();
 
 const { isMobile } = useViewport();
 const { editableMode } = useRaceFilters();

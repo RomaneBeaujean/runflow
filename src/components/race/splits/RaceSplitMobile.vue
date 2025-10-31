@@ -247,8 +247,8 @@ import InputRefuelStopDuration from '@/components/race/inputs/InputRefuelStopDur
 import InputTime from '@/components/race/inputs/InputTime.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
 import SlopeTag from '@/components/tags/SlopeTag.vue';
-import { useRace } from '@/composables/Race/useRace';
-import { useRaceFilters } from '@/composables/Race/useRaceFilters';
+import { useRace } from '@/composables/race/useRace';
+import { useRaceFilters } from '@/composables/race/useRaceFilters';
 import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 import { SplitItem } from '@/types/SplitItem';
 import { Button, Divider, Fieldset, ToggleSwitch } from 'primevue';

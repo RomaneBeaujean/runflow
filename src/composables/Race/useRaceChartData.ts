@@ -1,8 +1,8 @@
-import useRaceChartClick from '@/composables/Race/useChartClick';
-import { useEcharts } from '@/composables/Race/useEcharts';
-import { useRace } from '@/composables/Race/useRace';
-import useRaceChartSplitHover from '@/composables/Race/useRaceChartSplitHover';
-import { useRaceMetrics } from '@/composables/Race/useRaceMetrics';
+import useRaceChartClick from '@/composables/race/useChartClick';
+import { useEcharts } from '@/composables/race/useEcharts';
+import { useRace } from '@/composables/race/useRace';
+import useRaceChartSplitHover from '@/composables/race/useRaceChartSplitHover';
+import { useRaceMetrics } from '@/composables/race/useRaceMetrics';
 import { useViewport } from '@/composables/useViewport';
 import { chunkerizeSegments } from '@/lib/gpx/Segments';
 import {
@@ -250,7 +250,7 @@ export default function useRaceChartData() {
           backgroundColor: '#035581',
           color: '#fff',
           formatter: (params: any) => {
-            const distance = params.value;
+            const distance = roundOneNumber(params.value);
             return `${distance} km`;
           },
         },

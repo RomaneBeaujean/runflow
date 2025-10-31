@@ -7,6 +7,7 @@ import {
 } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';
+import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { computed } from 'vue';
 import { useRace } from './useRace';
@@ -22,6 +23,58 @@ export function useRaceMetrics() {
   function getCumulNegativeElevationToDistance(distance: number) {
     const point = points.value.find((el) => el.distance === distance);
     return Math.round(point?.cumulNegativeElevation ?? 0);
+  }
+
+  function getClosestPoint(targetDistance: number): GpxPoint {
+    let left = 0,
+      right = points.value.length - 1;
+    let closest = points.value[0];
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const midPoint = points.value[mid];
+      if (
+        Math.abs(midPoint.distance - targetDistance) <
+        Math.abs(closest.distance - targetDistance)
+      ) {
+        closest = midPoint;
+      }
+      if (midPoint.distance < targetDistance) left = mid + 1;
+      else right = mid - 1;
+    }
+    return closest;
+  }
+
+  function getClosestSeparator(targetDistance: number): Separator | null {
+    if (separators.value.length === 0) return null;
+    let left = 0,
+      right = separators.value.length - 1;
+    let closest = separators.value[0];
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const midSep = separators.value[mid];
+      if (
+        Math.abs(midSep.distance - targetDistance) <
+        Math.abs(closest.distance - targetDistance)
+      ) {
+        closest = midSep;
+      }
+      if (midSep.distance < targetDistance) left = mid + 1;
+      else right = mid - 1;
+    }
+    return closest;
+  }
+
+  function getSplitFromDistance(distance: number): Split | null {
+    let left = 0;
+    let right = splits.value.length - 1;
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const split = splits.value[mid];
+      if (distance < split.startDistance) right = mid - 1;
+      else if (distance > split.endDistance) left = mid + 1;
+      else return split;
+    }
+    return null;
   }
 
   function getFormattedTimeToDistance(distance: number) {
@@ -161,14 +214,17 @@ export function useRaceMetrics() {
     getPointsFromSplit,
     getSplitDistance,
     getMidPointFromSplit,
+    getSplitFromDistance,
     getSplitElevation,
     getSplitDuration,
     getSplitNegativeElevation,
     getCumulNegativeElevationToDistance,
     getFormattedDurationFromSplit,
+    getClosestSeparator,
     getCumulElevationToDistance,
     getCumulDurationToDistance,
     getSplitSlopePercent,
+    getClosestPoint,
     getFormattedTimeToDistance,
     averagePace,
   };

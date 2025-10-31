@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRace } from '@/composables/Race/useRace';
-import { useRaceMetrics } from '@/composables/Race/useRaceMetrics';
+import { useRace } from '@/composables/race/useRace';
+import { useRaceMetrics } from '@/composables/race/useRaceMetrics';
 import { getSlopeColors } from '@/lib/gpx/SlopeMetrix';
 import { minutesToFormattedDuration } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';

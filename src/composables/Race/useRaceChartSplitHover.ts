@@ -1,8 +1,10 @@
 import { Split } from '@/types/Split';
 import { ref } from 'vue';
 import { useEcharts } from './useEcharts';
+import { useRaceMetrics } from './useRaceMetrics';
 
-const { getTargetDistance, getSplitFromDistance } = useEcharts();
+const { getSplitFromDistance } = useRaceMetrics();
+const { getTargetDistance } = useEcharts();
 
 const hoveredSplit = ref<Split | null>(null);
 

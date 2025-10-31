@@ -152,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import useRaceSplits from '@/composables/Race/useRaceSplits';
+import useRaceSplits from '@/composables/race/useRaceSplits';
 import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 
 export interface RecapParams {

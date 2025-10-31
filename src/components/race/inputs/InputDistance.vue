@@ -13,7 +13,7 @@
   />
 </template>
 <script lang="ts" setup>
-import { useRace } from '@/composables/Race/useRace';
+import { useRace } from '@/composables/race/useRace';
 import { InputNumber, InputNumberInputEvent } from 'primevue';
 import { ref } from 'vue';
 

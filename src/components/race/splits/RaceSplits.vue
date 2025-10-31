@@ -47,9 +47,9 @@
 import AddSeparator from '@/components/race/AddSeparator.vue';
 import RaceSplitDesktop from '@/components/race/splits/RaceSplitDesktop.vue';
 import RaceSplitMobile from '@/components/race/splits/RaceSplitMobile.vue';
-import useRaceChartSplitHover from '@/composables/Race/useRaceChartSplitHover';
-import { useRaceFilters } from '@/composables/Race/useRaceFilters';
-import useRaceSplits from '@/composables/Race/useRaceSplits';
+import useRaceChartSplitHover from '@/composables/race/useRaceChartSplitHover';
+import { useRaceFilters } from '@/composables/race/useRaceFilters';
+import useRaceSplits from '@/composables/race/useRaceSplits';
 import { useViewport } from '@/composables/useViewport';
 import { SplitItem } from '@/types/SplitItem';
 

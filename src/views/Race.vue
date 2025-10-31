@@ -27,8 +27,8 @@ import RaceHeader from '@/components/race/header/RaceHeader.vue';
 import RaceRecapChartModal from '@/components/race/recap/RaceRecapChartModal.vue';
 import RaceRecapTableModal from '@/components/race/recap/RaceRecapTableModal.vue';
 import RaceSplits from '@/components/race/splits/RaceSplits.vue';
-import { useRace } from '@/composables/Race/useRace';
-import { useRaceFilters } from '@/composables/Race/useRaceFilters';
+import { useRace } from '@/composables/race/useRace';
+import { useRaceFilters } from '@/composables/race/useRaceFilters';
 import { useViewport } from '@/composables/useViewport';
 import { ProgressSpinner } from 'primevue';
 

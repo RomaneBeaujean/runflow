@@ -1,4 +1,4 @@
-import { useRace } from '@/composables/Race/useRace';
+import { useRace } from '@/composables/race/useRace';
 import { dateToMinutes, parseDate } from '@/lib/time';
 import { Separator } from '@/types/entities/Separator';
 import { SplitItem } from '@/types/SplitItem';
