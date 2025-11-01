@@ -29,6 +29,15 @@
           Colorer la courbe (% pente)
         </div>
       </div>
+      <div class="flex items-center gap-2">
+        <ToggleSwitch v-model="showSlopePoint" />
+        <div
+          class="text-xs cursor-pointer font-semibold text-primary-800"
+          @click="showSlopePoint = !showSlopePoint"
+        >
+          Afficher le % de pente (curseur)
+        </div>
+      </div>
     </div>
   </Drawer>
 </template>
@@ -39,7 +48,7 @@ import { Button, Drawer, ToggleSwitch } from 'primevue';
 import { ref } from 'vue';
 
 const opened = ref(false);
-const { sticky, editableMode, slopeVisual } = useRaceFilters();
+const { sticky, editableMode, slopeVisual, showSlopePoint } = useRaceFilters();
 </script>
 
 <style scoped lang="scss"></style>

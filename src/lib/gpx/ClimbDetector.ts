@@ -1,6 +1,7 @@
 import { GpxParse, smoothPointsByDistance } from '@/lib/gpx/GpxParse';
 import { GpxPoint } from '@/types/GpxPoint';
 import { SlopeType } from '@/types/Slope';
+import { roundOneNumber } from '../utils';
 
 type TransitionType = 'summit' | 'valley';
 
@@ -25,7 +26,7 @@ export class ClimbDetector {
   }
 }
 
-function computeSlidingSlope(
+export function computeSlidingSlope(
   points: GpxPoint[],
   windowSize: number
 ): SlidingSlopePoint[] {
@@ -47,6 +48,45 @@ function computeSlidingSlope(
     const deltaDistance = endPoint.distance - startPoint.distance;
     const slope =
       deltaDistance > 0 ? (deltaElevation / deltaDistance) * 100 : 0;
+
+    slidingSlopePoints.push({
+      distance: current.distance,
+      point: current,
+      slope,
+      slopeType: getSlopeType(slope),
+      slopeSize: getSlopeSize(slope),
+    });
+  }
+
+  return slidingSlopePoints;
+}
+
+export function computeSlidingSlopeKm(
+  points: GpxPoint[],
+  windowSize: number
+): SlidingSlopePoint[] {
+  if (points.length < 2) return [];
+  const totalDistance = points[points.length - 1].distance;
+
+  let slidingSlopePoints = [];
+
+  for (let i = 0; i < points.length; i++) {
+    const current = points[i];
+
+    const currDistance = points[i].distance;
+    const startDistance = Math.max(0, currDistance - windowSize / 2);
+    const endDistance = Math.min(currDistance + windowSize / 2, totalDistance);
+    const startPoint = points.find((el) => el.distance >= startDistance);
+    const endPoint = points.find((el) => el.distance >= endDistance);
+
+    const deltaElevation = endPoint.elevation - startPoint.elevation;
+    const deltaDistance = roundOneNumber(
+      (endPoint.distance - startPoint.distance) * 1000
+    );
+    const slope =
+      deltaDistance > 0
+        ? roundOneNumber((deltaElevation / deltaDistance) * 100)
+        : 0;
 
     slidingSlopePoints.push({
       distance: current.distance,

@@ -24,14 +24,16 @@ const {
   getSplitSlopePercent,
   getSplitElevation,
   getSplitNegativeElevation,
+  getSlopeFromDistance,
   getCumulDurationToDistance,
   getSplitDuration,
+  getClosestPoint,
 } = useRaceMetrics();
-const { splits, separators, totalDistance, points } = useRace();
+const { splits, separators, totalDistance } = useRace();
 const { clickedPoint, clickedSeparator } = useRaceChartClick();
-const { chartInstance } = useEcharts();
+const { chartInstance, getPositionFromPoint } = useEcharts();
 const { isMobile } = useViewport();
-const { slopeVisual } = useRaceFilters();
+const { slopeVisual, showSlopePoint } = useRaceFilters();
 
 export default function useRaceChartData() {
   const AREA_LINE_COLOR = '#155E75';
@@ -247,20 +249,60 @@ export default function useRaceChartData() {
 
   const chartOptions = ref({
     tooltip: {
+      show: true,
       trigger: 'axis',
-      showContent: false,
       axisPointer: {
         type: 'line',
-        snap: true,
         label: {
           show: true,
           backgroundColor: '#035581',
-          color: '#fff',
-          formatter: (params: any) => {
-            const distance = roundOneNumber(params.value);
-            return `${distance} km`;
-          },
+          formatter: (params: any) => `${params.value} km`,
         },
+      },
+      renderMode: 'html',
+      backgroundColor: 'transparent',
+      borderWidth: 0,
+      textStyle: {
+        color: '#fff',
+        fontSize: 12,
+      },
+      padding: 0,
+      position: (point, params, dom, rect, size) => {
+        if (!showSlopePoint.value) return [0, 0];
+        const [x, y] = point;
+
+        const [targetDistance] = chartInstance.value.convertFromPixel(
+          { xAxisIndex: 0, yAxisIndex: 0 },
+          [x, y]
+        );
+        const closestPoint = getClosestPoint(targetDistance);
+        const [px, py] = getPositionFromPoint(closestPoint);
+
+        const [tooltipWidth] = size.contentSize;
+        const left = x - tooltipWidth / 2;
+        return [left, `${py}px`];
+      },
+      formatter: (params: any) => {
+        if (!showSlopePoint.value) return '';
+        const [p] = params;
+        const slope = getSlopeFromDistance(p.value[0]);
+
+        const { color, background } = getSlopeColors(slope);
+
+        return `
+      <div style="
+        background:${background};
+        padding:4px 8px;
+        border-radius:4px;
+        font-size:12px;
+        font-weight: bold;
+        color:${color};
+        white-space:nowrap;
+        text-align:center;
+      ">
+        ${slope.toFixed(1)} %
+      </div>
+    `;
       },
     },
     grid: {

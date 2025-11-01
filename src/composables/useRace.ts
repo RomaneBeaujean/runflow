@@ -1,9 +1,11 @@
 import { useGpxSplits } from '@/composables/useGpxSplits';
+import { computeSlidingSlopeKm } from '@/lib/gpx/ClimbDetector';
 import { GpxParse } from '@/lib/gpx/GpxParse';
 import { roundOneNumber } from '@/lib/utils';
 import { Race } from '@/types/entities/Race';
 import { Separator } from '@/types/entities/Separator';
 import { GpxPoint } from '@/types/GpxPoint';
+import { SlidingSlopePoint } from '@/types/Slope';
 import { Split } from '@/types/Split';
 import { computed, ref, watch } from 'vue';
 
@@ -13,6 +15,7 @@ const splits = ref<Split[]>([]);
 const separators = ref<Separator[]>([]);
 const points = ref<GpxPoint[]>([]);
 const totalDistance = ref<number>(null);
+const slidingSlopesPoints = ref<SlidingSlopePoint[]>([]);
 const { recomputeSplits } = useGpxSplits();
 
 export function useRace() {
@@ -27,6 +30,7 @@ export function useRace() {
     splits.value =
       r.splits?.sort((a, b) => a.startDistance - b.endDistance) || [];
     startTime.value = r.startTime || null;
+    slidingSlopesPoints.value = computeSlidingSlopeKm(points.value, 0.5);
   };
 
   const separatorsDistances = computed(() => {
@@ -85,6 +89,7 @@ export function useRace() {
     startTime,
     separators,
     totalDistance,
+    slidingSlopesPoints,
     addSeparator,
     deleteSeparator,
     updateSeparator,

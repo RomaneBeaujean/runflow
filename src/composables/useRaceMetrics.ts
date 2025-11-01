@@ -12,7 +12,8 @@ import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { computed } from 'vue';
 
-const { points, separators, splits, totalDistance, race } = useRace();
+const { points, separators, splits, totalDistance, race, slidingSlopesPoints } =
+  useRace();
 
 export function useRaceMetrics() {
   function getCumulElevationToDistance(distance: number) {
@@ -23,6 +24,13 @@ export function useRaceMetrics() {
   function getCumulNegativeElevationToDistance(distance: number) {
     const point = points.value.find((el) => el.distance === distance);
     return Math.round(point?.cumulNegativeElevation ?? 0);
+  }
+
+  function getSlopeFromDistance(targetDistance: number): number {
+    const closestPoint = slidingSlopesPoints.value.find(
+      (el) => el.distance >= targetDistance
+    );
+    return closestPoint?.slope || 0;
   }
 
   function getClosestPoint(targetDistance: number): GpxPoint {
@@ -219,6 +227,7 @@ export function useRaceMetrics() {
     getSplitDuration,
     getSplitNegativeElevation,
     getCumulNegativeElevationToDistance,
+    getSlopeFromDistance,
     getFormattedDurationFromSplit,
     getClosestSeparator,
     getCumulElevationToDistance,
