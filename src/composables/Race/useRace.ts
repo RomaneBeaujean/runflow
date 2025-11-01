@@ -21,10 +21,12 @@ export function useRace() {
     race.value = r;
 
     const parser = new GpxParse(r.gpxContent);
-    points.value = parser.smoothedPoints;
-    totalDistance.value = roundOneNumber(parser.totalDistance);
-    separators.value = r.separators || [];
-    splits.value = r.splits || [];
+    points.value = parser.points.sort((a, b) => a.distance - b.distance);
+    totalDistance.value = parser.totalDistance;
+    separators.value =
+      r.separators?.sort((a, b) => a.distance - b.distance) || [];
+    splits.value =
+      r.splits?.sort((a, b) => a.startDistance - b.endDistance) || [];
     startTime.value = r.startTime || null;
   };
 

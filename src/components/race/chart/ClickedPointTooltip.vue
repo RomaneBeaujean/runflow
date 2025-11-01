@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import useRaceChartClick from '@/composables/race/useChartClick';
 import { useRace } from '@/composables/race/useRace';
+import useRaceChartClick from '@/composables/race/useRaceChartClick';
 import { Separator } from '@/types/entities/Separator';
 import { Button } from 'primevue';
 

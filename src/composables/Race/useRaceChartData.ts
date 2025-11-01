@@ -1,6 +1,6 @@
-import useRaceChartClick from '@/composables/race/useChartClick';
 import { useEcharts } from '@/composables/race/useEcharts';
 import { useRace } from '@/composables/race/useRace';
+import useRaceChartClick from '@/composables/race/useRaceChartClick';
 import useRaceChartSplitHover from '@/composables/race/useRaceChartSplitHover';
 import { useRaceMetrics } from '@/composables/race/useRaceMetrics';
 import { useViewport } from '@/composables/useViewport';
@@ -13,6 +13,7 @@ import {
 import { minutesToFormattedDuration } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';
+import { GpxSegment } from '@/types/GpxSegment';
 import { Split } from '@/types/Split';
 import { computed, ref, watch } from 'vue';
 import { useRaceFilters } from './useRaceFilters';
@@ -26,7 +27,7 @@ const {
   getCumulDurationToDistance,
   getSplitDuration,
 } = useRaceMetrics();
-const { splits, separators, totalDistance, race } = useRace();
+const { splits, separators, totalDistance, points } = useRace();
 const { clickedPoint, clickedSeparator } = useRaceChartClick();
 const { chartInstance } = useEcharts();
 const { isMobile } = useViewport();
@@ -36,16 +37,22 @@ export default function useRaceChartData() {
   const AREA_LINE_COLOR = '#155E75';
   const AREA_COLOR = '#EFF6FF';
   const AREA_COLOR_EMPHASIS = '#b1d5e8';
-  const AREA_OPACITY_EMPHASIS = 0.3;
-  const AREA_OPACITY = 0.6;
+  const CLICKED_SEPARATOR_COLOR = '#F59E1D';
+  const CLICKED_SEPARATOR_BG_COLOR = '#FEF3C7';
+  const REFUEL_BG_COLOR = '#F5D0FE';
+  const REFUEL_COLOR = '#C026D3';
+  const SEP_COLOR = '#035581';
+  const SEP_BG_COLOR = '#B1D5E8';
 
   // =========================
   // Séparateurs filtrés
   // =========================
   const chartSeparators = computed(() => {
-    return separators.value.filter((s) => {
-      return s.distance !== totalDistance.value;
-    });
+    return separators.value
+      .filter((s) => {
+        return s.distance !== totalDistance.value;
+      })
+      .sort((a, b) => a.distance - b.distance);
   });
 
   const separatorsSeries = computed(() => {
@@ -78,24 +85,24 @@ export default function useRaceChartData() {
           label: {
             color:
               sep.distance === clickedSeparator.value?.distance
-                ? '#F59E1D'
+                ? CLICKED_SEPARATOR_COLOR
                 : sep.refuel
-                  ? '#C026D3'
-                  : '#035581',
+                  ? REFUEL_COLOR
+                  : SEP_COLOR,
             backgroundColor:
               sep.distance === clickedSeparator.value?.distance
-                ? '#FEF3C7'
+                ? CLICKED_SEPARATOR_BG_COLOR
                 : sep.refuel
-                  ? '#F5D0FE'
-                  : '#B1D5E8',
+                  ? REFUEL_BG_COLOR
+                  : SEP_BG_COLOR,
           },
           lineStyle: {
             color:
               sep.distance === clickedSeparator.value?.distance
-                ? '#F59E1D'
+                ? CLICKED_SEPARATOR_COLOR
                 : sep.refuel
-                  ? '#C026D3'
-                  : '#035581',
+                  ? REFUEL_COLOR
+                  : SEP_COLOR,
             width: sep.distance === clickedSeparator.value?.distance ? 3 : 1,
           },
         })),
@@ -107,7 +114,7 @@ export default function useRaceChartData() {
         label: {
           show: true,
           rich: {
-            b: { fontWeight: 'bold' }, // style pour "bold"
+            b: { fontWeight: 'bold' },
           },
           fontSize: isMobile.value ? 8 : 12,
           borderRadius: 4,
@@ -145,17 +152,18 @@ export default function useRaceChartData() {
         type: 'line',
         data: points.map((p) => [p.distance, p.elevation]),
         smooth: false,
+        z: 2,
         showSymbol: false,
         lineStyle: slopeVisual.value
-          ? { width: 2 }
+          ? { color: 'transparent' }
           : { color: AREA_LINE_COLOR, width: 2 },
         areaStyle: slopeVisual.value
-          ? { opacity: AREA_OPACITY }
+          ? { color: 'white', opacity: 0.5 }
           : { color: AREA_COLOR, opacity: 1 },
         emphasis: {
           lineStyle: { width: 4 },
           areaStyle: slopeVisual.value
-            ? { opacity: AREA_OPACITY_EMPHASIS }
+            ? { color: 'white', opacity: 0.1 }
             : { color: AREA_COLOR_EMPHASIS, opacity: 1 },
         },
         markArea: {
@@ -174,6 +182,34 @@ export default function useRaceChartData() {
           },
           data: [],
         },
+      };
+
+      return serie;
+    });
+  });
+
+  const splitsColoredSeries = computed(() => {
+    if (!slopeVisual.value) return [];
+    const segments: GpxSegment[] = splits.value
+      .map((split) =>
+        ComputeSegmentSlopeKm(
+          chunkerizeSegments(getPointsFromSplit(split), 0.6)
+        )
+      )
+      .flat();
+
+    return segments.map((segment) => {
+      const points = segment.points;
+      const serie = {
+        id: `segment-${segment.startDistance}-${segment.endDistance}`,
+        type: 'line',
+        z: 1,
+        data: points.map((p) => [p.distance, p.elevation]),
+        smooth: false,
+        showSymbol: false,
+        lineStyle: { width: 2, color: getAreaSlopeColors(segment.slope) },
+        areaStyle: { opacity: 1, color: getAreaSlopeColors(segment.slope) },
+        emphasis: { opacity: 1 },
       };
 
       return serie;
@@ -204,35 +240,6 @@ export default function useRaceChartData() {
         : [],
     },
   }));
-
-  // =========================
-  // VisualMap pour les % de pente
-  // =========================
-
-  const slopeVisualMap = computed(() => {
-    const splitsSeriesCount = splits.value.length;
-    const splitsSeriesIndices = Array.from(
-      { length: splitsSeriesCount },
-      (_, i) => i
-    );
-    const segments = chunkerizeSegments(race.value.points, 0.5);
-    const slopes = ComputeSegmentSlopeKm(segments);
-    const pieces = slopes.map((segment) => {
-      return {
-        gt: segment.startDistance,
-        lt: segment.endDistance,
-        color: getAreaSlopeColors(segment.slope),
-      };
-    });
-
-    return {
-      type: 'piecewise',
-      show: false,
-      dimension: 0,
-      seriesIndex: splitsSeriesIndices,
-      pieces,
-    };
-  });
 
   // =========================
   // Chart options
@@ -283,8 +290,12 @@ export default function useRaceChartData() {
   const updateChartData = () => {
     const options = {
       ...chartOptions.value,
-      series: [...splitsSeries.value, separatorsSeries.value, lineSerie.value],
-      visualMap: slopeVisual ? slopeVisualMap.value : null,
+      series: [
+        ...splitsSeries.value,
+        separatorsSeries.value,
+        lineSerie.value,
+        ...splitsColoredSeries.value,
+      ],
     };
 
     chartOptions.value = options;
@@ -376,7 +387,7 @@ export default function useRaceChartData() {
   // Hover dynamique
   // =========================
 
-  const updateAreaColor = (split: Split, width: number, areaColor: string) => {
+  const updateAreaColor = (split: Split, areaColor: string) => {
     const serieIndex = splitsSeries.value.findIndex((s) =>
       s.id.includes(`serie-${split.startDistance}-`)
     );
@@ -386,14 +397,13 @@ export default function useRaceChartData() {
       series: [
         {
           id: splitsSeries.value[serieIndex].id,
-          lineStyle: { width },
           areaStyle: { color: areaColor },
         },
       ],
     });
   };
 
-  const updateAreaOpacity = (split: Split, width: number, opacity: number) => {
+  const updateAreaOpacity = (split: Split, opacity: number) => {
     const serieIndex = splitsSeries.value.findIndex((s) =>
       s.id.includes(`serie-${split.startDistance}-`)
     );
@@ -403,7 +413,6 @@ export default function useRaceChartData() {
       series: [
         {
           id: splitsSeries.value[serieIndex].id,
-          lineStyle: { width },
           areaStyle: { opacity },
         },
       ],
@@ -432,17 +441,18 @@ export default function useRaceChartData() {
     if (!chartInstance.value) return;
     if (previousHovered) {
       if (slopeVisual.value) {
-        updateAreaOpacity(previousHovered, 2, AREA_OPACITY);
+        updateAreaOpacity(previousHovered, 0.5);
       } else {
-        updateAreaColor(previousHovered, 2, AREA_COLOR);
+        updateAreaColor(previousHovered, AREA_COLOR);
       }
       updateMarkArea(previousHovered, []);
     }
+
     if (newHovered) {
       if (slopeVisual.value) {
-        updateAreaOpacity(newHovered, 4, AREA_OPACITY_EMPHASIS);
+        updateAreaOpacity(newHovered, 0.1);
       } else {
-        updateAreaColor(newHovered, 4, AREA_COLOR_EMPHASIS);
+        updateAreaColor(newHovered, AREA_COLOR_EMPHASIS);
       }
       updateMarkArea(newHovered, hoveredSplitMarkAreaData());
     }

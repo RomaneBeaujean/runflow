@@ -16,9 +16,9 @@
 <script setup lang="ts">
 import ClickedPointTooltip from '@/components/race/chart/ClickedPointTooltip.vue';
 import ClickedSeparatorTooltip from '@/components/race/chart/ClickedSeparatorTooltip.vue';
-import useRaceChartClick from '@/composables/race/useChartClick';
 import { useEcharts } from '@/composables/race/useEcharts';
 import { useRace } from '@/composables/race/useRace';
+import useRaceChartClick from '@/composables/race/useRaceChartClick';
 import useRaceChartData from '@/composables/race/useRaceChartData';
 import useRaceChartSplitHover from '@/composables/race/useRaceChartSplitHover';
 import { useViewport } from '@/composables/useViewport';

@@ -97,8 +97,6 @@ function detectRollingSlopeTransitions(
     currentType = iType;
   }
 
-  console.log(transitions);
-
   return transitions;
 }
 

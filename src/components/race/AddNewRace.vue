@@ -211,6 +211,10 @@ async function createCourse() {
     ? new ClimbDetector(gpxFile.value.content).separators
     : [roundOneNumber(gpxParser.totalDistance)];
 
+  if (!transitions.includes(gpxParser.totalDistance)) {
+    transitions.push(gpxParser.totalDistance);
+  }
+
   const splits = [];
 
   transitions.forEach((distance: number, index: number) => {
@@ -222,7 +226,6 @@ async function createCourse() {
 
   const separators = splits
     .map((el) => el.endDistance)
-    .filter((el) => el !== gpxParser.totalDistance)
     .map((it) => new Separator({ distance: it }));
 
   const id = await stores.races.addRace({

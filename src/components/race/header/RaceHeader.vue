@@ -48,7 +48,7 @@
 
         <div class="flex flex-wrap gap-2">
           <ColorTag color="primary"
-            >{{ race.totalDistance }} <small>km</small></ColorTag
+            >{{ totalDistance }} <small>km</small></ColorTag
           >
           <ColorTag color="amber"
             >{{ race.totalElevation }}m <small>d+</small></ColorTag

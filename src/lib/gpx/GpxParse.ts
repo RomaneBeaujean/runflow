@@ -4,6 +4,7 @@ import { roundOneNumber, roundThreeNumber } from '../utils';
 
 export class GpxParse {
   public points: GpxPoint[];
+  public pointsMeters: GpxPoint[];
   public smoothedPoints: GpxPoint[];
   public smoothedPointsMeters: GpxPoint[];
   public totalDistance: number;
@@ -19,7 +20,7 @@ export class GpxParse {
     let cumulElevation = 0;
     let cumulNegativeElevation = 0;
 
-    const gpxPointsMeters = points.map((point: Point, index) => {
+    this.pointsMeters = points.map((point: Point, index) => {
       const exactDistance = index === 0 ? 0 : distanceCumulMeters[index];
 
       if (index > 0) {
@@ -37,31 +38,27 @@ export class GpxParse {
       };
     });
 
-    this.smoothedPointsMeters = smoothPointsByDistance(gpxPointsMeters, 500);
-
-    this.points = gpxPointsMeters.map((p) => {
+    this.points = this.pointsMeters.map((p) => {
       return {
-        distance: roundThreeNumber(p.distance / 1000),
-        elevation: roundOneNumber(p.elevation),
-        cumulElevation: roundOneNumber(p.cumulElevation),
-        cumulNegativeElevation: roundOneNumber(p.cumulNegativeElevation),
+        distance: roundOneNumber(p.distance / 1000),
+        elevation: Math.round(p.elevation),
+        cumulElevation: Math.round(p.cumulElevation),
+        cumulNegativeElevation: Math.round(p.cumulNegativeElevation),
       };
     });
+
+    this.smoothedPointsMeters = smoothPointsByDistance(this.pointsMeters, 500);
 
     this.smoothedPoints = this.smoothedPointsMeters.map((p) => {
       return {
         distance: roundThreeNumber(p.distance / 1000),
-        elevation: roundOneNumber(p.elevation),
-        cumulElevation: roundOneNumber(p.cumulElevation),
-        cumulNegativeElevation: roundOneNumber(p.cumulNegativeElevation),
+        elevation: Math.round(p.elevation),
+        cumulElevation: Math.round(p.cumulElevation),
+        cumulNegativeElevation: Math.round(p.cumulNegativeElevation),
       };
     });
 
     this.totalDistance = roundOneNumber(track?.distance.total / 1000);
-  }
-
-  getSmoothedPoints(smoothSizeMeters: number) {
-    return smoothPointsByDistance(this.smoothedPointsMeters, smoothSizeMeters);
   }
 
   get totalElevation() {

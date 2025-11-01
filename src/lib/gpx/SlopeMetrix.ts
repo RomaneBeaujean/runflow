@@ -71,16 +71,12 @@ export const getSlopeColors = (slope: string | number) => {
 
 export const getAreaSlopeColors = (slope: number) => {
   const absVal = Math.abs(Number(slope));
-  if (absVal <= 2.5) {
+  if (absVal <= 5) {
     return '#009966'; // vert
-  } else if (absVal <= 5) {
-    return '#FEE685'; // jaune
-  } else if (absVal <= 7.5) {
-    return '#FFDF20'; // jaune foncé
   } else if (absVal <= 10) {
-    return '#FF6900'; // orange
+    return '#FEE685'; // jaune
   } else if (absVal <= 15) {
-    return '#D08700'; // marron
+    return '#FF6900'; // orange
   } else if (absVal <= 20) {
     return '#E7000B'; // rouge
   } else return '#8A0194'; // violet

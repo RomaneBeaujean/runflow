@@ -20,11 +20,11 @@ const clickedSeparatorPosition = ref<Position | null>(null);
 
 export default function useRaceChartClick() {
   const onChartClick = (event: any) => {
-    if (!editableMode.value || isMobile) return;
-    console.log(clickedPoint.value);
+    if (!editableMode.value || isMobile.value) return;
     closeTooltip();
 
     const targetDistance = getTargetDistance(event);
+
     if (!event.target) return;
     if (event.target?.name === 'line') {
       const closest = getClosestSeparator(targetDistance);
