@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
-import { GpxParse } from '@/lib/gpx/GpxParse';
+import { GpxParse, smoothPointsByDistance } from '@/lib/gpx/GpxParse';
 import { GpxPoint } from '@/types/GpxPoint';
 import { LineChart } from 'echarts/charts';
 import {
@@ -149,11 +149,12 @@ const separatorsSeries = computed(() => {
 });
 
 onMounted(async () => {
-  const response = await fetch('/bertagne.xml');
+  const response = await fetch('/belfort.xml');
   const text = await response.text();
   xml.value = text;
-  points.value = new GpxParse(xml.value).points;
-  points2.value = new GpxParse(xml.value).smoothedPoints;
+  const parsed = new GpxParse(xml.value);
+  points.value = parsed.points;
+  points2.value = smoothPointsByDistance(parsed.points, 1);
   separators1.value = new ClimbDetector(text).separators;
   updateChartData();
 });

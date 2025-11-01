@@ -78,6 +78,6 @@ export const getAreaSlopeColors = (slope: number) => {
   } else if (absVal <= 15) {
     return '#FF6900'; // orange
   } else if (absVal <= 20) {
-    return '#E7000B'; // rouge
-  } else return '#8A0194'; // violet
+    return '#FB2C36'; // rouge
+  } else return '#C6005C'; // violet
 };

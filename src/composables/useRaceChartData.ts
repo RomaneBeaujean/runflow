@@ -163,7 +163,7 @@ export default function useRaceChartData() {
         emphasis: {
           lineStyle: { width: 4 },
           areaStyle: slopeVisual.value
-            ? { color: 'white', opacity: 0.1 }
+            ? { color: 'white', opacity: 0.25 }
             : { color: AREA_COLOR_EMPHASIS, opacity: 1 },
         },
         markArea: {
@@ -450,7 +450,7 @@ export default function useRaceChartData() {
 
     if (newHovered) {
       if (slopeVisual.value) {
-        updateAreaOpacity(newHovered, 0.1);
+        updateAreaOpacity(newHovered, 0.25);
       } else {
         updateAreaColor(newHovered, AREA_COLOR_EMPHASIS);
       }

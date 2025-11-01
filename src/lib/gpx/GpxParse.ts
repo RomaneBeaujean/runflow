@@ -70,16 +70,13 @@ export class GpxParse {
   }
 }
 
-function smoothPointsByDistance(data: GpxPoint[], distanceMeters: number) {
+export function smoothPointsByDistance(data: GpxPoint[], windowSize: number) {
   const totalDistance = data[data.length - 1].distance;
   const smoothed = [];
   for (let i = 0; i < data.length; i++) {
     const currDistance = data[i].distance;
-    const startDistance = currDistance - distanceMeters / 2;
-    const endDistance = Math.min(
-      currDistance + distanceMeters / 2,
-      totalDistance
-    );
+    const startDistance = currDistance - windowSize / 2;
+    const endDistance = Math.min(currDistance + windowSize / 2, totalDistance);
 
     const startDistanceIndex = data.findIndex(
       (el) => el.distance >= startDistance
