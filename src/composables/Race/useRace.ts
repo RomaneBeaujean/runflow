@@ -1,4 +1,3 @@
-// src/composables/useRace.ts
 import { GpxParse } from '@/lib/gpx/GpxParse';
 import { roundOneNumber } from '@/lib/utils';
 import { Race } from '@/types/entities/Race';
