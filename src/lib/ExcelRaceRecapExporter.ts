@@ -1,5 +1,5 @@
 import { RecapParams } from '@/components/race/recap/RaceRecapTable.vue';
-import useRaceSplits from '@/composables/race/useRaceSplits';
+import useRaceSplits from '@/composables/useRaceSplits';
 import { dateToFormattedTime } from '@/lib/time';
 import * as XLSX from 'xlsx';
 

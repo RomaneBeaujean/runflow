@@ -83,8 +83,8 @@ import RaceEllipsisMenu from '@/components/race/header/RaceEllipsisMenu.vue';
 import InputTime from '@/components/race/inputs/InputTime.vue';
 import RaceViewParams from '@/components/race/RaceViewParams.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
-import { useRace } from '@/composables/race/useRace';
-import { useRaceMetrics } from '@/composables/race/useRaceMetrics';
+import { useRace } from '@/composables/useRace';
+import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { useViewport } from '@/composables/useViewport';
 import {
   dateToFormatted,

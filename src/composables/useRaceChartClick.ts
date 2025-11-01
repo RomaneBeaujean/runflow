@@ -1,11 +1,11 @@
+import { useEcharts } from '@/composables/useEcharts';
+import { useRaceFilters } from '@/composables/useRaceFilters';
+import { useRaceMetrics } from '@/composables/useRaceMetrics';
+import { useViewport } from '@/composables/useViewport';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Position } from '@/types/Position';
 import { Separator } from '@/types/entities/Separator';
 import { ref } from 'vue';
-import { useViewport } from '../useViewport';
-import { useEcharts } from './useEcharts';
-import { useRaceFilters } from './useRaceFilters';
-import { useRaceMetrics } from './useRaceMetrics';
 
 const { getClosestPoint, getClosestSeparator } = useRaceMetrics();
 const { getTargetDistance, getPositionFromDistance, getPositionFromPoint } =

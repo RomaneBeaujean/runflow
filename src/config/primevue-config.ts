@@ -1,8 +1,8 @@
 // src/config/primevue-config.ts
+import { locale } from '@/config/primevue-locale';
 import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 import PrimeVue from 'primevue/config';
-import { locale } from './primevue-locale';
 
 const MyPreset = definePreset(Aura, {
   semantic: {

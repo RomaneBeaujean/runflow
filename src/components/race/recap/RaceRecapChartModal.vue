@@ -96,8 +96,8 @@ import RaceRecapChart, {
   RecapChartParams,
 } from '@/components/race/recap/RaceRecapChart.vue';
 import SwitchToggle from '@/components/SwitchToggle.vue';
-import { useRace } from '@/composables/race/useRace';
-import { useRaceRecap } from '@/composables/race/useRaceRecap';
+import { useRace } from '@/composables/useRace';
+import { useRaceRecap } from '@/composables/useRaceRecap';
 import { useViewport } from '@/composables/useViewport';
 import download from 'downloadjs';
 import html2canvas from 'html2canvas';

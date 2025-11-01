@@ -1,8 +1,9 @@
-import { useEcharts } from '@/composables/race/useEcharts';
-import { useRace } from '@/composables/race/useRace';
-import useRaceChartClick from '@/composables/race/useRaceChartClick';
-import useRaceChartSplitHover from '@/composables/race/useRaceChartSplitHover';
-import { useRaceMetrics } from '@/composables/race/useRaceMetrics';
+import { useEcharts } from '@/composables/useEcharts';
+import { useRace } from '@/composables/useRace';
+import useRaceChartClick from '@/composables/useRaceChartClick';
+import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
+import { useRaceFilters } from '@/composables/useRaceFilters';
+import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { useViewport } from '@/composables/useViewport';
 import { chunkerizeSegments } from '@/lib/gpx/Segments';
 import {
@@ -16,7 +17,6 @@ import { Separator } from '@/types/entities/Separator';
 import { GpxSegment } from '@/types/GpxSegment';
 import { Split } from '@/types/Split';
 import { computed, ref, watch } from 'vue';
-import { useRaceFilters } from './useRaceFilters';
 
 const { hoveredSplit } = useRaceChartSplitHover();
 const {

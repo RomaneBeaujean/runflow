@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRaceFilters } from '@/composables/race/useRaceFilters';
+import { useRaceFilters } from '@/composables/useRaceFilters';
 import { Button, Drawer, ToggleSwitch } from 'primevue';
 import { ref } from 'vue';
 

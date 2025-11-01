@@ -132,8 +132,8 @@ import RaceRecapTable, {
   RecapParams,
 } from '@/components/race/recap/RaceRecapTable.vue';
 import SwitchToggle from '@/components/SwitchToggle.vue';
-import { useRace } from '@/composables/race/useRace';
-import { useRaceRecap } from '@/composables/race/useRaceRecap';
+import { useRace } from '@/composables/useRace';
+import { useRaceRecap } from '@/composables/useRaceRecap';
 import { useViewport } from '@/composables/useViewport';
 import { ExcelRaceRecapExporter } from '@/lib/ExcelRaceRecapExporter';
 import download from 'downloadjs';

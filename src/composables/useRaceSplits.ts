@@ -1,10 +1,10 @@
-import { useRace } from '@/composables/race/useRace';
+import { useRace } from '@/composables/useRace';
+import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
+import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { dateToMinutes, parseDate } from '@/lib/time';
 import { Separator } from '@/types/entities/Separator';
 import { SplitItem } from '@/types/SplitItem';
 import { computed, ref, watch } from 'vue';
-import useRaceChartSplitHover from './useRaceChartSplitHover';
-import { useRaceMetrics } from './useRaceMetrics';
 
 const { splits, startTime, separators } = useRace();
 const { hoveredSplit } = useRaceChartSplitHover();

@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRace } from '@/composables/race/useRace';
-import useRaceChartClick from '@/composables/race/useRaceChartClick';
+import { useRace } from '@/composables/useRace';
+import useRaceChartClick from '@/composables/useRaceChartClick';
 import { Button } from 'primevue';
 const { clickedSeparatorPosition, clickedSeparator, closeTooltip } =
   useRaceChartClick();

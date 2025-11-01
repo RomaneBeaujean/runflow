@@ -1,5 +1,5 @@
+import { RacesStore } from '@/stores/Races.store';
 import { reactive, type App } from 'vue';
-import { RacesStore } from './Races.store';
 
 export interface AppStores {
   races: RacesStore;

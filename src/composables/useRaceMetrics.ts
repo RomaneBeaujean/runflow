@@ -1,3 +1,4 @@
+import { useRace } from '@/composables/useRace';
 import { getAveragePace } from '@/lib/gpx/Metrics';
 import {
   dateToFormattedTime,
@@ -10,7 +11,6 @@ import { Separator } from '@/types/entities/Separator';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { computed } from 'vue';
-import { useRace } from './useRace';
 
 const { points, separators, splits, totalDistance, race } = useRace();
 

@@ -1,7 +1,7 @@
 import { GpxParse } from '@/lib/gpx/GpxParse';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
-import { Separator } from './Separator';
+import { Separator } from '@/types/entities/Separator';
 
 export class Race {
   id: string;

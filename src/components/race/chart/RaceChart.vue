@@ -16,11 +16,11 @@
 <script setup lang="ts">
 import ClickedPointTooltip from '@/components/race/chart/ClickedPointTooltip.vue';
 import ClickedSeparatorTooltip from '@/components/race/chart/ClickedSeparatorTooltip.vue';
-import { useEcharts } from '@/composables/race/useEcharts';
-import { useRace } from '@/composables/race/useRace';
-import useRaceChartClick from '@/composables/race/useRaceChartClick';
-import useRaceChartData from '@/composables/race/useRaceChartData';
-import useRaceChartSplitHover from '@/composables/race/useRaceChartSplitHover';
+import { useEcharts } from '@/composables/useEcharts';
+import { useRace } from '@/composables/useRace';
+import useRaceChartClick from '@/composables/useRaceChartClick';
+import useRaceChartData from '@/composables/useRaceChartData';
+import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
 import { useViewport } from '@/composables/useViewport';
 import { onMounted } from 'vue';
 import VChart from 'vue-echarts';

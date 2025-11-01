@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRaceRecap } from '@/composables/race/useRaceRecap';
+import { useRaceRecap } from '@/composables/useRaceRecap';
 import { useInjection } from '@/lib/useInjection';
 import { AppStores } from '@/stores/AppLoader';
 import { Race } from '@/types/entities/Race';

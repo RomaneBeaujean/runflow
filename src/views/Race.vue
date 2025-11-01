@@ -18,19 +18,18 @@
 </template>
 
 <script setup lang="ts">
-import { useInjection } from '@/lib/useInjection';
-import type { AppStores } from '@/stores/AppLoader';
-import { computed, onMounted, watch } from 'vue';
-
 import RaceChart from '@/components/race/chart/RaceChart.vue';
 import RaceHeader from '@/components/race/header/RaceHeader.vue';
 import RaceRecapChartModal from '@/components/race/recap/RaceRecapChartModal.vue';
 import RaceRecapTableModal from '@/components/race/recap/RaceRecapTableModal.vue';
 import RaceSplits from '@/components/race/splits/RaceSplits.vue';
-import { useRace } from '@/composables/race/useRace';
-import { useRaceFilters } from '@/composables/race/useRaceFilters';
+import { useRace } from '@/composables/useRace';
+import { useRaceFilters } from '@/composables/useRaceFilters';
 import { useViewport } from '@/composables/useViewport';
+import { useInjection } from '@/lib/useInjection';
+import type { AppStores } from '@/stores/AppLoader';
 import { ProgressSpinner } from 'primevue';
+import { computed, onMounted, watch } from 'vue';
 
 const props = defineProps<{ id: string }>();
 const stores = useInjection<AppStores>('stores');

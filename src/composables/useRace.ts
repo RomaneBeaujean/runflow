@@ -1,3 +1,4 @@
+import { useGpxSplits } from '@/composables/useGpxSplits';
 import { GpxParse } from '@/lib/gpx/GpxParse';
 import { roundOneNumber } from '@/lib/utils';
 import { Race } from '@/types/entities/Race';
@@ -5,7 +6,6 @@ import { Separator } from '@/types/entities/Separator';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { computed, ref, watch } from 'vue';
-import { useGpxSplits } from './useGpxSplits';
 
 const startTime = ref<Date | null>(null);
 const race = ref<Race | null>(null);

@@ -1,7 +1,7 @@
+import { useEcharts } from '@/composables/useEcharts';
+import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { Split } from '@/types/Split';
 import { ref } from 'vue';
-import { useEcharts } from './useEcharts';
-import { useRaceMetrics } from './useRaceMetrics';
 
 const { getSplitFromDistance } = useRaceMetrics();
 const { getTargetDistance } = useEcharts();
