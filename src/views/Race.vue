@@ -3,8 +3,16 @@
     <div id="race-header">
       <RaceHeader />
     </div>
+    <Divider />
+    <div class="flex justify-end pb-3">
+      <RaceChartParams />
+    </div>
     <div id="chart">
       <RaceChart />
+    </div>
+    <Divider />
+    <div class="flex justify-end p-3">
+      <SwitchToggle label="Mode édition" v-model="editableMode" />
     </div>
     <div id="splits" class="p-2">
       <RaceSplits />
@@ -20,27 +28,29 @@
 <script setup lang="ts">
 import RaceChart from '@/components/race/chart/RaceChart.vue';
 import RaceHeader from '@/components/race/header/RaceHeader.vue';
+import RaceChartParams from '@/components/race/RaceChartParams.vue';
 import RaceRecapChartModal from '@/components/race/recap/RaceRecapChartModal.vue';
 import RaceRecapTableModal from '@/components/race/recap/RaceRecapTableModal.vue';
 import RaceSplits from '@/components/race/splits/RaceSplits.vue';
+import SwitchToggle from '@/components/SwitchToggle.vue';
 import { useRace } from '@/composables/useRace';
-import { useRaceFilters } from '@/composables/useRaceFilters';
+import { useRaceChartParams } from '@/composables/useRaceChartParams';
 import { useViewport } from '@/composables/useViewport';
 import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
-import { ProgressSpinner } from 'primevue';
+import { Divider, ProgressSpinner } from 'primevue';
 import { computed, onMounted, watch } from 'vue';
 
 const props = defineProps<{ id: string }>();
 const stores = useInjection<AppStores>('stores');
 const { splits, separators, race, startTime, initRace } = useRace();
-const { sticky } = useRaceFilters();
+const { stickyChart, editableMode } = useRaceChartParams();
 const { isMobile } = useViewport();
 
 const classes = computed(() => {
   return [
     'race',
-    sticky.value ? 'sticky' : '',
+    stickyChart.value ? 'sticky' : '',
     isMobile.value ? 'mobile' : 'desktop',
   ].join(' ');
 });
@@ -101,13 +111,13 @@ watch(
 
 .desktop {
   #chart {
-    height: 400px;
+    height: 450px;
   }
 }
 
 .mobile {
   #chart {
-    height: 200px;
+    height: 250px;
   }
 }
 
@@ -120,13 +130,13 @@ watch(
 
   &.mobile {
     #race-table .header-row {
-      top: 200px !important;
+      top: 250px !important;
     }
   }
 
   &.desktop {
     #race-table .header-row {
-      top: 400px !important;
+      top: 450px !important;
     }
   }
 }

@@ -47,13 +47,13 @@
 import AddSeparator from '@/components/race/AddSeparator.vue';
 import RaceSplitDesktop from '@/components/race/splits/RaceSplitDesktop.vue';
 import RaceSplitMobile from '@/components/race/splits/RaceSplitMobile.vue';
+import { useRaceChartParams } from '@/composables/useRaceChartParams';
 import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
-import { useRaceFilters } from '@/composables/useRaceFilters';
 import useRaceSplits from '@/composables/useRaceSplits';
 import { useViewport } from '@/composables/useViewport';
 import { SplitItem } from '@/types/SplitItem';
 
-const { editableMode } = useRaceFilters();
+const { editableMode } = useRaceChartParams();
 const { isMobile } = useViewport();
 const { splitItems, hoveredSplitItem, getItemSplit } = useRaceSplits();
 const { hoveredSplit } = useRaceChartSplitHover();

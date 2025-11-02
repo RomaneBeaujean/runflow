@@ -33,6 +33,11 @@ export function useRaceMetrics() {
     return closestPoint?.slope || 0;
   }
 
+  function getPaceFromDistance(targetDistance: number): string {
+    const closestSplit = getSplitFromDistance(targetDistance);
+    return closestSplit.pace;
+  }
+
   function getClosestPoint(targetDistance: number): GpxPoint {
     let left = 0,
       right = points.value.length - 1;
@@ -136,6 +141,7 @@ export function useRaceMetrics() {
     const relevantSplits = splits.value.filter(
       (s) => s.endDistance <= distance
     );
+
     const totalSplitDuration = relevantSplits.reduce(
       (acc: number, curr: Split) => {
         const splitDistance = roundOneNumber(
@@ -162,7 +168,18 @@ export function useRaceMetrics() {
       0
     );
 
-    return totalSplitDuration + totalRefuelDuration;
+    const currentSplit = splits.value.find(
+      (el) => el.startDistance < distance && el.endDistance > distance
+    );
+
+    const currentSplitDistance = currentSplit
+      ? distance - currentSplit.startDistance
+      : 0;
+    const currentSplitDuration = currentSplit
+      ? durationFromPaceAndDistance(currentSplit.pace, currentSplitDistance)
+      : 0;
+
+    return totalSplitDuration + totalRefuelDuration + currentSplitDuration;
   }
 
   function getFormattedDurationFromSplit(split: Split): string {
@@ -216,6 +233,10 @@ export function useRaceMetrics() {
     return getAveragePace(splits.value, separators.value, totalDistance.value);
   });
 
+  const maxElevation = computed(() => {
+    return Math.max(...points.value.map((el) => el.elevation));
+  });
+
   return {
     getPointFromDistance,
     getIndexFromDistance,
@@ -225,6 +246,7 @@ export function useRaceMetrics() {
     getSplitFromDistance,
     getSplitElevation,
     getSplitDuration,
+    getPaceFromDistance,
     getSplitNegativeElevation,
     getCumulNegativeElevationToDistance,
     getSlopeFromDistance,
@@ -236,5 +258,6 @@ export function useRaceMetrics() {
     getClosestPoint,
     getFormattedTimeToDistance,
     averagePace,
+    maxElevation,
   };
 }

@@ -7,7 +7,7 @@
     @click="toggle"
   >
     <ToggleSwitch v-model="localValue" @click.stop />
-    <span class="text-xs inline-flex">
+    <span class="text-xs inline-flex items-center">
       {{ label }}
     </span>
   </div>

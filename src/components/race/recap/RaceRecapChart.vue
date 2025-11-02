@@ -12,7 +12,11 @@
 import { useRace } from '@/composables/useRace';
 import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { getSlopeColors } from '@/lib/gpx/SlopeMetrix';
-import { minutesToFormattedDuration } from '@/lib/time';
+import {
+  dateToFormattedTime,
+  minutesToFormattedDuration,
+  parseDate,
+} from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';
 import { Split } from '@/types/Split';
@@ -37,6 +41,7 @@ export interface RecapChartParams {
   totalDuration: boolean;
   splitPace: boolean;
   splitDuration: boolean;
+  timeBarrier: boolean;
   splitElevation: boolean;
   splitSlope: boolean;
 }
@@ -62,16 +67,17 @@ const {
   getCumulDurationToDistance,
   getSplitDuration,
   getFormattedTimeToDistance,
+  maxElevation,
 } = useRaceMetrics();
 
-const { totalDistance, splits, separators, race } = useRace();
+const { totalDistance, splits, separators } = useRace();
 
 const props = defineProps<{ params: RecapChartParams }>();
 const recapChartRef = ref(null);
 
 const computedWidth = computed(() => {
   const distanceTotalKm = totalDistance.value;
-  const maxElevationMeters = race.value.maxElevation;
+  const maxElevationMeters = maxElevation.value;
   const step = 200;
   const maxElevationRounded = Math.ceil(maxElevationMeters / step) * step;
   const diffElevation = maxElevationRounded;
@@ -111,7 +117,7 @@ const splitMarkArea = (split: Split) => {
         label: {
           position: 'insideBottom',
           color: '#61325c',
-          offset: props.params.time ? [0, -25] : [],
+          offset: props.params.splitPace ? [0, -25] : [],
           backgroundColor: '#F4F0F8BF',
           formatter: () =>
             props.params.splitPace ? `{b|${split.pace}}\n{s|min/km}` : '',
@@ -259,9 +265,36 @@ const markareaTime = computed(() => {
       label: {
         position: 'insideBottom',
         color: '#054b3a',
+        rotate: 0,
+        offset: [0, 0],
         fontWeight: 'bold',
         backgroundColor: '#e7f7f3',
         formatter: () => `${getFormattedTimeToDistance(sep.distance)}`,
+      },
+    },
+    {
+      xAxis: sep.distance,
+      yAxis: 0,
+    },
+  ]);
+});
+
+const markareaTimeBarrier = computed(() => {
+  if (!props.params.timeBarrier) return [];
+  return chartSeparators.value.map((sep: Separator) => [
+    {
+      xAxis: sep.distance,
+      yAxis: 0,
+      label: {
+        position: 'bottom',
+        color: '#BE123C',
+        fontSize: '10px',
+        offset: [0, -15],
+        backgroundColor: '#FCE7F3',
+        formatter: () => {
+          if (!sep.timeBarrier) return '';
+          return `Max: ${dateToFormattedTime(parseDate(sep.timeBarrier))}`;
+        },
       },
     },
     {
@@ -321,7 +354,11 @@ const separatorsSeries = computed(() => {
         borderRadius: 4,
         padding: 4,
       },
-      data: [...markareaTotalDuration.value, ...markareaTime.value],
+      data: [
+        ...markareaTotalDuration.value,
+        ...markareaTime.value,
+        ...markareaTimeBarrier.value,
+      ],
     },
   };
 });

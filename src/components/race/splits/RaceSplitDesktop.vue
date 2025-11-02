@@ -204,7 +204,7 @@ import InputTime from '@/components/race/inputs/InputTime.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
 import SlopeTag from '@/components/tags/SlopeTag.vue';
 import { useRace } from '@/composables/useRace';
-import { useRaceFilters } from '@/composables/useRaceFilters';
+import { useRaceChartParams } from '@/composables/useRaceChartParams';
 import { dateToFormattedTime, minutesToFormattedDuration } from '@/lib/time';
 import { SplitItem } from '@/types/SplitItem';
 import { Button, ToggleSwitch } from 'primevue';
@@ -222,7 +222,7 @@ const {
   race,
 } = useRace();
 
-const { editableMode } = useRaceFilters();
+const { editableMode } = useRaceChartParams();
 
 const edition = ref<boolean>(false);
 

@@ -1,5 +1,5 @@
 import { useEcharts } from '@/composables/useEcharts';
-import { useRaceFilters } from '@/composables/useRaceFilters';
+import { useRaceChartParams } from '@/composables/useRaceChartParams';
 import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { useViewport } from '@/composables/useViewport';
 import { GpxPoint } from '@/types/GpxPoint';
@@ -12,7 +12,7 @@ const { getTargetDistance, getPositionFromDistance, getPositionFromPoint } =
   useEcharts();
 
 const { isMobile } = useViewport();
-const { editableMode } = useRaceFilters();
+const { editableMode } = useRaceChartParams();
 const clickedPoint = ref<GpxPoint | null>(null);
 const clickedPointPosition = ref<Position | null>(null);
 const clickedSeparator = ref<Separator | null>(null);

@@ -69,7 +69,13 @@ input {
 
 .p-toggleswitch {
   height: 20px !important;
+  min-width: 40px !important;
 }
+
+.p-toggleswitch input {
+  min-width: 100% !important;
+}
+
 
 .p-inputnumber-increment-button,
 .p-inputnumber-decrement-button {

@@ -28,6 +28,11 @@
               label="Temps écoulé"
               v-model="params.totalDuration"
             />
+            <SwitchToggle
+              :display="isMobile ? 'col' : 'row'"
+              label="Barrière horraire"
+              v-model="params.timeBarrier"
+            />
           </div>
 
           <Divider layout="vertical" />
@@ -112,6 +117,7 @@ const paramsCollapsed = ref<boolean>(true);
 const params = ref<RecapChartParams>({
   time: true,
   totalDuration: true,
+  timeBarrier: true,
   splitPace: true,
   splitDuration: true,
   splitElevation: true,

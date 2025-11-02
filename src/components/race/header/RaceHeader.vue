@@ -65,8 +65,7 @@
 
     <!-- Boutons -->
     <div class="flex-0">
-      <div v-if="!editing" class="flex flex-row">
-        <RaceViewParams />
+      <div v-if="!editing" class="flex flex-row flex-0">
         <RaceEllipsisMenu :race="race" :edit="startEditing" />
       </div>
       <div v-if="editing" class="flex gap-1">
@@ -81,7 +80,6 @@
 import RaceBreadcrumbs from '@/components/race/header/RaceBreadcrumbs.vue';
 import RaceEllipsisMenu from '@/components/race/header/RaceEllipsisMenu.vue';
 import InputTime from '@/components/race/inputs/InputTime.vue';
-import RaceViewParams from '@/components/race/RaceViewParams.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
 import { useRace } from '@/composables/useRace';
 import { useRaceMetrics } from '@/composables/useRaceMetrics';

@@ -59,7 +59,7 @@ const splitItems = computed((): SplitItem[] => {
 
     const timeBarrierDuration = dateToMinutes(timeBarrier, firstItem.time);
 
-    const timeBarrierValid = timeBarrier ? timeBarrier > time : null;
+    const timeBarrierValid = timeBarrier && time ? timeBarrier > time : null;
 
     return {
       id: `row-${separator.distance}`,
