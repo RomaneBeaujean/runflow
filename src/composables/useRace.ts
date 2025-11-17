@@ -1,6 +1,6 @@
 import { useGpxSplits } from '@/composables/useGpxSplits';
 import { computeSlidingSlopeKm } from '@/lib/gpx/ClimbDetector';
-import { GpxParse } from '@/lib/gpx/GpxParse';
+import { GpxParse, smoothPointsByDistance } from '@/lib/gpx/GpxParse';
 import { roundOneNumber } from '@/lib/utils';
 import { Race } from '@/types/entities/Race';
 import { Separator } from '@/types/entities/Separator';
@@ -23,7 +23,10 @@ export function useRace() {
     race.value = r;
 
     const parser = new GpxParse(r.gpxContent);
-    points.value = parser.points.sort((a, b) => a.distance - b.distance);
+    points.value = smoothPointsByDistance(
+      parser.points.sort((a, b) => a.distance - b.distance),
+      0.3
+    );
     totalDistance.value = parser.totalDistance;
     separators.value =
       r.separators?.sort((a, b) => a.distance - b.distance) || [];

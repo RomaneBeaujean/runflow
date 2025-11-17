@@ -96,7 +96,7 @@
                       v-model="automaticSeparators"
                       inputId="automatic_separators"
                       name="generateGpxOptions"
-                      value="automatic_separators"
+                      value="automatic"
                     />
                     <label for="automatic_separators" class="text-sm">
                       Détecter automatiquement les segments (montées/descentes)
@@ -153,7 +153,7 @@ const gpxFile = ref<{ content: string; name: string }>(null);
 const raceName = ref<string | null>(null);
 const raceDate = ref<Date | null>(null);
 const startTime = ref<Date | null>(null);
-const automaticSeparators = ref<boolean>(false);
+const automaticSeparators = ref<string>(null);
 const pace = ref<string>(null);
 
 const removeFile = () => {
@@ -161,7 +161,7 @@ const removeFile = () => {
   gpxFile.value = null;
   raceDate.value = null;
   startTime.value = null;
-  automaticSeparators.value = false;
+  automaticSeparators.value = null;
   pace.value = null;
 };
 
@@ -189,7 +189,7 @@ function close() {
   gpxFile.value = null;
   raceDate.value = null;
   startTime.value = null;
-  automaticSeparators.value = false;
+  automaticSeparators.value = null;
   pace.value = null;
 }
 
@@ -199,7 +199,7 @@ async function createCourse() {
   const gpxParser = new GpxParse(gpxFile.value.content);
 
   const transitions =
-    automaticSeparators.value == true
+    automaticSeparators.value == 'automatic'
       ? new ClimbDetector(gpxFile.value.content).separators
       : [roundOneNumber(gpxParser.totalDistance)];
 

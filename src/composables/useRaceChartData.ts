@@ -25,7 +25,6 @@ const {
   getCumulDurationToDistance,
   getFormattedTimeToDistance,
   getPaceFromDistance,
-  getClosestPoint,
 } = useRaceMetrics();
 const { splits, separators, totalDistance } = useRace();
 const { clickedPoint, clickedSeparator } = useRaceChartClick();

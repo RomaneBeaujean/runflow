@@ -1,3 +1,4 @@
+1
 <template>
   <div class="cell w-[24px] font-semibold">
     <span v-if="isNotFirstLine" class="text-xs"> #{{ split.index }} </span>

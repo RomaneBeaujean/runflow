@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 import { Race } from '@/types/entities/Race';
 import { Breadcrumb } from 'primevue';
@@ -14,6 +14,13 @@ const props = defineProps<{ race: Race }>();
 
 onMounted(() => {
   if (!props.race) return;
+  items.value = [
+    { label: 'Plans de course', url: '/races' },
+    { label: props.race.name, disabled: true },
+  ];
+});
+
+watch(props.race, () => {
   items.value = [
     { label: 'Plans de course', url: '/races' },
     { label: props.race.name, disabled: true },

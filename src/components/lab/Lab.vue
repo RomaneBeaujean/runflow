@@ -119,6 +119,7 @@ const separatorsSeries = computed(() => {
         lineStyle: { color: '#024264', type: 'dashed', width: 1 },
         label: {
           show: true,
+          rotate: 45,
           position: 'end',
           color: '#035581',
         },
@@ -149,7 +150,7 @@ const separatorsSeries = computed(() => {
 });
 
 onMounted(async () => {
-  const response = await fetch('/belfort.xml');
+  const response = await fetch('/ventoux.xml');
   const text = await response.text();
   xml.value = text;
   const parsed = new GpxParse(xml.value);
