@@ -8,9 +8,9 @@ export function durationFromPaceAndDistance(
   pace: string,
   distance: number
 ): number {
-  if (!pace) return 0;
+  if (!pace) return null;
   const match = pace?.match(/^(\d{1,2}):(\d{2})$/);
-  if (!match) return 0;
+  if (!match) return null;
 
   const minutes = parseInt(match[1], 10);
   const seconds = parseInt(match[2], 10);

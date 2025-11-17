@@ -1,4 +1,5 @@
 import { GpxParse } from '@/lib/gpx/GpxParse';
+import { getTotalDuration } from '@/lib/gpx/Metrics';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { Separator } from '@/types/entities/Separator';
@@ -26,6 +27,10 @@ export class Race {
       data?.separators?.sort((a, b) => a.distance - b.distance) ?? [];
     this.startTime = data?.startTime ? new Date(data.startTime) : null;
     this.date = data?.date ? new Date(data.date) : null;
+  }
+
+  get totalDuration() {
+    return getTotalDuration(this.splits, this.separators);
   }
 
   get totalDistance() {

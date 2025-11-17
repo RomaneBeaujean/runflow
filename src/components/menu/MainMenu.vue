@@ -1,71 +1,87 @@
 <template>
-  <Toolbar style="border-radius: 0 !important">
-    <template #start v-if="!isMobile">
-      <div class="flex items-center">
-        <img src="@/assets/logo.png" alt="Logo" class="h-8 mr-4" />
-
-        <Button
-          v-for="item in items"
-          :key="item.path"
-          :label="item.label"
-          :icon="item.illustration"
-          size="small"
-          text
-          :severity="isActive(item.path) ? 'primary' : 'secondary'"
-          @click="selectItem(item.path)"
-        />
+  <template v-if="!isMobile">
+    <div class="p-5 relative bg-white shadow-xs">
+      <div class="absolute">
+        <AppLogo />
       </div>
-    </template>
-
-    <template #start v-if="isMobile">
-      <Button
-        icon="pi pi-bars"
-        severity="secondary"
-        text
-        @click="drawerVisible = true"
-      />
-    </template>
-    <template #center v-if="isMobile">
-      <img src="@/assets/logo.png" alt="Logo" class="h-6" />
-    </template>
-  </Toolbar>
-  <Drawer v-model:visible="drawerVisible">
-    <template #header>
-      <img src="@/assets/logo.png" alt="Logo" class="h-6" />
-    </template>
-    <div class="flex flex-col items-stretch">
-      <div
-        class="mobile-menu-item"
-        v-for="item in items"
-        :key="item.path"
-        :data-active="isActive(item.path) ? true : null"
-        @click="selectItem(item.path)"
-      >
-        <i v-if="item.illustration" :class="item.illustration" class="mr-4"></i>
-        {{ item.label }}
+      <div class="flex flex-1 justify-center items-center gap-4">
+        <nav class="flex w-max gap-4">
+          <Button
+            v-for="item in items"
+            :key="item.label"
+            @click="selectItem(item.path)"
+            :label="item.label"
+            :icon="item.illustration"
+            :text="!isActive(item.path)"
+          />
+        </nav>
       </div>
     </div>
-  </Drawer>
+  </template>
+  <template v-else>
+    <div class="p-5 relative">
+      <div class="absolute">
+        <Button icon="pi pi-bars" text @click="drawerVisible = true" />
+      </div>
+      <div class="flex justify-center">
+        <AppLogo />
+      </div>
+    </div>
+    <Drawer v-model:visible="drawerVisible">
+      <template #header>
+        <img src="@/assets/logo.png" alt="Logo" class="h-6" />
+      </template>
+      <div class="flex flex-col items-stretch">
+        <div
+          class="mobile-menu-item"
+          v-for="item in items"
+          :key="item.path"
+          :data-active="isActive(item.path) ? true : null"
+          @click="selectItem(item.path)"
+        >
+          <i
+            v-if="item.illustration"
+            :class="item.illustration"
+            class="mr-4"
+          ></i>
+          {{ item.label }}
+        </div>
+      </div>
+    </Drawer>
+  </template>
 </template>
 
 <script setup lang="ts">
 import { useViewport } from '@/composables/useViewport';
 import router from '@/router/router';
-import { Button, Drawer, Toolbar } from 'primevue';
+import { Button, Drawer } from 'primevue';
 import { ref } from 'vue';
-
-const drawerVisible = ref(false);
+import AppLogo from '../logo/AppLogo.vue';
 
 const { isMobile } = useViewport();
+const drawerVisible = ref(false);
+
+const activeItem = ref();
 
 const items = [
-  { label: 'Plans de course', path: 'races', illustration: 'pi pi-map' },
+  { label: 'Acceuil', path: '', illustration: 'pi pi-home' },
+  { label: 'Plans de course', path: 'races', illustration: 'pi pi-trophy' },
+  {
+    label: "Plans d'entrainement",
+    path: 'trainings',
+    illustration: 'pi pi-bolt',
+  },
+  {
+    label: 'Planificateur de randonnées',
+    path: 'trails',
+    illustration: 'pi pi-calendar',
+  },
   // { label: 'Laboratoire', path: 'lab', illustration: 'pi pi-map' },
 ];
 
 const getInitialRoute = (): string => {
   const segments = window.location.pathname.split('/').filter(Boolean);
-  return segments[0] || 'overview';
+  return segments[0] || '';
 };
 const activeRoute = ref(getInitialRoute());
 const isActive = (path: string) => activeRoute.value === path;
@@ -96,14 +112,14 @@ const selectItem = (path: string) => {
   border-radius: 4px;
 
   &[data-active] {
-    color: var(--color-primary-700);
+    color: var(--p-primary-600);
   }
 
   &:focus,
   &:active,
   &:hover {
     cursor: pointer;
-    background-color: var(--color-blue-50);
+    background-color: var(--p-primary-50);
   }
 }
 </style>

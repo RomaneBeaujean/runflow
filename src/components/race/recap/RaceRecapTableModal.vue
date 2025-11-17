@@ -201,7 +201,7 @@ const downloadFile = async () => {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .p-dialog.recap-modal {
   width: 80vw;
   height: 80vh;

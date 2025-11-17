@@ -4,7 +4,6 @@
     text
     severity="secondary"
     size="small"
-    label="Paramètres du graphique"
     @click="opened = true"
   ></Button>
   <Drawer v-model:visible="opened" header="Paramètres" position="right">

@@ -29,7 +29,11 @@ import { ref, watch } from 'vue';
 
 const emit = defineEmits(['update']);
 
-const props = defineProps<{ pace: string; distance: number; size?: string }>();
+const props = defineProps<{
+  pace: string | null;
+  distance: number;
+  size?: string;
+}>();
 
 const currentPace = ref<string>(props.pace);
 
@@ -38,7 +42,9 @@ const currentDurationMinutes = ref<number>(
 );
 
 const currentDuration = ref<string>(
-  minutesToFormattedDuration(currentDurationMinutes.value)
+  currentDurationMinutes.value
+    ? minutesToFormattedDuration(currentDurationMinutes.value)
+    : null
 );
 
 watch(

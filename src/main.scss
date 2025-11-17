@@ -1,6 +1,9 @@
+
 :root {
-  font-family: 'Open Sans', sans-serif;
-} 
+  font-family: Segoe UI,sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
  
 body {
   padding: 0;
@@ -12,6 +15,23 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  background-color: #F9F9FB;
+}
+/* effet de flou lumineux en bas */
+#app::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 200px;
+  width: 200px;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0)
+  );
+  filter: blur(30px);
+  pointer-events: none;
 }
 
 /* Scrollbar globale moderne, style Apple / Infinite Scrollbar */
@@ -85,4 +105,30 @@ input {
 .p-inputnumber-input {
   padding-right: 32px !important;
   -webkit-appearance: textfield !important;
+}
+
+span.p-button-label {
+  white-space: nowrap;
+}
+
+.p-breadcrumb {
+  background: transparent !important;
+}
+
+.leckerli-one-regular {
+  font-family: "Leckerli One", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poiret-one-regular {
+  font-family: "Poiret One", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.ms-madi-regular {
+  font-family: 'Ms Madi', cursive;
+  font-weight: 400;
+  font-style: normal;
 }

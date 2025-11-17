@@ -1,22 +1,48 @@
 <template>
-  <div v-if="race" id="race" :class="classes">
-    <div id="race-header">
+  <div
+    v-if="race"
+    id="race"
+    :class="[
+      'race flex p-5 flex-col relative',
+      stickyChart && 'sticky',
+      isMobile ? 'mobile' : 'desktop',
+    ]"
+  >
+    <div class="w-full relative">
       <RaceHeader />
     </div>
-    <Divider />
-    <div class="flex justify-end pb-3">
-      <RaceChartParams />
+
+    <div :class="[stickyChart && 'sticky top-0 z-40']">
+      <Card>
+        <template #title>
+          <div class="flex justify-between">
+            <div>Profil de la course</div>
+            <div><RaceChartParams /></div>
+          </div>
+        </template>
+        <template #content>
+          <div class="h-[250px] md:h-[450px]">
+            <RaceChart />
+          </div>
+        </template>
+      </Card>
     </div>
-    <div id="chart">
-      <RaceChart />
-    </div>
-    <Divider />
-    <div class="flex justify-end p-3">
-      <SwitchToggle label="Mode édition" v-model="editableMode" />
-    </div>
-    <div id="splits" class="p-2">
-      <RaceSplits />
-    </div>
+
+    <Card class="mt-8">
+      <template #title>
+        <div class="flex justify-between">
+          <div>Tableau des splits</div>
+          <div>
+            <SwitchToggle label="Mode édition" v-model="editableMode" />
+          </div>
+        </div>
+      </template>
+      <template #content>
+        <div id="splits">
+          <RaceSplits />
+        </div>
+      </template>
+    </Card>
   </div>
   <div v-else class="flex justify-center items-center h-40 text-gray-500">
     <ProgressSpinner />
@@ -38,22 +64,14 @@ import { useRaceChartParams } from '@/composables/useRaceChartParams';
 import { useViewport } from '@/composables/useViewport';
 import { useInjection } from '@/lib/useInjection';
 import type { AppStores } from '@/stores/AppLoader';
-import { Divider, ProgressSpinner } from 'primevue';
-import { computed, onMounted, watch } from 'vue';
+import { Card, ProgressSpinner } from 'primevue';
+import { onMounted, watch } from 'vue';
 
 const props = defineProps<{ id: string }>();
 const stores = useInjection<AppStores>('stores');
 const { splits, separators, race, startTime, initRace } = useRace();
 const { stickyChart, editableMode } = useRaceChartParams();
 const { isMobile } = useViewport();
-
-const classes = computed(() => {
-  return [
-    'race',
-    stickyChart.value ? 'sticky' : '',
-    isMobile.value ? 'mobile' : 'desktop',
-  ].join(' ');
-});
 
 const initRaceComposable = async () => {
   if (!props.id) return;
@@ -83,51 +101,12 @@ watch(
 </script>
 
 <style lang="scss">
-#race {
-  display: flex;
-  padding: 8px;
-  flex-direction: column;
-}
-
-#race-header,
-#chart {
-  flex: 1 1 auto;
-  background-color: white;
-  position: relative;
-}
-
-#race-table .header-row {
-  position: sticky;
-  background-color: white;
-  height: auto;
-  z-index: 30;
-  top: 0;
-}
-
 #race-table .p-datatable-table-container {
   overflow-x: unset !important;
   overflow-y: unset !important;
 }
 
-.desktop {
-  #chart {
-    height: 450px;
-  }
-}
-
-.mobile {
-  #chart {
-    height: 250px;
-  }
-}
-
 .sticky {
-  #chart {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-  }
-
   &.mobile {
     #race-table .header-row {
       top: 250px !important;

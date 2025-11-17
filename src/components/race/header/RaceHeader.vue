@@ -1,85 +1,88 @@
 <template>
-  <div class="flex flex-row justify-between p-3" v-if="race">
-    <div class="flex flex-col flex-1 gap-2 min-w-0">
-      <!-- RaceBreadcrumbs -->
-      <RaceBreadcrumbs :race="race" v-if="!isMobile" />
-
-      <!-- Race name -->
-      <div class="flex min-w-0">
-        <div v-if="!editing" class="flex flex-1 items-center min-w-0">
-          <span class="font-semibold text-xl truncate block max-w-full">
-            {{ race.name }}
-          </span>
+  <template v-if="race">
+    <div class="flex md:flex-row flex-col p-3 relative">
+      <div class="flex-1 flex flex-col">
+        <div class="flex justify-center">
+          <RaceBreadcrumbs :race="race" />
         </div>
-        <div v-else>
-          <InputText
-            v-model="editableName"
-            class="w-full sm:w-auto"
-            placeholder="Nom du plan"
-          />
+        <div class="flex flex-col gap-2">
+          <div class="flex justify-center gap-2 min-w-0">
+            <div
+              v-if="!editing"
+              class="flex justify-center items-center min-w-0"
+            >
+              <span
+                class="text-4xl p-3 truncate block max-w-full poiret-one-regular"
+              >
+                {{ race.name }}
+              </span>
+            </div>
+            <div v-else>
+              <InputText
+                v-model="editableName"
+                class="w-full sm:w-auto"
+                placeholder="Nom du plan"
+              />
+            </div>
+          </div>
+          <div class="flex flex-col gap-2 items-center">
+            <div
+              class="text-xs text-neutral-600 pb-3"
+              v-if="(race.date || race.startTime) && !editing"
+            >
+              <span v-if="race.date">
+                Le {{ dateToFormatted(race.date) }}
+              </span>
+              <span v-if="race.startTime">
+                à {{ dateToFormattedTime(race.startTime) }}
+              </span>
+            </div>
+            <div v-if="editing" class="flex flex-wrap gap-2">
+              <DatePicker
+                v-model="editableDate"
+                locale="fr"
+                dateFormat="dd/mm/yy"
+                showIcon
+                placeholder="Date"
+              />
+              <InputTime
+                :time="editableTime"
+                @update="({ time }) => (editableTime = time)"
+              />
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <ColorTag color="primary"
+                >{{ totalDistance }} <small>km</small></ColorTag
+              >
+              <ColorTag color="amber"
+                >{{ race.totalElevation }}m <small>d+</small></ColorTag
+              >
+              <ColorTag color="deep-purple" icon="pi pi-bolt">
+                Allure moyenne: {{ averagePace }} <small>min/km</small>
+              </ColorTag>
+              <ColorTag color="green" icon="pi pi-stopwatch">
+                Durée totale: {{ totalDuration }}
+              </ColorTag>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Infos course -->
-      <div class="flex flex-col gap-2">
-        <!-- Date -->
-        <div
-          class="text-xs text-neutral-600"
-          v-if="(race.date || race.startTime) && !editing"
-        >
-          <span v-if="race.date"> Le {{ dateToFormatted(race.date) }} </span>
-          <span v-if="race.startTime">
-            à {{ dateToFormattedTime(race.startTime) }}
-          </span>
+      <div class="absolute right-0 mt-[5px]">
+        <div v-if="!editing" class="flex flex-row flex-0">
+          <RaceEllipsisMenu :race="race" :edit="startEditing" />
         </div>
-        <div v-if="editing" class="flex flex-wrap gap-2">
-          <DatePicker
-            v-model="editableDate"
-            locale="fr"
-            dateFormat="dd/mm/yy"
-            showIcon
-            placeholder="Date"
-          />
-          <InputTime
-            :time="editableTime"
-            @update="({ time }) => (editableTime = time)"
-          />
-        </div>
-
-        <div class="flex flex-wrap gap-2">
-          <ColorTag color="primary"
-            >{{ totalDistance }} <small>km</small></ColorTag
-          >
-          <ColorTag color="amber"
-            >{{ race.totalElevation }}m <small>d+</small></ColorTag
-          >
-          <ColorTag color="deep-purple" icon="pi pi-bolt">
-            Allure moyenne: {{ averagePace }} <small>min/km</small>
-          </ColorTag>
-          <ColorTag color="green" icon="pi pi-stopwatch">
-            Durée totale: {{ totalDuration }}
-          </ColorTag>
+        <div v-if="editing" class="flex gap-1">
+          <Button icon="pi pi-check" rounded @click="saveEdit" />
+          <Button icon="pi pi-times" rounded @click="cancelEdit" />
         </div>
       </div>
     </div>
-
-    <!-- Boutons -->
-    <div class="flex-0">
-      <div v-if="!editing" class="flex flex-row flex-0">
-        <RaceEllipsisMenu :race="race" :edit="startEditing" />
-      </div>
-      <div v-if="editing" class="flex gap-1">
-        <Button icon="pi pi-check" rounded @click="saveEdit" />
-        <Button icon="pi pi-times" rounded @click="cancelEdit" />
-      </div>
-    </div>
-  </div>
+  </template>
 </template>
 
 <script setup lang="ts">
-import RaceBreadcrumbs from '@/components/race/header/RaceBreadcrumbs.vue';
 import RaceEllipsisMenu from '@/components/race/header/RaceEllipsisMenu.vue';
-import InputTime from '@/components/race/inputs/InputTime.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
 import { useRace } from '@/composables/useRace';
 import { useRaceMetrics } from '@/composables/useRaceMetrics';
@@ -94,6 +97,8 @@ import { AppStores } from '@/stores/AppLoader';
 import { Race } from '@/types/entities/Race';
 import { Button, DatePicker, InputText } from 'primevue';
 import { computed, ref } from 'vue';
+import InputTime from '../inputs/InputTime.vue';
+import RaceBreadcrumbs from './RaceBreadcrumbs.vue';
 
 const stores = useInjection<AppStores>('stores');
 const { isMobile } = useViewport();

@@ -138,7 +138,7 @@ const downloadFile = async () => {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .p-dialog.recap-chart-modal {
   width: 80vw;
   height: 80vh;
