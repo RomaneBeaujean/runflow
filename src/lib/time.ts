@@ -142,3 +142,14 @@ export function dateToFormatted(value: Date) {
   if (!value) return null;
   return value.toLocaleDateString('fr-FR');
 }
+
+export function paceToNumber(pace: string) {
+  const [min, sec] = pace.split(':').map(Number);
+  return min + sec / 60;
+}
+
+export function numberToPace(v: number) {
+  const minutes = Math.floor(v);
+  const seconds = Math.round((v - minutes) * 60);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}

@@ -3,7 +3,7 @@ import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { Split } from '@/types/Split';
 import { ref } from 'vue';
 
-const { getSplitFromDistance } = useRaceMetrics();
+const { getSplitFromDistance, getSeparatorFromDistance } = useRaceMetrics();
 const { getTargetDistance } = useEcharts();
 
 const hoveredSplit = ref<Split | null>(null);
@@ -11,9 +11,12 @@ const hoveredSplit = ref<Split | null>(null);
 export default function useRaceChartSplitHover() {
   const onChartHover = (event: any) => {
     const targetDistance = getTargetDistance(event);
-    const targetSplit = getSplitFromDistance(targetDistance);
-    if (!targetSplit) return;
-    hoveredSplit.value = targetSplit;
+    if (!getSeparatorFromDistance(targetDistance)) {
+      const targetSplit = getSplitFromDistance(targetDistance);
+      hoveredSplit.value = targetSplit;
+    } else {
+      hoveredSplit.value = null;
+    }
   };
 
   const onChartLeave = () => {

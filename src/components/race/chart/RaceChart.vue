@@ -3,10 +3,11 @@
     v-if="race"
     autoresize
     ref="chartRef"
-    style="position: relative"
     :option="chartOptions"
     @zr:click="onChartClick"
+    @zr:mousedown="onChartMouseDown"
     @zr:mouseover="onChartHover"
+    @zr:mousemove="onChartHover"
     @zr:globalout="onChartLeave"
   />
   <ClickedPointTooltip v-if="!isMobile" />
@@ -18,8 +19,8 @@ import ClickedPointTooltip from '@/components/race/chart/ClickedPointTooltip.vue
 import ClickedSeparatorTooltip from '@/components/race/chart/ClickedSeparatorTooltip.vue';
 import { useEcharts } from '@/composables/useEcharts';
 import { useRace } from '@/composables/useRace';
-import useRaceChartClick from '@/composables/useRaceChartClick';
 import useRaceChartData from '@/composables/useRaceChartData';
+import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
 import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
 import { useViewport } from '@/composables/useViewport';
 import { onMounted } from 'vue';
@@ -27,7 +28,7 @@ import VChart from 'vue-echarts';
 
 const { isMobile } = useViewport();
 const { onChartHover, onChartLeave } = useRaceChartSplitHover();
-const { onChartClick } = useRaceChartClick();
+const { onChartClick, onChartMouseDown } = useRaceChartInteraction();
 
 const { race } = useRace();
 const { chartRef } = useEcharts();

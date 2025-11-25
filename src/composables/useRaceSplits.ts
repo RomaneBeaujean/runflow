@@ -14,6 +14,7 @@ const {
   getCumulNegativeElevationToDistance,
   getSplitDistance,
   getSplitNegativeElevation,
+  getSplitFromDistance,
   getSplitSlopePercent,
   getSplitDuration,
   getSplitElevation,
@@ -45,9 +46,7 @@ const splitItems = computed((): SplitItem[] => {
   };
 
   const items = separators.value.map((separator: Separator, index: number) => {
-    const split = splits.value.find(
-      (s) => s.endDistance === separator.distance
-    );
+    const split = getSplitFromDistance(separator.distance);
 
     const cumulDuration = getCumulDurationToDistance(separator.distance);
 

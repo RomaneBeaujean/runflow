@@ -4,6 +4,8 @@ import {
   dateToFormattedTime,
   durationFromPaceAndDistance,
   minutesToFormattedDuration,
+  numberToPace,
+  paceToNumber,
   parseDate,
 } from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
@@ -58,36 +60,50 @@ export function useRaceMetrics() {
   }
 
   function getClosestSeparator(targetDistance: number): Separator | null {
-    if (separators.value.length === 0) return null;
-    let left = 0,
-      right = separators.value.length - 1;
+    if (!targetDistance || separators.value.length === 0) return null;
+
+    let left = 0;
+    let right = separators.value.length - 1;
+
     let closest = separators.value[0];
+
     while (left <= right) {
       const mid = Math.floor((left + right) / 2);
-      const midSep = separators.value[mid];
+      const midSeparator = separators.value[mid];
+
+      // Mise à jour du plus proche
       if (
-        Math.abs(midSep.distance - targetDistance) <
+        Math.abs(midSeparator.distance - targetDistance) <
         Math.abs(closest.distance - targetDistance)
       ) {
-        closest = midSep;
+        closest = midSeparator;
       }
-      if (midSep.distance < targetDistance) left = mid + 1;
-      else right = mid - 1;
+
+      if (midSeparator.distance < targetDistance) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
     }
+
     return closest;
   }
 
+  function getSeparatorFromDistance(targetDistance: number): Separator | null {
+    if (!targetDistance) return null;
+    return (
+      separators.value.find(
+        (el) => roundOneNumber(el.distance) == roundOneNumber(targetDistance)
+      ) || null
+    );
+  }
+
   function getSplitFromDistance(distance: number): Split | null {
-    let left = 0;
-    let right = splits.value.length - 1;
-    while (left <= right) {
-      const mid = Math.floor((left + right) / 2);
-      const split = splits.value[mid];
-      if (distance < split.startDistance) right = mid - 1;
-      else if (distance > split.endDistance) left = mid + 1;
-      else return split;
-    }
-    return null;
+    return (
+      splits.value.find(
+        (el) => distance >= el.startDistance && distance <= el.endDistance
+      ) || null
+    );
   }
 
   function getFormattedTimeToDistance(distance: number) {
@@ -187,11 +203,13 @@ export function useRaceMetrics() {
   }
 
   function getSplitDistance(split: Split): number {
+    if (!split) throw new Error('Cannot read properties of null');
     const distance = roundOneNumber(split.endDistance - split.startDistance);
     return roundOneNumber(distance);
   }
 
   function getSplitDuration(split: Split): number {
+    if (!split) throw new Error('Cannot read properties of null');
     const distance = roundOneNumber(split.endDistance - split.startDistance);
     const durationMinutes = durationFromPaceAndDistance(split.pace, distance);
     return durationMinutes;
@@ -233,6 +251,20 @@ export function useRaceMetrics() {
     return getAveragePace(splits.value, separators.value, totalDistance.value);
   });
 
+  const maxPace = computed(() => {
+    const maxPaceNumber = Math.max(
+      ...splits.value.map((el) => paceToNumber(el.pace))
+    );
+    return numberToPace(maxPaceNumber);
+  });
+
+  const minPace = computed(() => {
+    const maxPaceNumber = Math.min(
+      ...splits.value.map((el) => paceToNumber(el.pace))
+    );
+    return numberToPace(maxPaceNumber);
+  });
+
   const maxElevation = computed(() => {
     return Math.max(...points.value.map((el) => el.elevation));
   });
@@ -252,12 +284,15 @@ export function useRaceMetrics() {
     getSlopeFromDistance,
     getFormattedDurationFromSplit,
     getClosestSeparator,
+    getSeparatorFromDistance,
     getCumulElevationToDistance,
     getCumulDurationToDistance,
     getSplitSlopePercent,
     getClosestPoint,
     getFormattedTimeToDistance,
     averagePace,
+    maxPace,
+    minPace,
     maxElevation,
   };
 }

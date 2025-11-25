@@ -24,10 +24,10 @@
 
 <script setup lang="ts">
 import { useRace } from '@/composables/useRace';
-import useRaceChartClick from '@/composables/useRaceChartClick';
+import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
 import { Button } from 'primevue';
 const { clickedSeparatorPosition, clickedSeparator, closeTooltip } =
-  useRaceChartClick();
+  useRaceChartInteraction();
 const { deleteSeparator } = useRace();
 
 const handleDeleteSeparator = () => {

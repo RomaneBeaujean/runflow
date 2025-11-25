@@ -11,9 +11,7 @@
               v-if="!editing"
               class="flex justify-center items-center min-w-0"
             >
-              <span
-                class="text-4xl p-3 truncate block max-w-full poiret-one-regular"
-              >
+              <span class="text-4xl p-3 truncate block max-w-full title-font">
                 {{ race.name }}
               </span>
             </div>
@@ -86,7 +84,6 @@ import RaceEllipsisMenu from '@/components/race/header/RaceEllipsisMenu.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
 import { useRace } from '@/composables/useRace';
 import { useRaceMetrics } from '@/composables/useRaceMetrics';
-import { useViewport } from '@/composables/useViewport';
 import {
   dateToFormatted,
   dateToFormattedTime,
@@ -101,7 +98,6 @@ import InputTime from '../inputs/InputTime.vue';
 import RaceBreadcrumbs from './RaceBreadcrumbs.vue';
 
 const stores = useInjection<AppStores>('stores');
-const { isMobile } = useViewport();
 const { race, startTime, splits, totalDistance } = useRace();
 const { averagePace, getCumulDurationToDistance } = useRaceMetrics();
 

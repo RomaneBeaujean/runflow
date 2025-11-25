@@ -20,6 +20,15 @@
 
       <Divider />
 
+      <div class="font-xs font-semibold">Allure</div>
+
+      <SwitchToggle
+        v-model:model-value="showPaceLine"
+        label="Afficher la courbe d'allure"
+      />
+
+      <Divider />
+
       <div class="font-xs font-semibold">Séparateurs</div>
 
       <SwitchToggle
@@ -69,6 +78,7 @@ const {
   showPointSlope,
   showPointPace,
   showPointDuration,
+  showPaceLine,
 } = useRaceChartParams();
 </script>
 

@@ -14,7 +14,6 @@ export class Race {
   date: Date | null;
   startTime: Date | null;
   points: GpxPoint[];
-  maxElevation: number;
 
   constructor(data?: Partial<Race>) {
     this.id = data?.id ?? '';

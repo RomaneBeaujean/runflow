@@ -43,12 +43,12 @@
 
 <script setup lang="ts">
 import { useRace } from '@/composables/useRace';
-import useRaceChartClick from '@/composables/useRaceChartClick';
+import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
 import { Separator } from '@/types/entities/Separator';
 import { Button } from 'primevue';
 
 const { clickedPoint, clickedPointPosition, closeTooltip } =
-  useRaceChartClick();
+  useRaceChartInteraction();
 
 const { addSeparator } = useRace();
 

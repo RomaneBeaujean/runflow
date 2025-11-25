@@ -4,24 +4,29 @@ export function useGpxSplits() {
   function recomputeSplits({
     separators,
     oldSplits,
+    totalDistance,
+    averagePace,
   }: {
     separators: number[];
     oldSplits?: Split[];
+    totalDistance: number;
+    averagePace: string;
   }): Split[] {
-    const splits: Split[] = [];
     const previousSplits = oldSplits || [];
+    const sep = [...new Set([...separators, totalDistance])];
 
-    separators.forEach((currentDistance: number, index: number) => {
-      const startDistance = index === 0 ? 0 : splits[index - 1].endDistance;
-      const endDistance = currentDistance;
+    return sep.map((end, index) => {
+      const start = index === 0 ? 0 : separators[index - 1];
       const oldSplit = previousSplits.find(
-        (os: Split) => os.startDistance >= startDistance
+        (el) => el.startDistance == start || el.endDistance == end
       );
-      const pace = oldSplit ? oldSplit.pace : '06:30';
-      splits.push({ startDistance, endDistance, pace });
+      const pace = oldSplit?.pace || averagePace;
+      return {
+        startDistance: start,
+        endDistance: end,
+        pace,
+      };
     });
-
-    return splits;
   }
 
   return {

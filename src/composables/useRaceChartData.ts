@@ -1,47 +1,61 @@
 import { useEcharts } from '@/composables/useEcharts';
 import { useRace } from '@/composables/useRace';
-import useRaceChartClick from '@/composables/useRaceChartClick';
+import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
 import { useRaceChartParams } from '@/composables/useRaceChartParams';
 import useRaceChartSplitHover from '@/composables/useRaceChartSplitHover';
 import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { useViewport } from '@/composables/useViewport';
+import { getMarkLineColorStops, getPaceColor } from '@/lib/colors';
 import { chunkerizeSegments } from '@/lib/gpx/Segments';
 import {
   ComputeSegmentSlopeKm,
   getAreaSlopeColors,
   getSlopeColors,
 } from '@/lib/gpx/SlopeMetrix';
-import { minutesToFormattedDuration } from '@/lib/time';
+import {
+  minutesToFormattedDuration,
+  numberToPace,
+  paceToNumber,
+} from '@/lib/time';
 import { roundOneNumber } from '@/lib/utils';
-import { Separator } from '@/types/entities/Separator';
 import { GpxSegment } from '@/types/GpxSegment';
 import { Split } from '@/types/Split';
 import { computed, ref, watch } from 'vue';
-
 const { hoveredSplit } = useRaceChartSplitHover();
 const {
+  averagePace,
+  maxPace,
+  minPace,
   getPointsFromSplit,
   getSlopeFromDistance,
   getCumulDurationToDistance,
   getFormattedTimeToDistance,
   getPaceFromDistance,
 } = useRaceMetrics();
-const { splits, separators, totalDistance } = useRace();
-const { clickedPoint, clickedSeparator } = useRaceChartClick();
-const { chartInstance, getPositionFromPoint } = useEcharts();
+const { splits, separators, totalDistance, maxElevation } = useRace();
+const {
+  clickedPoint,
+  clickedSeparator,
+  dragPaceDistance,
+  dragPaceValue,
+  dragSeparator,
+  dragSeparatorDistance,
+} = useRaceChartInteraction();
+const { chartInstance } = useEcharts();
 const { isMobile } = useViewport();
 const {
   showSlopeAreaColor,
   showPointSlope,
   showPointPace,
   showSeparatorDuration,
+  showPaceLine,
   showPointDuration,
   showPointTime,
 } = useRaceChartParams();
 
-const AREA_LINE_COLOR = '#155E75';
-const AREA_COLOR = '#EFF6FF';
-const AREA_COLOR_EMPHASIS = '#b1d5e8';
+const AREA_LINE_COLOR = '#bfbfbf';
+const AREA_COLOR = '#DEDEDE';
+const AREA_COLOR_EMPHASIS = '#bfbfbf';
 const AREA_OPACITY = 0.6;
 const AREA_OPACITY_EMPHASIS = 0.4;
 const CLICKED_SEPARATOR_COLOR = '#F59E1D';
@@ -53,108 +67,6 @@ const SEP_BG_COLOR = '#B1D5E8';
 
 export default function useRaceChartData() {
   // =========================
-  // Séparateurs
-  // =========================
-  const chartSeparators = computed(() => {
-    return separators.value
-      .filter((s) => {
-        return s.distance !== totalDistance.value;
-      })
-      .sort((a, b) => a.distance - b.distance);
-  });
-
-  const separatorsSeries = computed(() => {
-    return {
-      id: 'separators',
-      type: 'line',
-      data: [],
-      markLine: {
-        animation: false,
-        symbol: 'none',
-        lineStyle: { color: '#024264', type: 'dashed', width: 1 },
-        label: {
-          show: true,
-          position: 'end',
-          color: '#035581',
-          fontWeight: 'bold',
-          fontSize: isMobile.value ? 8 : 11,
-          backgroundColor: '#B1D5E8',
-          padding: isMobile.value ? 2 : 4,
-          rotate: isMobile.value ? 90 : 45,
-          offset: isMobile.value ? [10, 11] : [20, 10],
-          borderRadius: 4,
-          rich: {
-            xs: { fontSize: 8 },
-          },
-          formatter: (params: any) => `${params.value} {xs|km} `,
-        },
-        data: chartSeparators.value.map((sep: Separator) => ({
-          xAxis: sep.distance,
-          label: {
-            color:
-              sep.distance === clickedSeparator.value?.distance
-                ? CLICKED_SEPARATOR_COLOR
-                : sep.refuel
-                  ? REFUEL_COLOR
-                  : SEP_COLOR,
-            backgroundColor:
-              sep.distance === clickedSeparator.value?.distance
-                ? CLICKED_SEPARATOR_BG_COLOR
-                : sep.refuel
-                  ? REFUEL_BG_COLOR
-                  : SEP_BG_COLOR,
-          },
-          lineStyle: {
-            color:
-              sep.distance === clickedSeparator.value?.distance
-                ? CLICKED_SEPARATOR_COLOR
-                : sep.refuel
-                  ? REFUEL_COLOR
-                  : SEP_COLOR,
-            width: sep.distance === clickedSeparator.value?.distance ? 3 : 1,
-          },
-        })),
-      },
-      markArea: {
-        zlevel: 1,
-        silent: true,
-        itemStyle: { color: 'transparent' },
-        label: {
-          show: true,
-          rich: {
-            b: { fontWeight: 'bold' },
-          },
-          fontSize: isMobile.value ? 8 : 12,
-          borderRadius: 4,
-          padding: 4,
-        },
-        data: showSeparatorDuration.value
-          ? chartSeparators.value.map((sep: Separator) => [
-              {
-                xAxis: sep.distance,
-                yAxis: 0,
-                label: {
-                  position: 'bottom',
-                  color: '#054b3a',
-                  fontWeight: 'bold',
-                  offset: isMobile.value ? [22, 0] : [-35, 0],
-                  rotate: isMobile.value ? 90 : 45,
-                  backgroundColor: '#e7f7f3',
-                  formatter: () =>
-                    `${minutesToFormattedDuration(getCumulDurationToDistance(sep.distance))}`,
-                },
-              },
-              {
-                xAxis: sep.distance,
-                yAxis: 0,
-              },
-            ])
-          : [],
-      },
-    };
-  });
-
-  // =========================
   // Splits
   // =========================
 
@@ -165,6 +77,7 @@ export default function useRaceChartData() {
         id: `serie-${split.startDistance}-${split.endDistance}`,
         type: 'line',
         symbol: 'diamond',
+        cursor: 'default',
         data: points.map((p) => [p.distance, p.elevation]),
         smooth: false,
         z: 2,
@@ -181,27 +94,91 @@ export default function useRaceChartData() {
             borderColor: '#DB2777',
             borderWidth: 0,
           },
-          lineStyle: { width: 4 },
           areaStyle: showSlopeAreaColor.value
             ? { color: 'white' }
             : { color: AREA_COLOR_EMPHASIS, opacity: 1 },
         },
-        markArea: {
-          zlevel: 1,
-          silent: true,
-          itemStyle: { color: 'transparent' },
-          label: {
-            show: true,
-            rich: {
-              b: { fontWeight: 'bold' },
-            },
-            lineHeight: isMobile.value ? 10 : 14,
-            fontSize: isMobile.value ? 8 : 12,
-            borderRadius: 4,
-            padding: 4,
-          },
-          data: [],
-        },
+        // markLine: {
+        //   animation: false,
+        //   symbol: 'none',
+        //   lineStyle: { color: '#024264', type: 'dashed', width: 1 },
+        //   label: {
+        //     show: true,
+        //     position: 'end',
+        //     color: '#035581',
+        //     fontWeight: 'bold',
+        //     fontSize: isMobile.value ? 8 : 11,
+        //     backgroundColor: '#B1D5E8',
+        //     padding: isMobile.value ? 2 : 4,
+        //     rotate: isMobile.value ? 90 : 45,
+        //     offset: isMobile.value ? [10, 11] : [20, 10],
+        //     borderRadius: 4,
+        //     rich: {
+        //       xs: { fontSize: 8 },
+        //     },
+        //     formatter: (params: any) => `${params.value} {xs|km} `,
+        //   },
+        //   data: separator
+        //     ? [
+        //         {
+        //           xAxis: separator.distance,
+        //           label: {
+        //             color:
+        //               separator.distance === clickedSeparator.value?.distance
+        //                 ? CLICKED_SEPARATOR_COLOR
+        //                 : separator.refuel
+        //                   ? REFUEL_COLOR
+        //                   : SEP_COLOR,
+        //             backgroundColor:
+        //               separator.distance === clickedSeparator.value?.distance
+        //                 ? CLICKED_SEPARATOR_BG_COLOR
+        //                 : separator.refuel
+        //                   ? REFUEL_BG_COLOR
+        //                   : SEP_BG_COLOR,
+        //           },
+        //         },
+        //       ]
+        //     : [],
+        // },
+        // markArea: {
+        //   zlevel: 1,
+        //   silent: true,
+        //   symbol: 'none',
+        //   label: {
+        //     show: true,
+        //     rich: {
+        //       b: { fontWeight: 'bold' },
+        //     },
+        //     fontSize: isMobile.value ? 8 : 12,
+        //     borderRadius: 4,
+        //     padding: 4,
+        //   },
+        //   data:
+        //     separator && showSeparatorDuration.value
+        //       ? [
+        //           [
+        //             {
+        //               xAxis: separator.distance,
+        //               yAxis: 0,
+        //               label: {
+        //                 position: 'bottom',
+        //                 color: '#054b3a',
+        //                 fontWeight: 'bold',
+        //                 offset: isMobile.value ? [22, 0] : [-35, 0],
+        //                 rotate: isMobile.value ? 90 : 45,
+        //                 backgroundColor: '#e7f7f3',
+        //                 formatter: () =>
+        //                   `${minutesToFormattedDuration(getCumulDurationToDistance(separator.distance))}`,
+        //               },
+        //             },
+        //             {
+        //               xAxis: separator.distance,
+        //               yAxis: 0,
+        //             },
+        //           ],
+        //         ]
+        //       : [],
+        // },
       };
 
       return serie;
@@ -223,6 +200,8 @@ export default function useRaceChartData() {
       const serie = {
         id: `segment-${segment.startDistance}-${segment.endDistance}`,
         type: 'line',
+        cursor: 'default',
+        silent: true,
         z: 1,
         data: points.map((p) => [p.distance, p.elevation]),
         smooth: false,
@@ -240,12 +219,126 @@ export default function useRaceChartData() {
   });
 
   // =========================
+  // Séparateurs
+  // =========================
+  const chartSeparators = computed(() => {
+    return separators.value
+      .filter((s) => {
+        return s && s.distance !== totalDistance.value;
+      })
+      .sort((a, b) => a.distance - b.distance);
+  });
+
+  const separatorsSeries = computed(() => {
+    const maxYRounded = Math.ceil(maxElevation.value / 100) * 100;
+    const step = 50;
+    const allPoints = [
+      ...Array.from(
+        { length: Math.ceil(maxYRounded / step) + 1 },
+        (_, i) => i * step
+      ),
+      maxYRounded,
+    ];
+
+    return chartSeparators.value.map((separator) => {
+      const isDragged = separator.distance == dragSeparator.value?.distance;
+      const distance = isDragged
+        ? dragSeparatorDistance.value
+        : separator.distance;
+
+      const serie = {
+        id: `separator-${separator.distance}`,
+        type: 'line',
+        cursor: 'col-resize',
+        symbol: 'rect',
+        z: 10,
+        symbolSize: [10, 30],
+        itemStyle: { opacity: 0 },
+        lineStyle: { opacity: 0 },
+        data: allPoints.map((el) => [distance, el]),
+        markLine: {
+          animation: false,
+          symbol: 'none',
+          lineStyle: { color: '#024264', type: 'dashed', width: 1 },
+          label: {
+            show: true,
+            position: 'end',
+            color: '#035581',
+            fontWeight: 'bold',
+            fontSize: isMobile.value ? 8 : 11,
+            backgroundColor: '#B1D5E8',
+            padding: isMobile.value ? 2 : 4,
+            rotate: isMobile.value ? 90 : 45,
+            offset: isMobile.value ? [10, 11] : [20, 10],
+            borderRadius: 4,
+            rich: {
+              xs: { fontSize: 8 },
+            },
+            formatter: (params: any) => `${params.value} {xs|km} `,
+          },
+          data: [
+            {
+              xAxis: distance,
+              label: {
+                color: separator.refuel ? REFUEL_COLOR : SEP_COLOR,
+                backgroundColor: separator.refuel
+                  ? REFUEL_BG_COLOR
+                  : SEP_BG_COLOR,
+              },
+            },
+          ],
+        },
+        markArea: {
+          zlevel: 1,
+          silent: true,
+          itemStyle: { color: 'transparent' },
+          label: {
+            show: true,
+            rich: {
+              b: { fontWeight: 'bold' },
+            },
+            fontSize: isMobile.value ? 8 : 12,
+            borderRadius: 4,
+            padding: 4,
+          },
+          data: showSeparatorDuration.value
+            ? [
+                [
+                  {
+                    xAxis: distance,
+                    yAxis: 0,
+                    label: {
+                      position: 'bottom',
+                      color: '#054b3a',
+                      fontWeight: 'bold',
+                      offset: isMobile.value ? [22, 0] : [-35, 0],
+                      rotate: isMobile.value ? 90 : 45,
+                      backgroundColor: '#e7f7f3',
+                      formatter: () =>
+                        `${minutesToFormattedDuration(getCumulDurationToDistance(distance))}`,
+                    },
+                  },
+                  {
+                    xAxis: distance,
+                    yAxis: 0,
+                  },
+                ],
+              ]
+            : [],
+        },
+      };
+      return serie;
+    });
+  });
+
+  // =========================
   // Clicked Point
   // =========================
 
-  const lineSerie = computed(() => ({
+  const clickedPointSerie = computed(() => ({
     id: 'line',
     type: 'line',
+    silent: true,
     data: [],
     markLine: {
       animation: false,
@@ -269,10 +362,148 @@ export default function useRaceChartData() {
   }));
 
   // =========================
+  // Pace serie
+  // =========================
+
+  const isSplitPaceDrag = (split: Split) => {
+    const isDragged =
+      dragPaceDistance.value &&
+      dragPaceDistance.value >= split.startDistance &&
+      dragPaceDistance.value <= split.endDistance;
+    return isDragged;
+  };
+
+  const paceSeries = computed(() => {
+    if (!showPaceLine.value) return [];
+    return splits.value.map((split, index) => {
+      const points = getPointsFromSplit(split);
+      const isDragged = isSplitPaceDrag(split);
+
+      const currentPace = isDragged
+        ? dragPaceValue.value
+        : paceToNumber(split.pace);
+
+      const nextSplit =
+        index == splits.value.length - 1 ? null : splits.value[index + 1];
+
+      const nextPace = !nextSplit
+        ? currentPace
+        : isSplitPaceDrag(nextSplit)
+          ? dragPaceValue.value
+          : paceToNumber(nextSplit.pace);
+
+      const startPace = Math.max(currentPace, nextPace);
+      const endPace = Math.min(currentPace, nextPace);
+
+      const serie = {
+        id: `pace-${split.startDistance}-${split.endDistance}`,
+        type: 'line',
+        cursor: 'row-resize',
+        symbolSize: 30,
+        symbol: 'rect',
+        animation: false,
+        itemStyle: {
+          opacity: 0,
+        },
+        data: points.map((p) => [p.distance, currentPace]),
+        smooth: false,
+        lineStyle: {
+          color: getPaceColor(
+            currentPace,
+            paceToNumber(averagePace.value),
+            paceToNumber(minPace.value),
+            paceToNumber(maxPace.value)
+          ),
+          width: 3,
+        },
+        z: 2,
+        showSymbol: false,
+        yAxisIndex: 1,
+        markLine: {
+          yAxisIndex: 1,
+          animation: false,
+          symbol: 'none',
+          silent: true,
+          lineStyle: {
+            width: 3,
+            type: 'solid',
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1, // vertical gradient
+              colorStops: getMarkLineColorStops(
+                startPace,
+                endPace,
+                paceToNumber(averagePace.value),
+                paceToNumber(minPace.value),
+                paceToNumber(maxPace.value)
+              ),
+            },
+          },
+          data: [
+            [
+              { xAxis: split.endDistance, yAxis: currentPace },
+              { xAxis: split.endDistance, yAxis: nextPace },
+            ],
+          ],
+        },
+        markArea: {
+          zlevel: 1,
+          silent: true,
+          itemStyle: { color: 'transparent' },
+          yAxisIndex: 1,
+          label: {
+            show: true,
+            rich: {
+              b: { fontWeight: 'bold' },
+            },
+            fontSize: isMobile.value ? 8 : 12,
+            borderRadius: 4,
+            padding: 4,
+          },
+          data: isDragged
+            ? [
+                [
+                  {
+                    xAxis: split.startDistance,
+                    yAxis: currentPace,
+                    label: {
+                      padding: 8,
+                      fontWeight: 'bold',
+                      backgroundColor: '#ffffff',
+                      color: getPaceColor(
+                        currentPace,
+                        paceToNumber(averagePace.value),
+                        paceToNumber(minPace.value),
+                        paceToNumber(maxPace.value)
+                      ),
+                      formatter: `${numberToPace(currentPace)}/km`,
+                    },
+                  },
+                  {
+                    xAxis: split.endDistance,
+                    yAxis: currentPace,
+                  },
+                ],
+              ]
+            : [],
+        },
+      };
+
+      return serie;
+    });
+  });
+
+  // =========================
   // Chart options
   // =========================
 
   const chartOptions = ref({
+    legend: {
+      show: !isMobile.value,
+    },
     tooltip: {
       show: true,
       trigger: 'axis',
@@ -303,19 +534,42 @@ export default function useRaceChartData() {
       min: 0,
       max: totalDistance ?? 0,
     },
-    yAxis: {
-      type: 'value',
-      show: true,
-      axisLabel: {
-        formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
+    yAxis: [
+      {
+        type: 'value',
+        position: 'left',
+        show: isMobile.value ? false : true,
+        axisLabel: {
+          formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
+        },
       },
-    },
-    series: [],
+      {
+        type: 'value',
+        position: 'right',
+        show: isMobile.value ? false : true,
+        min: Math.max(paceToNumber(minPace.value) - 3, 2.5),
+        max: Math.min(paceToNumber(maxPace.value) + 5, 25),
+        axisLabel: {
+          formatter: (v: number) => {
+            const minutes = Math.floor(v);
+            const seconds = Math.round((v - minutes) * 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
+          },
+        },
+      },
+    ],
+    series: [
+      ...splitsSeries.value,
+      ...splitsColoredSeries.value,
+      ...separatorsSeries.value,
+      ...paceSeries.value,
+      clickedPointSerie.value,
+    ],
   });
 
-  /**
-   * Hovered Point
-   */
+  // =========================
+  // Hovered Point
+  // =========================
 
   const getPointerTooltipPosition = (point: any, size: any) => {
     const [x] = point;
@@ -404,18 +658,7 @@ export default function useRaceChartData() {
   };
 
   watch(hoveredSplit, (newHovered, previousHovered) => {
-    if (!chartInstance.value) return;
-
-    // if (
-    //   showSplitDistance.value ||
-    //   showSplitElevation.value ||
-    //   showSplitPace.value
-    // ) {
-    //   if (previousHovered) updateMarkArea(previousHovered, []);
-    //   if (newHovered) updateMarkArea(newHovered, hoveredSplitMarkAreaData());
-    // }
-
-    if (isMobile.value) return;
+    if (!chartInstance.value || isMobile.value) return;
 
     // Area Emphasis
     if (showSlopeAreaColor.value) {
@@ -434,11 +677,15 @@ export default function useRaceChartData() {
   const updateChartData = () => {
     const options = {
       ...chartOptions.value,
+      legend: {
+        show: !isMobile.value,
+      },
       series: [
         ...splitsSeries.value,
-        separatorsSeries.value,
-        lineSerie.value,
         ...splitsColoredSeries.value,
+        ...separatorsSeries.value,
+        ...paceSeries.value,
+        clickedPointSerie.value,
       ],
     };
 
@@ -466,6 +713,9 @@ export default function useRaceChartData() {
       showPointSlope,
       showSeparatorDuration,
       showSlopeAreaColor,
+      showPaceLine,
+      dragPaceValue,
+      dragSeparatorDistance,
     ],
     () => {
       updateChartData();

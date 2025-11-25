@@ -61,8 +61,6 @@ import AppLogo from '../logo/AppLogo.vue';
 const { isMobile } = useViewport();
 const drawerVisible = ref(false);
 
-const activeItem = ref();
-
 const items = [
   { label: 'Acceuil', path: '', illustration: 'pi pi-home' },
   { label: 'Plans de course', path: 'races', illustration: 'pi pi-trophy' },

@@ -2,7 +2,7 @@
   <div class="p-8 h-full w-full overflow-y-auto">
     <div class="flex gap-1 flex-col md:flex-row">
       <div
-        class="poiret-one-regular text-4xl whitespace-nowrap flex justify-center mb-10 text-center flex-1"
+        class="title-font text-4xl whitespace-nowrap flex justify-center mb-10 text-center flex-1"
       >
         Plans de course
       </div>

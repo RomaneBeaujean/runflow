@@ -21,7 +21,7 @@
           </div>
         </template>
         <template #content>
-          <div class="h-[250px] md:h-[450px]">
+          <div class="h-[250px] md:h-[450px] relative">
             <RaceChart />
           </div>
         </template>
@@ -69,22 +69,22 @@ import { onMounted, watch } from 'vue';
 
 const props = defineProps<{ id: string }>();
 const stores = useInjection<AppStores>('stores');
-const { splits, separators, race, startTime, initRace } = useRace();
+const { race, initRace, splits, separators, startTime } = useRace();
 const { stickyChart, editableMode } = useRaceChartParams();
 const { isMobile } = useViewport();
 
-const initRaceComposable = async () => {
+const initComposables = async () => {
   if (!props.id) return;
   const raceData = stores.races.getRace(props.id);
   if (!raceData) return;
   initRace(raceData);
 };
 
-onMounted(() => initRaceComposable());
+onMounted(() => initComposables());
 
 watch(
   () => props.id,
-  () => initRaceComposable()
+  () => initComposables()
 );
 
 watch(

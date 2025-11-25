@@ -7,38 +7,55 @@ import { Separator } from '@/types/entities/Separator';
 import { GpxPoint } from '@/types/GpxPoint';
 import { SlidingSlopePoint } from '@/types/Slope';
 import { Split } from '@/types/Split';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
-const startTime = ref<Date | null>(null);
 const race = ref<Race | null>(null);
+const startTime = ref<Date | null>(null);
 const splits = ref<Split[]>([]);
 const separators = ref<Separator[]>([]);
 const points = ref<GpxPoint[]>([]);
 const totalDistance = ref<number>(null);
+const maxElevation = ref<number>(null);
 const slidingSlopesPoints = ref<SlidingSlopePoint[]>([]);
 const { recomputeSplits } = useGpxSplits();
 
 export function useRace() {
-  const initRace = (r: Race) => {
-    race.value = r;
+  const initRace = (initialRace: Race) => {
+    race.value = initialRace;
 
-    const parser = new GpxParse(r.gpxContent);
+    const parser = new GpxParse(initialRace.gpxContent);
+
+    // POINTS
     points.value = smoothPointsByDistance(
-      parser.points.sort((a, b) => a.distance - b.distance),
+      parser.points.slice().sort((a, b) => a.distance - b.distance), // slice pour cloner
       0.3
     );
-    totalDistance.value = parser.totalDistance;
-    separators.value =
-      r.separators?.sort((a, b) => a.distance - b.distance) || [];
-    splits.value =
-      r.splits?.sort((a, b) => a.startDistance - b.endDistance) || [];
-    startTime.value = r.startTime || null;
     slidingSlopesPoints.value = computeSlidingSlopeKm(points.value, 0.5);
-  };
+    maxElevation.value = Math.max(...parser.points.map((el) => el.elevation));
 
-  const separatorsDistances = computed(() => {
-    return separators.value.map((el) => el.distance);
-  });
+    // TOTAL DISTANCE
+    totalDistance.value = parser.totalDistance;
+
+    // SEPARATORS
+    const sep = (initialRace.separators || [])
+      .slice()
+      .sort((a, b) => a.distance - b.distance);
+
+    // ajouter totalDistance s'il n'existe pas
+    if (!sep.some((el) => el.distance === totalDistance.value)) {
+      sep.push(new Separator({ distance: totalDistance.value }));
+    }
+
+    separators.value = [...sep];
+
+    // SPLITS
+    splits.value = (initialRace.splits || [])
+      .slice()
+      .sort((a, b) => a.startDistance - b.endDistance);
+
+    // START TIME
+    startTime.value = initialRace.startTime || null;
+  };
 
   const updateRaceStartTime = (newStartTime: Date) => {
     startTime.value = newStartTime;
@@ -57,7 +74,6 @@ export function useRace() {
     const withNewValue = [...withoutOldValue, newValue].sort(
       (a: Separator, b: Separator) => a.distance - b.distance
     );
-
     separators.value = withNewValue;
   };
 
@@ -77,37 +93,6 @@ export function useRace() {
     });
   };
 
-  watch(
-    () => separators,
-    () => {
-      splits.value = generateSplits();
-    },
-    { deep: true }
-  );
-
-  return {
-    race,
-    splits,
-    points,
-    startTime,
-    separators,
-    totalDistance,
-    slidingSlopesPoints,
-    addSeparator,
-    deleteSeparator,
-    updateSeparator,
-    updateSplitPace,
-    updateRaceStartTime,
-    initRace,
-  };
-
-  function generateSplits() {
-    return recomputeSplits({
-      separators: separatorsDistances.value,
-      oldSplits: splits.value,
-    });
-  }
-
   function deleteSeparatorByDistance(d: number) {
     return [...separators.value].filter((el: Separator) => el.distance !== d);
   }
@@ -117,4 +102,35 @@ export function useRace() {
       (a: Separator, b: Separator) => a.distance - b.distance
     );
   }
+
+  return {
+    race,
+    splits,
+    points,
+    startTime,
+    separators,
+    maxElevation,
+    totalDistance,
+    slidingSlopesPoints,
+    addSeparator,
+    deleteSeparator,
+    updateSeparator,
+    updateSplitPace,
+    updateRaceStartTime,
+    initRace,
+  };
 }
+
+watch(
+  [separators],
+  () => {
+    const distances = separators.value.map((el) => el.distance);
+    splits.value = recomputeSplits({
+      separators: distances,
+      oldSplits: splits.value,
+      totalDistance: totalDistance.value,
+      averagePace: '06:30',
+    });
+  },
+  { flush: 'post' }
+);
