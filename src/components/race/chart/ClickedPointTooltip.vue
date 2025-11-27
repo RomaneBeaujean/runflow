@@ -13,29 +13,22 @@
     ></i>
     <div
       class="p-2 bg-white rounded-md shadow-md"
-      style="transform: translate(-15px)"
+      style="transform: translate(-50%)"
     >
       <div class="flex flex-col gap-1">
         <Button
-          label="Ajouter un séparateur"
+          v-tooltip.bottom="'Ajout séparateur'"
           icon="pi pi-arrows-v"
-          size="small"
-          class="p-button-text w-full justify-start hover:bg-gray-100"
+          text
           @click="() => addSeparatorOnClickedPoint(false)"
         />
         <Button
-          label="Ajouter un ravitaillement"
+          v-tooltip.bottom="'Ajout ravitaillement'"
           icon="pi pi-shopping-cart"
-          size="small"
-          class="p-button-text w-full justify-start hover:bg-gray-100"
+          text
           @click="() => addSeparatorOnClickedPoint(true)"
         />
-        <Button
-          label="Fermer"
-          size="small"
-          class="p-button-text p-button-secondary w-full justify-start hover:bg-gray-200"
-          @click="closeTooltip"
-        />
+        <Button icon="pi pi-times" text @click="closeTooltip" />
       </div>
     </div>
   </div>

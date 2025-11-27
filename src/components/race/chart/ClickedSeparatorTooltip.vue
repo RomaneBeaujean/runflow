@@ -5,19 +5,24 @@
       position: 'absolute',
       left: clickedSeparatorPosition.left,
       top: clickedSeparatorPosition.top,
-      transform: 'translate(-50%, -50%)',
     }"
   >
-    <div class="mt-12 bg-white rounded-md">
-      <Button
-        icon="pi pi-trash"
-        label="Supprimer"
-        class="w-full"
-        size="small"
-        severity="danger"
-        text
-        @click="handleDeleteSeparator"
-      />
+    <div class="p-2 bg-white rounded-md shadow-2xl opacity-90 ml-2">
+      <div class="flex flex-col gap-3">
+        <Button
+          icon="pi pi-cart-arrow-down"
+          :text="!isRefuel"
+          v-tooltip="'Ravitaillement'"
+          @click="handleUpdateRefuel"
+        />
+        <Button
+          icon="pi pi-trash"
+          severity="danger"
+          text
+          @click="handleDeleteSeparator"
+        />
+        <Button icon="pi pi-times" @click="closeTooltip" text />
+      </div>
     </div>
   </div>
 </template>
@@ -26,14 +31,32 @@
 import { useRace } from '@/composables/useRace';
 import useRaceChartInteraction from '@/composables/useRaceChartInteraction';
 import { Button } from 'primevue';
+import { ref, watch } from 'vue';
+
+const isRefuel = ref<boolean>(false);
 const { clickedSeparatorPosition, clickedSeparator, closeTooltip } =
   useRaceChartInteraction();
-const { deleteSeparator } = useRace();
+const { deleteSeparator, updateSeparator } = useRace();
+
+const handleUpdateRefuel = () => {
+  isRefuel.value = !isRefuel.value;
+
+  updateSeparator(clickedSeparator.value, {
+    ...clickedSeparator.value,
+    refuel: isRefuel.value,
+  });
+};
 
 const handleDeleteSeparator = () => {
   deleteSeparator(clickedSeparator.value.distance);
   closeTooltip();
 };
+
+watch(clickedSeparator, () => {
+  if (clickedSeparator.value) {
+    isRefuel.value = clickedSeparator.value.refuel;
+  }
+});
 </script>
 
 <style scoped></style>

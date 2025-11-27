@@ -61,15 +61,14 @@ import RaceSplits from '@/components/race/splits/RaceSplits.vue';
 import SwitchToggle from '@/components/SwitchToggle.vue';
 import { useRace } from '@/composables/useRace';
 import { useRaceChartParams } from '@/composables/useRaceChartParams';
+import { useStores } from '@/composables/useStores';
 import { useViewport } from '@/composables/useViewport';
-import { useInjection } from '@/lib/useInjection';
-import type { AppStores } from '@/stores/AppLoader';
 import { Card, ProgressSpinner } from 'primevue';
 import { onMounted, watch } from 'vue';
 
 const props = defineProps<{ id: string }>();
-const stores = useInjection<AppStores>('stores');
-const { race, initRace, splits, separators, startTime } = useRace();
+const stores = useStores();
+const { race, initRace } = useRace();
 const { stickyChart, editableMode } = useRaceChartParams();
 const { isMobile } = useViewport();
 
@@ -85,18 +84,6 @@ onMounted(() => initComposables());
 watch(
   () => props.id,
   () => initComposables()
-);
-
-watch(
-  [splits, separators, startTime],
-  () => {
-    stores.races.updateRace(race.value.id, {
-      separators: separators.value,
-      splits: splits.value,
-      startTime: startTime.value,
-    });
-  },
-  { deep: true }
 );
 </script>
 

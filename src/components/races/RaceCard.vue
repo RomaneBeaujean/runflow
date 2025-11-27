@@ -64,20 +64,19 @@
 </template>
 
 <script setup lang="ts">
+import { useStores } from '@/composables/useStores';
 import { getAveragePace } from '@/lib/gpx/Metrics';
 import {
   dateToFormatted,
   dateToFormattedTime,
   minutesToFormattedDuration,
 } from '@/lib/time';
-import { useInjection } from '@/lib/useInjection';
-import type { AppStores } from '@/stores/AppLoader';
 import { Race } from '@/types/entities/Race';
 import { Button, Card } from 'primevue';
 import { useRouter } from 'vue-router';
 import ColorTag from '../tags/ColorTag.vue';
 
-const stores = useInjection<AppStores>('stores');
+const stores = useStores();
 const props = defineProps<{ race: Race }>();
 const router = useRouter();
 const { deleteRace } = stores.races;

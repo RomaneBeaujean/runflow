@@ -121,11 +121,10 @@
 </template>
 
 <script setup lang="ts">
+import { useStores } from '@/composables/useStores';
 import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
 import { GpxParse } from '@/lib/gpx/GpxParse';
-import { useInjection } from '@/lib/useInjection';
 import { roundOneNumber } from '@/lib/utils';
-import type { AppStores } from '@/stores/AppLoader';
 import { Separator } from '@/types/entities/Separator';
 import {
   Button,
@@ -147,7 +146,7 @@ import InputTime from './inputs/InputTime.vue';
 
 const currentStep = ref('1');
 const visible = ref<boolean>(false);
-const stores = useInjection<AppStores>('stores');
+const stores = useStores();
 const router = useRouter();
 const gpxFile = ref<{ content: string; name: string }>(null);
 const raceName = ref<string | null>(null);

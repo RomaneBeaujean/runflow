@@ -70,7 +70,7 @@ export class RacesStore {
     const existing = await db.races.get(id);
     if (!existing) return;
 
-    const newRace: Race = { ...existing, ...updated };
+    const newRace = { ...existing, ...updated };
     const cleanRace = JSON.parse(JSON.stringify(toRaw(newRace))); // sérialise tout proprement
 
     try {

@@ -5,14 +5,13 @@
 
 <script setup lang="ts">
 import { useRaceRecap } from '@/composables/useRaceRecap';
-import { useInjection } from '@/lib/useInjection';
-import { AppStores } from '@/stores/AppLoader';
+import { useStores } from '@/composables/useStores';
 import { Race } from '@/types/entities/Race';
 import { Button, Menu } from 'primevue';
 import type { MenuItem } from 'primevue/menuitem';
 import { ref } from 'vue';
 
-const stores = useInjection<AppStores>('stores');
+const stores = useStores();
 const props = defineProps<{ race: Race; edit: () => void }>();
 const menu = ref(null);
 const { showTableModal, showChartModal } = useRaceRecap();

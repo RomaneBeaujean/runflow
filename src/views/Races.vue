@@ -25,11 +25,10 @@
 <script setup lang="ts">
 import AddNewRace from '@/components/race/AddNewRace.vue';
 import RacesList from '@/components/races/RacesList.vue';
-import { useInjection } from '@/lib/useInjection';
-import { AppStores } from '@/stores/AppLoader';
+import { useStores } from '@/composables/useStores';
 import { Button } from 'primevue';
 
-const stores = useInjection<AppStores>('stores');
+const stores = useStores();
 
 const importFile = () => {
   const input = document.createElement('input');

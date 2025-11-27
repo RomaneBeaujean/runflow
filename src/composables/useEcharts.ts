@@ -47,27 +47,27 @@ export function useEcharts() {
   };
 
   const getTargetDistancePace = (event: any) => {
-    const [targetDistance, targetPace] = chartInstance.value.convertFromPixel(
+    const [distance, pace] = chartInstance.value.convertFromPixel(
       { xAxisIndex: 0, yAxisIndex: 1 },
       [event.offsetX, event.offsetY]
     );
-    return [targetDistance, targetPace];
+    return { distance, pace };
   };
 
   const getTargetDistanceSeparator = (event: any) => {
-    const [targetDistance, targetSeparator] =
-      chartInstance.value.convertFromPixel({ xAxisIndex: 0, yAxisIndex: 0 }, [
-        event.offsetX,
-        event.offsetY,
-      ]);
-    return [targetDistance, targetSeparator];
+    const [distance, elevation] = chartInstance.value.convertFromPixel(
+      { xAxisIndex: 0, yAxisIndex: 0 },
+      [event.offsetX, event.offsetY]
+    );
+    return { distance, elevation };
   };
 
   const getPositionFromDistance = (distance: number) => {
-    return chartInstance.value.convertToPixel(
+    const [x, y] = chartInstance.value.convertToPixel(
       { xAxisIndex: 0, yAxisIndex: 0 },
       [distance, 0]
     );
+    return { x, y };
   };
 
   const getPositionFromPoint = (point: GpxPoint) =>

@@ -6,11 +6,13 @@ import { configurePrimeVue } from '@/config/primevue-config';
 import router from '@/router/router';
 import { AppLoader } from '@/stores/AppLoader';
 import '@/style.css';
+import Tooltip from 'primevue/tooltip';
 import { createApp } from 'vue';
 
 const app = createApp(App);
 configurePrimeVue(app);
 app.use(router);
+app.directive('tooltip', Tooltip);
 
 const loader = new AppLoader();
 

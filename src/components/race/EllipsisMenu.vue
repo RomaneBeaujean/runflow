@@ -9,13 +9,12 @@
 </template>
 
 <script setup lang="ts">
-import { useInjection } from '@/lib/useInjection';
-import { AppStores } from '@/stores/AppLoader';
+import { useStores } from '@/composables/useStores';
 import { Button, Menu } from 'primevue';
 import type { MenuItem } from 'primevue/menuitem';
 import { ref } from 'vue';
 
-const stores = useInjection<AppStores>('stores');
+const stores = useStores();
 
 const menu = ref(null);
 

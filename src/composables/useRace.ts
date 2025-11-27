@@ -1,4 +1,3 @@
-import { useGpxSplits } from '@/composables/useGpxSplits';
 import { computeSlidingSlopeKm } from '@/lib/gpx/ClimbDetector';
 import { GpxParse, smoothPointsByDistance } from '@/lib/gpx/GpxParse';
 import { roundOneNumber } from '@/lib/utils';
@@ -7,7 +6,8 @@ import { Separator } from '@/types/entities/Separator';
 import { GpxPoint } from '@/types/GpxPoint';
 import { SlidingSlopePoint } from '@/types/Slope';
 import { Split } from '@/types/Split';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
+import { useRaceWatchers } from './useRaceWatchers';
 
 const race = ref<Race | null>(null);
 const startTime = ref<Date | null>(null);
@@ -17,7 +17,6 @@ const points = ref<GpxPoint[]>([]);
 const totalDistance = ref<number>(null);
 const maxElevation = ref<number>(null);
 const slidingSlopesPoints = ref<SlidingSlopePoint[]>([]);
-const { recomputeSplits } = useGpxSplits();
 
 export function useRace() {
   const initRace = (initialRace: Race) => {
@@ -55,6 +54,9 @@ export function useRace() {
 
     // START TIME
     startTime.value = initialRace.startTime || null;
+
+    // Watchers
+    useRaceWatchers();
   };
 
   const updateRaceStartTime = (newStartTime: Date) => {
@@ -120,17 +122,3 @@ export function useRace() {
     initRace,
   };
 }
-
-watch(
-  [separators],
-  () => {
-    const distances = separators.value.map((el) => el.distance);
-    splits.value = recomputeSplits({
-      separators: distances,
-      oldSplits: splits.value,
-      totalDistance: totalDistance.value,
-      averagePace: '06:30',
-    });
-  },
-  { flush: 'post' }
-);

@@ -38,83 +38,118 @@ export default function useRaceChartInteraction() {
   const zr = computed(() => chartInstance.value.getZr());
 
   const onChartClick = (event: any) => {
-    if (!editableMode.value || isMobile.value) return;
+    const targetDistance = getTargetDistance(event);
+    if (!editableMode.value || isMobile.value || !targetDistance) return;
+
     closeTooltip();
 
-    const targetDistance = getTargetDistance(event);
+    const isSeparatorClick = event.target
+      ? ['path', 'tspan', 'rect', 'ec-line'].includes(event.target.type)
+      : false;
 
-    if (!event.target) return;
-    if (event.target?.name === 'line') {
-      const closest = getClosestSeparator(targetDistance);
-      if (!closest) return;
-      clickedSeparator.value = closest;
-      const [x, y] = getPositionFromDistance(closest.distance);
-      clickedSeparatorPosition.value = { left: `${x}px`, top: `${y}px` };
+    if (isSeparatorClick) {
+      handleSeparatorClick(targetDistance);
     } else {
-      const closest = getClosestPoint(targetDistance);
-      const [px, py] = getPositionFromPoint(closest);
-      clickedPoint.value = closest;
-      clickedPointPosition.value = { left: `${px}px`, top: `${py}px` };
+      handleChartClick(targetDistance);
     }
   };
 
   const onChartMouseDown = (event: any) => {
     if (!editableMode.value || isMobile.value) return;
+    closeTooltip();
     const el = event.target;
     if (!el) return;
-
-    if (el.cursor == 'row-resize' && showPaceLine.value) {
-      const [x, y] = getTargetDistancePace(event);
-      dragPaceDistance.value = x;
-      dragPaceValue.value = y;
-      zr.value.on('mousemove', onPaceMouseMove);
-      zr.value.on('mouseup', onPaceMouseUp);
-    }
-
-    if (el.cursor == 'col-resize') {
-      const [x, y] = getTargetDistanceSeparator(event);
-      dragSeparator.value = getClosestSeparator(x);
-      dragSeparatorDistance.value = roundOneNumber(x);
-      zr.value.on('mousemove', onSeparatorMouseMove);
-      zr.value.on('mouseup', onSeparatorMouseUp);
-    }
+    if (el.cursor == 'row-resize' && showPaceLine.value) initPaceDrag(event);
+    if (el.cursor == 'col-resize') initSeparatorDrag(event);
   };
 
-  const onPaceMouseUp = (event: any) => {
-    zr.value.off('mousemove', onPaceMouseMove);
-    zr.value.off('mouseup', onPaceMouseUp);
-    const [x, y] = getTargetDistancePace(event);
-    const split = getSplitFromDistance(x);
-    updateSplitPace(split, numberToPace(y));
-    dragPaceDistance.value = null;
-    dragPaceValue.value = null;
+  /**
+   * CHART CLICK
+   */
+
+  const handleChartClick = (targetDistance: number) => {
+    const closest = getClosestPoint(targetDistance);
+    const [px, py] = getPositionFromPoint(closest);
+    clickedPoint.value = closest;
+    clickedPointPosition.value = { left: `${px}px`, top: `${py}px` };
   };
 
-  const onSeparatorMouseUp = (event: any) => {
-    zr.value.off('mousemove', onSeparatorMouseMove);
-    zr.value.off('mouseup', onSeparatorMouseUp);
-    const newSeparator = {
-      ...dragSeparator.value,
-      distance: roundOneNumber(dragSeparatorDistance.value),
+  /**
+   * SEPARATOR CLICK
+   */
+
+  const handleSeparatorClick = (targetDistance: number) => {
+    const separator = getClosestSeparator(targetDistance);
+    clickedSeparator.value = separator;
+    const { x } = getPositionFromDistance(separator.distance);
+    clickedSeparatorPosition.value = {
+      left: `${x}px`,
+      top: `50px`,
     };
-    updateSeparator(dragSeparator.value, newSeparator);
   };
-
-  const onPaceMouseMove = (event: any) => {
-    const [x, y] = getTargetDistancePace(event);
-    dragPaceValue.value = y;
-  };
-
-  const onSeparatorMouseMove = (event: any) => {
-    const [x] = getTargetDistanceSeparator(event);
-    dragSeparatorDistance.value = roundOneNumber(x);
-  };
-
   const closeTooltip = () => {
     clickedPoint.value = null;
     clickedPointPosition.value = null;
     clickedSeparatorPosition.value = null;
     clickedSeparator.value = null;
+  };
+
+  /**
+   * PACE DRAG
+   */
+
+  const initPaceDrag = (event: any) => {
+    const { distance, pace } = getTargetDistancePace(event);
+    dragPaceDistance.value = distance;
+    dragPaceValue.value = pace;
+    zr.value.on('mousemove', onPaceMouseMove);
+    zr.value.on('mouseup', onPaceMouseUp);
+  };
+
+  const onPaceMouseMove = (event: any) => {
+    const { pace } = getTargetDistancePace(event);
+    dragPaceValue.value = pace;
+  };
+
+  const onPaceMouseUp = (event: any) => {
+    zr.value.off('mousemove', onPaceMouseMove);
+    zr.value.off('mouseup', onPaceMouseUp);
+    const { distance, pace } = getTargetDistancePace(event);
+    if (dragPaceDistance.value && dragPaceValue.value) {
+      const split = getSplitFromDistance(distance);
+      updateSplitPace(split, numberToPace(pace));
+    }
+    dragPaceDistance.value = null;
+    dragPaceValue.value = null;
+  };
+  /**
+   * SEPARATOR DRAG
+   */
+
+  const initSeparatorDrag = (event: any) => {
+    const { distance } = getTargetDistanceSeparator(event);
+    dragSeparator.value = getClosestSeparator(distance);
+    zr.value.on('mousemove', onSeparatorMouseMove);
+    zr.value.on('mouseup', onSeparatorMouseUp);
+  };
+
+  const onSeparatorMouseMove = (event: any) => {
+    const { distance } = getTargetDistanceSeparator(event);
+    dragSeparatorDistance.value = roundOneNumber(distance);
+  };
+
+  const onSeparatorMouseUp = () => {
+    zr.value.off('mousemove', onSeparatorMouseMove);
+    zr.value.off('mouseup', onSeparatorMouseUp);
+    if (dragSeparatorDistance.value && dragSeparator.value) {
+      const newSeparator = {
+        ...dragSeparator.value,
+        distance: roundOneNumber(dragSeparatorDistance.value),
+      };
+      updateSeparator(dragSeparator.value, newSeparator);
+    }
+    dragSeparator.value = null;
+    dragSeparatorDistance.value = null;
   };
 
   return {

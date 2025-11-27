@@ -84,20 +84,19 @@ import RaceEllipsisMenu from '@/components/race/header/RaceEllipsisMenu.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
 import { useRace } from '@/composables/useRace';
 import { useRaceMetrics } from '@/composables/useRaceMetrics';
+import { useStores } from '@/composables/useStores';
 import {
   dateToFormatted,
   dateToFormattedTime,
   minutesToFormattedDuration,
 } from '@/lib/time';
-import { useInjection } from '@/lib/useInjection';
-import { AppStores } from '@/stores/AppLoader';
 import { Race } from '@/types/entities/Race';
 import { Button, DatePicker, InputText } from 'primevue';
 import { computed, ref } from 'vue';
 import InputTime from '../inputs/InputTime.vue';
 import RaceBreadcrumbs from './RaceBreadcrumbs.vue';
 
-const stores = useInjection<AppStores>('stores');
+const stores = useStores();
 const { race, startTime, splits, totalDistance } = useRace();
 const { averagePace, getCumulDurationToDistance } = useRaceMetrics();
 

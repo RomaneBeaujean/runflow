@@ -13,11 +13,10 @@
 </template>
 
 <script setup lang="ts">
-import { useInjection } from '@/lib/useInjection';
-import type { AppStores } from '@/stores/AppLoader';
+import { useStores } from '@/composables/useStores';
 import RaceCard from './RaceCard.vue';
 
-const stores = useInjection<AppStores>('stores');
+const stores = useStores();
 </script>
 
 <style scoped lang="scss"></style>
