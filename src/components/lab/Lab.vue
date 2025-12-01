@@ -51,6 +51,9 @@
 import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
 import { GpxParse, smoothPointsByDistance } from '@/lib/gpx/GpxParse';
 import { getAveragePace, getTotalDuration } from '@/lib/gpx/Metrics';
+import { PaceCalculator } from '@/lib/gpx/PaceCalculator';
+import { computeSlidingSlopeKm } from '@/lib/gpx/SlopeMetrix';
+import { computeSplits } from '@/lib/Splits';
 import { minutesToFormattedDuration, paceToNumber } from '@/lib/time';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
@@ -179,36 +182,36 @@ const totalDistance = ref<number>();
 const maxPace = ref<number>(5.5);
 const minUpPace = ref<number>(15);
 const minDownPace = ref<number>(9);
-const pUp = ref<number>(0.5);
-const pDown = ref<number>(2);
+const pUp = ref<number>(1);
+const pDown = ref<number>(1);
 const sOpt = ref<number>(-3);
 const avg = ref<string>('09:04');
 const splits = ref<Split[]>([]);
+const slopeMax = ref();
+const slopeMin = ref();
+const calculator = ref();
 
-const modelPoints = computed(() => {
-  // const calculator = new PaceCalculator(points.value, totalDistance.value);
-  // const sMax = calculator.sMax;
-  // const sMin = calculator.sMin;
-  // const vMax = paceToKmh(maxPace.value); // vitesse max (a pente optimale)
-  // const vMinDown = paceToKmh(minDownPace.value); // vitesse minimum en descente
-  // const vMinUp = paceToKmh(minUpPace.value); // vitesse minimum en montée
-  // const model = calculator.createSpeedModel({
-  //   vMax,
-  //   sOpt: sOpt.value,
-  //   pUp: pUp.value,
-  //   pDown: pDown.value,
-  //   sMin,
-  //   vMinDown,
-  //   sMax,
-  //   vMinUp,
-  // });
-  // const arr = [];
-  // for (let i = sMin; i <= sMax; i++) {
-  //   arr.push(i);
-  // }
-  // return arr.map((num) => {
-  //   return [num, kmhToPace(model(num))];
-  // });
+const calculatorPoints = computed(() => {
+  const vMax = paceToKmh(maxPace.value);
+  const vMinDown = paceToKmh(minDownPace.value);
+  const vMinUp = paceToKmh(minUpPace.value);
+
+  const model = calculator.value.createSpeedModel({
+    vMax,
+    vMinDown,
+    vMinUp,
+    pUp: pUp.value,
+    pDown: pDown.value,
+    sOpt: sOpt.value,
+  });
+
+  const arr = [];
+  for (let i = slopeMin.value; i <= slopeMax.value; i++) {
+    arr.push(i);
+  }
+  return arr.map((num) => {
+    return [num, model(num)];
+  });
 });
 
 const modelSerie = computed(() => {
@@ -218,7 +221,7 @@ const modelSerie = computed(() => {
       smooth: false,
       showSymbol: false,
       type: 'line',
-      data: modelPoints.value,
+      data: calculatorPoints.value,
       lineStyle: { color: 'orange', width: 1 },
     },
   ];
@@ -302,17 +305,17 @@ const series = computed(() => {
 });
 
 const calculate = () => {
-  // splits.value = new PaceCalculator(xml.value).calculateSplitPace({
-  //   splits: computeSplits(separators.value),
-  //   avg: paceToNumber(avg.value),
-  //   maxPace: maxPace.value,
-  //   upMinPace: minUpPace.value,
-  //   downMinPace: minDownPace.value,
-  //   pUp: pUp.value,
-  //   pDown: pDown.value,
-  //   sOpt: sOpt.value,
-  // });
-  // updateChartData();
+  splits.value = calculator.value.calculateSplitPace({
+    splits: computeSplits(separators.value),
+    avg: paceToNumber(avg.value),
+    maxPace: maxPace.value,
+    upMinPace: minUpPace.value,
+    downMinPace: minDownPace.value,
+    pUp: pUp.value,
+    pDown: pDown.value,
+    sOpt: sOpt.value,
+  });
+  updateChartData();
 };
 
 onMounted(async () => {
@@ -323,6 +326,15 @@ onMounted(async () => {
   points.value = smoothPointsByDistance(parsed.points, 1);
   separators.value = new ClimbDetector(text).separators;
   totalDistance.value = parsed.totalDistance;
+  const slopes = computeSlidingSlopeKm(points.value, 0.5).map((it) => it.slope);
+  slopeMax.value = Math.max(...slopes);
+  slopeMin.value = Math.min(...slopes);
+  calculator.value = new PaceCalculator({
+    slopeMax: slopeMax.value,
+    slopeMin: slopeMin.value,
+    points: points.value,
+    totalDistance: totalDistance.value,
+  });
   calculate();
   updateChartData();
 });

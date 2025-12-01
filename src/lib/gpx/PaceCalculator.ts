@@ -1,40 +1,41 @@
-import { SlidingSlopePoint } from '@/types/Slope';
+import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { kmhToPace, numberToPace, paceToKmh } from '../time';
-import { computeSlidingSlopeKm } from './SlopeMetrix';
+import { chunkerizeSegments } from './Segments';
+import { computeSegmentSlopeKm } from './SlopeMetrix';
+
+export interface SplitWithDuration {
+  startDistance: number;
+  endDistance: number;
+  pace: string;
+  duration: number;
+}
 
 export class PaceCalculator {
   totalDistance: number;
-  points: SlidingSlopePoint[];
+  points: GpxPoint[];
   slopeMin: number;
   slopeMax: number;
 
   constructor({ points, totalDistance, slopeMin, slopeMax }) {
-    this.points = computeSlidingSlopeKm(points, 0.3);
+    this.points = points;
     this.totalDistance = totalDistance;
     this.slopeMax = slopeMax;
     this.slopeMin = slopeMin;
   }
 
-  createSpeedModel({
-    vMax,
-    sOpt,
-    pUp,
-    pDown,
-    slopeMin,
-    vMinDown,
-    slopeMax,
-    vMinUp,
-  }) {
+  createSpeedModel({ vMax, sOpt, pUp, pDown, vMinDown, vMinUp }) {
     const aL =
-      -Math.log(vMinDown / vMax) / Math.pow(Math.abs(slopeMin - sOpt), pDown);
+      -Math.log(vMinDown / vMax) /
+      Math.pow(Math.abs(this.slopeMin - sOpt), pDown);
     const aR =
-      -Math.log(vMinUp / vMax) / Math.pow(Math.abs(slopeMax - sOpt), pUp);
-    return function getSpeed(slope: number) {
+      -Math.log(vMinUp / vMax) / Math.pow(Math.abs(this.slopeMax - sOpt), pUp);
+    return function getPace(slope: number) {
       const a = slope <= sOpt ? aL : aR;
       const p = slope <= sOpt ? pDown : pUp;
       const v = vMax * Math.exp(-a * Math.pow(Math.abs(slope - sOpt), p));
-      return Math.max(0, Math.min(v, vMax));
+      const speed = Math.max(0, Math.min(v, vMax));
+      return kmhToPace(speed);
     };
   }
 
@@ -56,50 +57,54 @@ export class PaceCalculator {
       pUp,
       pDown,
       sOpt,
-      slopeMin: this.slopeMin,
-      slopeMax: this.slopeMax,
       vMax,
       vMinDown,
       vMinUp,
     });
 
-    const pacedPoints = this.points.map((p, idx) => {
-      const pace = kmhToPace(findPaceFromSlopeFn(p.slope));
-      const distance =
-        idx === 0 ? 0 : p.distance - this.points[idx - 1].distance;
-      return {
-        ...p,
-        pace,
-        duration: pace * distance,
-      };
-    });
+    const pacedSplits: SplitWithDuration[] = splits.map(
+      (split: Partial<Split>) => {
+        const points = this.points.filter(
+          (el) =>
+            el.distance >= split.startDistance &&
+            el.distance <= split.endDistance
+        );
+        const segments = chunkerizeSegments(points, 0.1);
+        const segmentSlope = computeSegmentSlopeKm(segments);
+        const segmentPaced = segmentSlope.map((s) => {
+          const pace = findPaceFromSlopeFn(s.slope);
+          const distance = s.distance;
+          const duration = pace * distance;
+          return {
+            ...s,
+            duration,
+          };
+        });
+        const duration = segmentPaced.reduce((acc, s) => acc + s.duration, 0);
+        return {
+          ...split,
+          duration: duration,
+        };
+      }
+    );
 
-    const duration = pacedPoints.reduce((acc, s) => acc + s.duration, 0);
+    const splitsDuration = pacedSplits.reduce((acc, s) => acc + s.duration, 0);
     const durationTarget = avg ? this.totalDistance * avg : null;
-    const correctionFactor = avg ? durationTarget / duration : 1;
+    const correctionFactor = avg ? durationTarget / splitsDuration : 1;
 
-    const adjustedPoints = pacedPoints.map((p) => ({
-      ...p,
-      pace: p.pace * correctionFactor,
-      duration: p.duration * correctionFactor,
-    }));
+    const finalSplits = pacedSplits.map((split) => {
+      const distance = split.endDistance - split.startDistance;
+      const duration = split.duration * correctionFactor;
+      const pace = numberToPace(duration / distance);
 
-    return splits.map((split: Partial<Split>) => {
-      const splitPoints = adjustedPoints.filter(
-        (p) =>
-          p.distance >= split.startDistance && p.distance <= split.endDistance
-      );
-      const totalDistance = split.endDistance - split.startDistance;
-      const totalDuration = splitPoints.reduce((acc, p) => acc + p.duration, 0);
-      const pace = numberToPace(totalDuration / totalDistance);
-
-      const splitWithPace: Split = {
+      return {
         startDistance: split.startDistance,
         endDistance: split.endDistance,
+        duration,
         pace,
       };
-
-      return splitWithPace;
     });
+
+    return finalSplits;
   }
 }

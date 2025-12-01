@@ -7,7 +7,7 @@
         :style="{ left: thumbPosition + '%' }"
       >
         <span class="flex flex-nowrap whitespace-nowrap items-center">
-          <b>{{ formattedValue }}</b>
+          <b>{{ roundOneNumber(value) }}</b>
         </span>
       </div>
 
@@ -36,28 +36,13 @@
           @mousedown.stop="startDrag"
         ></div>
       </div>
-
-      <!-- Graduation avec valeurs -->
-      <!-- <div class="flex justify-between">
-        <div
-          v-for="tick in ticks"
-          :key="tick"
-          class="text-center w-px relative"
-        >
-          <div class="absolute transform -translate-x-1/2">
-            <span class="text-sm text-gray-600">{{
-              minutesToFormattedDuration(tick)
-            }}</span>
-          </div>
-        </div>
-      </div> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { minutesToFormattedDuration } from '@/lib/time';
-import { computed, ref, watch } from 'vue';
+import { roundOneNumber } from '@/lib/utils';
+import { ref, watch } from 'vue';
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: number): void;
@@ -79,10 +64,6 @@ const thumbPosition = ref(0);
 
 let dragging = false;
 
-const formattedValue = computed(() => {
-  return minutesToFormattedDuration(value.value);
-});
-
 const updateThumbPosition = () => {
   thumbPosition.value =
     ((value.value - min.value) / (max.value - min.value)) * 100;
@@ -94,7 +75,6 @@ const setValueFromEvent = (event: MouseEvent) => {
   const rect = sliderRef.value.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const ratio = Math.min(Math.max(x / rect.width, 0), 1);
-
   const raw = min.value + ratio * (max.value - min.value);
   value.value = Math.round(raw / step.value) * step.value;
 

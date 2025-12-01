@@ -1,14 +1,16 @@
 import { Split } from '@/types/Split';
 
 export function computeSplits(separators: number[]): Partial<Split>[] {
-  return separators.map((end, index) => {
-    const start = index === 0 ? 0 : separators[index - 1];
+  return separators
+    .filter((s) => s !== 0)
+    .map((end, index) => {
+      const start = index === 0 ? 0 : separators[index - 1];
 
-    return {
-      startDistance: start,
-      endDistance: end,
-    };
-  });
+      return {
+        startDistance: start,
+        endDistance: end,
+      };
+    });
 }
 
 export function recomputeSplits({

@@ -59,6 +59,18 @@
           </div>
         </div>
       </Fieldset>
+      <Fieldset legend="Ajustement de la courbe">
+        <div class="flex gap-3">
+          <div class="w-[50%]">
+            <div class="text-center font-bold p-2">Facilité en montée</div>
+            <Slider v-model="pUp" :min="0.1" :max="2" :step="0.1" />
+          </div>
+          <div class="w-[50%]">
+            <div class="text-center font-bold p-2">Facilité en descente</div>
+            <Slider v-model="pDown" :min="0.1" :max="4" :step="0.1" />
+          </div>
+        </div>
+      </Fieldset>
       <Fieldset legend="Graphique des allures calculées">
         <div>
           <div class="flex gap-3">
@@ -68,7 +80,7 @@
                 v-model="averagePace"
                 :min="maxPace"
                 :max="minUpPace"
-                :step="0.5"
+                :step="1 / 60"
               />
             </div>
             <div class="w-[50%]">
@@ -103,14 +115,15 @@
           @click="close"
         />
       </div>
-      <!-- <div>
+      <div>
         <Button
           size="small"
-          icon="pi pi-download"
+          icon="pi pi-check-circle"
           variant="outlined"
-          label="Appliquer"
+          label="Appliquer les allures"
+          @click="applyAndClose"
         />
-      </div> -->
+      </div>
     </template>
   </Dialog>
 </template>
@@ -124,9 +137,10 @@ import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
 import { getAveragePace } from '@/lib/gpx/Metrics';
 import { PaceCalculator } from '@/lib/gpx/PaceCalculator';
 import { getSlopeColors } from '@/lib/gpx/SlopeMetrix';
-import { computeSplits } from '@/lib/Splits';
+import { computeSplits, recomputeSplits } from '@/lib/Splits';
 import { numberToPace, paceToNumber } from '@/lib/time';
-import { roundOneNumber } from '@/lib/utils';
+import { roundThreeNumber } from '@/lib/utils';
+import { Separator } from '@/types/entities/Separator';
 import { Split } from '@/types/Split';
 import { LineChart } from 'echarts/charts';
 import {
@@ -144,6 +158,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
 import DurationSlider from './inputs/DurationSlider.vue';
 import PaceSlider from './inputs/PaceSlider.vue';
+import Slider from './inputs/Slider.vue';
 
 use([
   CanvasRenderer,
@@ -156,18 +171,21 @@ use([
   GraphicComponent,
 ]);
 
-const { points, totalDistance, slopeMax, slopeMin, xml } = useRace();
+const { splits, points, totalDistance, slopeMax, slopeMin, xml, separators } =
+  useRace();
 
 const { getSlopeFromDistance } = useRaceMetrics();
 const automaticPaceChartRef = ref(null);
 const show = ref<boolean>(false);
-const maxPace = ref<number>(6);
-const minUpPace = ref<number>(15);
-const minDownPace = ref<number>(9);
+const maxPace = ref<number>(6.5);
+const minUpPace = ref<number>(20);
+const minDownPace = ref<number>(10);
 const calculator = ref<PaceCalculator>(null);
 const splitsWithPace = ref<Split[]>([]);
 const averagePace = ref<number>(null);
 const totalDuration = ref<number>(null);
+const pUp = ref<number>(0.5);
+const pDown = ref<number>(2);
 const calculatedAveragePace = ref<number>(null);
 const calculatedTotalDuration = ref<number>(null);
 const { isMobile } = useViewport();
@@ -188,10 +206,10 @@ watch([show], () => {
   }
 });
 
-const splits = computed(() => {
+const partialSplits = computed(() => {
   const separators = new ClimbDetector(xml.value).separators;
   const splits = computeSplits([
-    ...new Set([0, ...separators, totalDistance.value]),
+    ...new Set([...separators, totalDistance.value]),
   ]);
   return splits;
 });
@@ -209,7 +227,7 @@ const finalAveragePace = computed(() => {
   return avg;
 });
 
-const finalTotalDuration = computed(() => {
+const durationFromSplitsAndPace = computed(() => {
   return splitsWithPace.value.reduce((acc, curr) => {
     const distance = curr.endDistance - curr.startDistance;
     const pace = paceToNumber(curr.pace);
@@ -374,22 +392,25 @@ const chartOptions = ref({
 const calculate = () => {
   if (averagePace.value && calculatedAveragePace.value == averagePace.value)
     return;
+
   splitsWithPace.value = calculator.value.calculateSplitPace({
-    splits: splits.value,
+    splits: partialSplits.value,
     avg: averagePace.value,
     maxPace: maxPace.value,
     upMinPace: minUpPace.value,
     downMinPace: minDownPace.value,
-    pUp: 0.5,
-    pDown: 2,
+    pUp: pUp.value,
+    pDown: pDown.value,
     sOpt: -3,
   });
   if (averagePace.value == null) {
     averagePace.value = paceToNumber(finalAveragePace.value);
-    calculatedAveragePace.value = paceToNumber(finalAveragePace.value);
-    calculatedTotalDuration.value = finalTotalDuration.value;
-    totalDuration.value = finalTotalDuration.value;
   }
+  if (totalDuration.value == null) {
+    totalDuration.value = durationFromSplitsAndPace.value;
+  }
+  calculatedAveragePace.value = paceToNumber(finalAveragePace.value);
+  calculatedTotalDuration.value = durationFromSplitsAndPace.value;
   updateChartData();
 };
 
@@ -459,26 +480,49 @@ const close = () => {
   calculatedTotalDuration.value = null;
 };
 
-watch([minDownPace, minUpPace, maxPace], () => {
+const applyAndClose = () => {
+  const oldDistances = separators.value.map((el) => el.distance);
+  const splitsSeparators = splitsWithPace.value
+    .map((el) => el.endDistance)
+    .filter((el) => !oldDistances.includes(el))
+    .map((el) => new Separator({ distance: el }));
+
+  const allSeparators = [...separators.value, ...splitsSeparators].sort(
+    (a, b) => a.distance - b.distance
+  );
+
+  splits.value = recomputeSplits({
+    separators: allSeparators.map((it) => it.distance),
+    oldSplits: splitsWithPace.value,
+    totalDistance: totalDistance.value,
+    averagePace: numberToPace(averagePace.value),
+  });
+
+  separators.value = allSeparators;
+
+  close();
+};
+
+watch([minDownPace, minUpPace, maxPace, pUp, pDown], () => {
   averagePace.value = null;
-  calculatedAveragePace.value = null;
-  calculatedTotalDuration.value = null;
   totalDuration.value = null;
   calculate();
 });
 
-watch(totalDuration, () => {
-  const newPace = totalDuration.value / totalDistance.value;
-  if (roundOneNumber(averagePace.value) !== roundOneNumber(newPace)) {
-    averagePace.value = newPace;
-  }
+watch([averagePace], () => {
+  if (averagePace.value == calculatedAveragePace.value) return;
+  totalDuration.value = null;
+  calculate();
 });
 
-watch([averagePace], () => {
-  const newDuration = averagePace.value * totalDistance.value;
-  const oldDuration = totalDuration.value;
-  if (Math.round(newDuration) !== Math.round(oldDuration)) {
-    totalDuration.value = newDuration;
+watch([totalDuration], () => {
+  if (
+    Math.round(totalDuration.value) == Math.round(calculatedTotalDuration.value)
+  )
+    return;
+  const newPace = totalDuration.value / totalDistance.value;
+  if (roundThreeNumber(averagePace.value) !== roundThreeNumber(newPace)) {
+    averagePace.value = newPace;
   }
 });
 </script>

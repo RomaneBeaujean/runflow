@@ -160,14 +160,10 @@ export function useRaceMetrics() {
 
     const totalSplitDuration = relevantSplits.reduce(
       (acc: number, curr: Split) => {
-        const splitDistance = roundOneNumber(
-          curr.endDistance - curr.startDistance
-        );
-        const splitDuration = durationFromPaceAndDistance(
-          curr.pace,
-          splitDistance
-        );
-        return (acc += splitDuration);
+        const distance = curr.endDistance - curr.startDistance;
+        const pace = paceToNumber(curr.pace);
+        const duration = pace * distance;
+        return (acc += duration);
       },
       0
     );
@@ -192,7 +188,7 @@ export function useRaceMetrics() {
       ? distance - currentSplit.startDistance
       : 0;
     const currentSplitDuration = currentSplit
-      ? durationFromPaceAndDistance(currentSplit.pace, currentSplitDistance)
+      ? currentSplitDistance * paceToNumber(currentSplit.pace)
       : 0;
 
     return totalSplitDuration + totalRefuelDuration + currentSplitDuration;
