@@ -11,11 +11,11 @@
         Simulateur des allures ajustées à la pente
       </span>
     </template>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2" v-if="show">
       <Fieldset legend="Ajustement des allures">
-        <div class="flex flex-col gap-10 p-5">
+        <div class="flex flex-col md:gap-10 gap-3 md:p-5">
           <div class="flex justify-center">
-            <div class="flex flex-col gap-2 w-[70%] p-3">
+            <div class="flex flex-col gap-2 md:w-[70%] md:p-3">
               <div class="font-semibold text-center">
                 Quelle est votre allure la plus rapide, sur une pente parfaite
                 (environ -3%) ?
@@ -25,8 +25,8 @@
               </div>
             </div>
           </div>
-          <div class="flex">
-            <div class="flex flex-col gap-2 w-[50%]">
+          <div class="flex flex-col md:flex-row gap-3">
+            <div class="flex flex-col gap-2 md:w-[50%]">
               <div class="font-semibold text-center">
                 Quelle est votre allure la plus lente en montée, sur la portion
                 la plus pentue ({{ Math.round(slopeMax) }}
@@ -38,10 +38,11 @@
                   :max="30"
                   :step="0.5"
                   v-model="minUpPace"
+                  :hideGraduation="isMobile"
                 />
               </div>
             </div>
-            <div class="flex flex-col gap-2 w-[50%]">
+            <div class="flex flex-col gap-2 md:w-[50%]">
               <div class="font-semibold text-center">
                 Quelle est votre allure la plus lente en descente, sur la
                 portion la plus négative ({{ Math.round(slopeMin) }}
@@ -53,6 +54,7 @@
                   :max="30"
                   :step="0.5"
                   v-model="minDownPace"
+                  :hideGraduation="isMobile"
                 />
               </div>
             </div>
@@ -73,17 +75,18 @@
       </Fieldset>
       <Fieldset legend="Graphique des allures calculées">
         <div>
-          <div class="flex gap-3">
-            <div class="w-[50%]">
+          <div class="flex flex-col md:flex-row gap-3">
+            <div class="md:w-[50%]">
               <div class="text-center font-bold p-2">Allure moyenne</div>
               <PaceSlider
                 v-model="averagePace"
                 :min="maxPace"
                 :max="minUpPace"
                 :step="1 / 60"
+                :hideGraduation="isMobile"
               />
             </div>
-            <div class="w-[50%]">
+            <div class="md:w-[50%]">
               <div class="text-center font-bold p-2">Durée totale</div>
               <DurationSlider
                 v-model="totalDuration"
@@ -97,7 +100,8 @@
             <VChart
               autoresize
               ref="automaticPaceChartRef"
-              style="position: relative; width: 100%; min-height: 400px"
+              style="position: relative; width: 100%"
+              class="min-h-[250px] md:h-[400px]"
               :option="chartOptions"
             />
           </div>
@@ -252,7 +256,7 @@ const series = computed(() => {
       showSymbol: false,
       type: 'line',
       data: points.value.map((p) => [p.distance, p.elevation]),
-      lineStyle: { color: '#DEDEDE', width: 2 },
+      lineStyle: { color: '#DEDEDE', width: 1 },
       areaStyle: { color: '#DEDEDE' },
       emphasis: {
         disabled: true,
@@ -289,7 +293,7 @@ const series = computed(() => {
         yAxisIndex: 1,
         lineStyle: {
           color: paceColor,
-          width: 3,
+          width: isMobile.value ? 1 : 3,
         },
         markLine: {
           yAxisIndex: 1,
@@ -297,7 +301,7 @@ const series = computed(() => {
           symbol: 'none',
           silent: true,
           lineStyle: {
-            width: 3,
+            width: isMobile.value ? 1 : 3,
             type: 'solid',
             color: {
               type: 'linear',
@@ -328,30 +332,28 @@ const series = computed(() => {
 });
 
 const yAxis = computed(() => {
-  return !isMobile.value
-    ? [
-        {
-          type: 'value',
-          position: 'left',
-          show: isMobile.value ? false : true,
-          axisLabel: {
-            formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
-          },
+  return [
+    {
+      type: 'value',
+      position: 'left',
+      show: isMobile.value ? false : true,
+      axisLabel: {
+        formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
+      },
+    },
+    {
+      type: 'value',
+      position: 'right',
+      show: isMobile.value ? false : true,
+      axisLabel: {
+        formatter: (v: number) => {
+          const minutes = Math.floor(v);
+          const seconds = Math.round((v - minutes) * 60);
+          return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
         },
-        {
-          type: 'value',
-          position: 'right',
-          show: isMobile.value ? false : true,
-          axisLabel: {
-            formatter: (v: number) => {
-              const minutes = Math.floor(v);
-              const seconds = Math.round((v - minutes) * 60);
-              return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
-            },
-          },
-        },
-      ]
-    : [];
+      },
+    },
+  ];
 });
 
 const chartOptions = ref({

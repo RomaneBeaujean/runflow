@@ -38,7 +38,7 @@
       </div>
 
       <!-- Graduation avec valeurs -->
-      <div class="flex justify-between">
+      <div class="flex justify-between" v-if="!hideGraduation">
         <div
           v-for="tick in ticks"
           :key="tick"
@@ -66,6 +66,7 @@ const props = defineProps<{
   min?: number;
   max?: number;
   step?: number;
+  hideGraduation?: boolean;
 }>();
 
 const sliderRef = ref<HTMLElement | null>(null);

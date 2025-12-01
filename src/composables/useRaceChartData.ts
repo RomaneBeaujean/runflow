@@ -535,32 +535,30 @@ export default function useRaceChartData() {
       min: 0,
       max: totalDistance ?? 0,
     },
-    yAxis: !isMobile.value
-      ? [
-          {
-            type: 'value',
-            position: 'left',
-            show: isMobile.value ? false : true,
-            axisLabel: {
-              formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
-            },
+    yAxis: [
+      {
+        type: 'value',
+        position: 'left',
+        show: isMobile.value ? false : true,
+        axisLabel: {
+          formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
+        },
+      },
+      {
+        type: 'value',
+        position: 'right',
+        show: isMobile.value ? false : true,
+        min: Math.max(paceToNumber(minPace.value) - 3, 2.5),
+        max: Math.min(paceToNumber(maxPace.value) + 5, 25),
+        axisLabel: {
+          formatter: (v: number) => {
+            const minutes = Math.floor(v);
+            const seconds = Math.round((v - minutes) * 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
           },
-          {
-            type: 'value',
-            position: 'right',
-            show: isMobile.value ? false : true,
-            min: Math.max(paceToNumber(minPace.value) - 3, 2.5),
-            max: Math.min(paceToNumber(maxPace.value) + 5, 25),
-            axisLabel: {
-              formatter: (v: number) => {
-                const minutes = Math.floor(v);
-                const seconds = Math.round((v - minutes) * 60);
-                return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
-              },
-            },
-          },
-        ]
-      : [],
+        },
+      },
+    ],
     series: [
       ...splitsSeries.value,
       ...splitsColoredSeries.value,
@@ -683,32 +681,30 @@ export default function useRaceChartData() {
       legend: {
         show: !isMobile.value,
       },
-      yAxis: !isMobile.value
-        ? [
-            {
-              type: 'value',
-              position: 'left',
-              show: isMobile.value ? false : true,
-              axisLabel: {
-                formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
-              },
+      yAxis: [
+        {
+          type: 'value',
+          position: 'left',
+          show: isMobile.value ? false : true,
+          axisLabel: {
+            formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
+          },
+        },
+        {
+          type: 'value',
+          position: 'right',
+          show: isMobile.value ? false : true,
+          min: Math.max(paceToNumber(minPace.value) - 3, 2.5),
+          max: Math.min(paceToNumber(maxPace.value) + 5, 25),
+          axisLabel: {
+            formatter: (v: number) => {
+              const minutes = Math.floor(v);
+              const seconds = Math.round((v - minutes) * 60);
+              return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
             },
-            {
-              type: 'value',
-              position: 'right',
-              show: isMobile.value ? false : true,
-              min: Math.max(paceToNumber(minPace.value) - 3, 2.5),
-              max: Math.min(paceToNumber(maxPace.value) + 5, 25),
-              axisLabel: {
-                formatter: (v: number) => {
-                  const minutes = Math.floor(v);
-                  const seconds = Math.round((v - minutes) * 60);
-                  return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
-                },
-              },
-            },
-          ]
-        : [],
+          },
+        },
+      ],
       series: [
         ...splitsSeries.value,
         ...splitsColoredSeries.value,
