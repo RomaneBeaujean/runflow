@@ -8,7 +8,7 @@ import { useViewport } from '@/composables/useViewport';
 import { getMarkLineColorStops, getPaceColor } from '@/lib/colors';
 import { chunkerizeSegments } from '@/lib/gpx/Segments';
 import {
-  ComputeSegmentSlopeKm,
+  computeSegmentSlopeKm,
   getAreaSlopeColors,
   getSlopeColors,
 } from '@/lib/gpx/SlopeMetrix';
@@ -190,7 +190,7 @@ export default function useRaceChartData() {
     if (!showSlopeAreaColor.value) return [];
     const segments: GpxSegment[] = splits.value
       .map((split) =>
-        ComputeSegmentSlopeKm(
+        computeSegmentSlopeKm(
           chunkerizeSegments(getPointsFromSplit(split), 0.3)
         )
       )
@@ -620,7 +620,7 @@ export default function useRaceChartData() {
     ${showPointSlope.value ? slopeDiv : ''}
     ${showPointPace.value ? paceDiv : ''}
     ${showPointDuration.value ? durationDiv : ''}
-     ${showPointTime.value && time ? timeDiv : ''}
+    ${showPointTime.value && time ? timeDiv : ''}
     </div>`;
   };
 

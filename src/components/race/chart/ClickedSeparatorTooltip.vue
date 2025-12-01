@@ -12,16 +12,24 @@
         <Button
           icon="pi pi-cart-arrow-down"
           :text="!isRefuel"
-          v-tooltip="'Ravitaillement'"
+          v-tooltip.bottom="
+            isRefuel ? 'Enlever ravitaillement' : 'Définir ravitaillement'
+          "
           @click="handleUpdateRefuel"
         />
         <Button
           icon="pi pi-trash"
           severity="danger"
           text
+          v-tooltip.bottom="'Supprimer'"
           @click="handleDeleteSeparator"
         />
-        <Button icon="pi pi-times" @click="closeTooltip" text />
+        <Button
+          icon="pi pi-times"
+          @click="closeTooltip"
+          text
+          v-tooltip.bottom="'Fermer'"
+        />
       </div>
     </div>
   </div>

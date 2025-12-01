@@ -2,7 +2,7 @@
   <InputMask
     v-model="currentPace"
     mask="99:99 (min/km)"
-    placeholder="(min/km)"
+    placeholder="Allure (min/km)"
     class="input-pace mr-2"
     :size="props.size || 'small'"
     style="width: 125px"
@@ -42,61 +42,50 @@ const currentDurationMinutes = ref<number>(
 );
 
 const currentDuration = ref<string>(
-  currentDurationMinutes.value
-    ? minutesToFormattedDuration(currentDurationMinutes.value)
-    : null
+  minutesToFormattedDuration(currentDurationMinutes.value)
 );
 
-watch(
-  () => currentPace.value,
-  (newPace, oldPace) => {
-    if (!newPace?.match(/^\d{1,2}:\d{2}/) || newPace === oldPace) return;
-    const newPaceCleaned = newPace.slice(0, 5);
+watch(currentPace, (newPace, oldPace) => {
+  if (!newPace?.match(/^\d{1,2}:\d{2}/) || newPace === oldPace) return;
+  const newPaceCleaned = newPace.slice(0, 5);
 
-    const newDurationMinutes = durationFromPaceAndDistance(
-      newPaceCleaned,
-      props.distance
-    );
+  const newDurationMinutes = durationFromPaceAndDistance(
+    newPaceCleaned,
+    props.distance
+  );
 
-    if (newDurationMinutes !== currentDurationMinutes.value) {
-      currentDurationMinutes.value = newDurationMinutes;
-      currentDuration.value = minutesToFormattedDuration(newDurationMinutes);
-    }
+  if (newDurationMinutes !== currentDurationMinutes.value) {
+    currentDurationMinutes.value = newDurationMinutes;
+    currentDuration.value = minutesToFormattedDuration(newDurationMinutes);
   }
-);
+});
 
-watch(
-  () => currentDurationMinutes.value,
-  (newDuration, oldDuration) => {
-    if (
-      !currentDuration.value?.match(/^\d{1,2}h\d{2}$/) ||
-      newDuration === oldDuration
-    )
-      return;
-    const newPace = paceFromMinutesAndDistance(newDuration, props.distance);
-    const oldPace = currentPace.value;
+watch(currentDurationMinutes, (newDuration, oldDuration) => {
+  if (
+    !currentDuration.value?.match(/^\d{1,2}h\d{2}$/) ||
+    newDuration === oldDuration
+  )
+    return;
+  const newPace = paceFromMinutesAndDistance(newDuration, props.distance);
+  const oldPace = currentPace.value;
 
-    if (!oldPace.match(newPace)) {
-      currentPace.value = newPace;
-    }
+  if (!oldPace.match(newPace)) {
+    currentPace.value = newPace;
   }
-);
+});
 
-watch(
-  () => currentDuration.value,
-  (newDuration, oldDuration) => {
-    if (
-      !currentDuration.value?.match(/^\d{1,2}h\d{2}$/) ||
-      newDuration === oldDuration
-    )
-      return;
+watch(currentDuration, (newDuration, oldDuration) => {
+  if (
+    !currentDuration.value?.match(/^\d{1,2}h\d{2}$/) ||
+    newDuration === oldDuration
+  )
+    return;
 
-    const inMinutes = formattedDurationToMinutes(newDuration);
-    if (Math.round(currentDurationMinutes.value) !== Math.round(inMinutes)) {
-      currentDurationMinutes.value = inMinutes;
-    }
+  const inMinutes = formattedDurationToMinutes(newDuration);
+  if (Math.round(currentDurationMinutes.value) !== Math.round(inMinutes)) {
+    currentDurationMinutes.value = inMinutes;
   }
-);
+});
 
 watch([currentPace, currentDuration], () => {
   emit('update', {

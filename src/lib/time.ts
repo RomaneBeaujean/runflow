@@ -153,3 +153,11 @@ export function numberToPace(v: number) {
   const seconds = Math.round((v - minutes) * 60);
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
+
+export function paceToKmh(pace: number) {
+  return 60 / pace;
+}
+
+export function kmhToPace(kmh: number) {
+  return 60 / kmh;
+}

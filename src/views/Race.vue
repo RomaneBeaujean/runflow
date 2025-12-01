@@ -11,6 +11,9 @@
     <div class="w-full relative">
       <RaceHeader />
     </div>
+    <div class="p-5 flex justify-center">
+      <RaceAutomaticPace />
+    </div>
 
     <div :class="[stickyChart && 'sticky top-0 z-40']">
       <Card>
@@ -54,6 +57,7 @@
 <script setup lang="ts">
 import RaceChart from '@/components/race/chart/RaceChart.vue';
 import RaceHeader from '@/components/race/header/RaceHeader.vue';
+import RaceAutomaticPace from '@/components/race/RaceAutomaticPace.vue';
 import RaceChartParams from '@/components/race/RaceChartParams.vue';
 import RaceRecapChartModal from '@/components/race/recap/RaceRecapChartModal.vue';
 import RaceRecapTableModal from '@/components/race/recap/RaceRecapTableModal.vue';

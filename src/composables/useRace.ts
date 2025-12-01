@@ -1,5 +1,5 @@
-import { computeSlidingSlopeKm } from '@/lib/gpx/ClimbDetector';
 import { GpxParse, smoothPointsByDistance } from '@/lib/gpx/GpxParse';
+import { computeSlidingSlopeKm } from '@/lib/gpx/SlopeMetrix';
 import { roundOneNumber } from '@/lib/utils';
 import { Race } from '@/types/entities/Race';
 import { Separator } from '@/types/entities/Separator';
@@ -17,6 +17,9 @@ const points = ref<GpxPoint[]>([]);
 const totalDistance = ref<number>(null);
 const maxElevation = ref<number>(null);
 const slidingSlopesPoints = ref<SlidingSlopePoint[]>([]);
+const slopeMax = ref<number>();
+const slopeMin = ref<number>();
+const xml = ref<string>(null);
 
 export function useRace() {
   const initRace = (initialRace: Race) => {
@@ -24,21 +27,26 @@ export function useRace() {
 
     const parser = new GpxParse(initialRace.gpxContent);
 
+    xml.value = initialRace.gpxContent;
+
     // POINTS
-    points.value = smoothPointsByDistance(
-      parser.points.slice().sort((a, b) => a.distance - b.distance), // slice pour cloner
-      0.3
-    );
+    points.value = smoothPointsByDistance([...parser.points], 0.3);
     slidingSlopesPoints.value = computeSlidingSlopeKm(points.value, 0.5);
     maxElevation.value = Math.max(...parser.points.map((el) => el.elevation));
+    slopeMax.value = Math.max(
+      ...slidingSlopesPoints.value.map((it) => it.slope)
+    );
+    slopeMin.value = Math.min(
+      ...slidingSlopesPoints.value.map((it) => it.slope)
+    );
 
     // TOTAL DISTANCE
     totalDistance.value = parser.totalDistance;
 
     // SEPARATORS
-    const sep = (initialRace.separators || [])
-      .slice()
-      .sort((a, b) => a.distance - b.distance);
+    const sep = [...(initialRace.separators || [])].sort(
+      (a, b) => a.distance - b.distance
+    );
 
     // ajouter totalDistance s'il n'existe pas
     if (!sep.some((el) => el.distance === totalDistance.value)) {
@@ -113,6 +121,9 @@ export function useRace() {
     separators,
     maxElevation,
     totalDistance,
+    slopeMax,
+    xml,
+    slopeMin,
     slidingSlopesPoints,
     addSeparator,
     deleteSeparator,

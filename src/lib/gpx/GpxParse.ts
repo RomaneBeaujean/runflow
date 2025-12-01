@@ -86,7 +86,7 @@ export function smoothPointsByDistance(data: GpxPoint[], windowSize: number) {
     const start = Math.max(0, startDistanceIndex);
     const end = endDistanceIndex;
 
-    const subset = data.slice(start, end);
+    const subset = start === end ? [data[i]] : data.slice(start, end);
     const avgElevation =
       subset.reduce((sum, p) => sum + p.elevation, 0) / subset.length;
 

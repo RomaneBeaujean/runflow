@@ -62,7 +62,7 @@ const { isMobile } = useViewport();
 const drawerVisible = ref(false);
 
 const items = [
-  { label: 'Acceuil', path: '', illustration: 'pi pi-home' },
+  { label: 'Accueil', path: '', illustration: 'pi pi-home' },
   { label: 'Plans de course', path: 'races', illustration: 'pi pi-trophy' },
   {
     label: "Plans d'entrainement",

@@ -2,7 +2,6 @@ import { durationFromPaceAndDistance } from '@/lib/time';
 import { Separator } from '@/types/entities/Separator';
 import { GpxPoint } from '@/types/GpxPoint';
 import { GpxSegment } from '@/types/GpxSegment';
-import { SlopeType } from '@/types/Slope';
 import { Split } from '@/types/Split';
 
 export function getTotalDuration(
@@ -53,12 +52,6 @@ export const getSlope = (points: GpxPoint[]) => {
   const elevation = getElevation(points);
   const distance = getDistance(points);
   return (elevation / distance) * 100;
-};
-
-export const getSlopeType = (slope: number): SlopeType => {
-  if (slope >= 1) return 'up';
-  if (slope <= -1) return 'down';
-  return 'flat';
 };
 
 export const getSlopeDiff = (slopeA: number, slopeB: number) => {

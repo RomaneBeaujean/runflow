@@ -1,9 +1,10 @@
-import { getDistance, getSlopeType } from '@/lib/gpx/Metrics';
+import { getDistance } from '@/lib/gpx/Metrics';
 import { roundOneNumber } from '@/lib/utils';
 import { GpxPoint } from '@/types/GpxPoint';
 import { GpxSegment } from '@/types/GpxSegment';
+import { SlidingSlopePoint, SlopeSize, SlopeType } from '@/types/Slope';
 
-export function ComputeSegmentSlope(segments: GpxPoint[][]): GpxSegment[] {
+export function computeSegmentSlope(segments: GpxPoint[][]): GpxSegment[] {
   return segments.map((seg) => {
     const lastPoint = seg[seg.length - 1];
     const firstPoint = seg[0];
@@ -22,7 +23,7 @@ export function ComputeSegmentSlope(segments: GpxPoint[][]): GpxSegment[] {
   });
 }
 
-export function ComputeSegmentSlopeKm(segments: GpxPoint[][]): GpxSegment[] {
+export function computeSegmentSlopeKm(segments: GpxPoint[][]): GpxSegment[] {
   return segments.map((seg) => {
     const points = seg.sort((a, b) => a.distance - b.distance);
     const lastPoint = points[seg.length - 1];
@@ -31,8 +32,9 @@ export function ComputeSegmentSlopeKm(segments: GpxPoint[][]): GpxSegment[] {
     const distance = roundOneNumber(lastPoint.distance - firstPoint.distance);
     const distanceMeters = roundOneNumber(distance * 1000);
 
-    const slope =
-      distanceMeters > 0 ? (diffElevation / distanceMeters) * 100 : 0;
+    const slope = Math.round(
+      distanceMeters > 0 ? (diffElevation / distanceMeters) * 100 : 0
+    );
 
     return {
       startDistance: firstPoint.distance,
@@ -80,4 +82,90 @@ export const getAreaSlopeColors = (slope: number) => {
   } else if (absVal <= 20) {
     return '#FB2C36'; // rouge
   } else return '#C6005C'; // violet
+};
+
+export function computeSlidingSlope(
+  points: GpxPoint[],
+  windowSize: number
+): SlidingSlopePoint[] {
+  if (points.length < 2) return [];
+  const totalDistance = points[points.length - 1].distance;
+
+  let slidingSlopePoints = [];
+
+  for (let i = 0; i < points.length; i++) {
+    const current = points[i];
+
+    const currDistance = points[i].distance;
+    const startDistance = Math.max(0, currDistance - windowSize / 2);
+    const endDistance = Math.min(currDistance + windowSize / 2, totalDistance);
+    const startPoint = points.find((el) => el.distance >= startDistance);
+    const endPoint = points.find((el) => el.distance >= endDistance);
+
+    const deltaElevation = endPoint.elevation - startPoint.elevation;
+    const deltaDistance = endPoint.distance - startPoint.distance;
+    const slope =
+      deltaDistance > 0 ? (deltaElevation / deltaDistance) * 100 : 0;
+
+    slidingSlopePoints.push({
+      distance: current.distance,
+      point: current,
+      slope,
+      slopeType: getSlopeType(slope),
+      slopeSize: getSlopeSize(slope),
+    });
+  }
+
+  return slidingSlopePoints;
+}
+
+export function computeSlidingSlopeKm(
+  points: GpxPoint[],
+  windowSize: number
+): SlidingSlopePoint[] {
+  if (points.length < 2) return [];
+  const totalDistance = points[points.length - 1].distance;
+
+  let slidingSlopePoints = [];
+
+  points.forEach((current, i) => {
+    const currDistance = points[i].distance;
+    const startDistance = Math.max(0, currDistance - windowSize / 2);
+    const endDistance = Math.min(totalDistance, currDistance + windowSize / 2);
+    const startPoint = points.find((el) => el.distance >= startDistance);
+    const endPoint = points.find((el) => el.distance >= endDistance);
+
+    const deltaElevation = endPoint.elevation - startPoint.elevation;
+    const deltaDistance = roundOneNumber(
+      (endPoint.distance - startPoint.distance) * 1000
+    );
+    const slope =
+      deltaDistance > 0
+        ? roundOneNumber((deltaElevation / deltaDistance) * 100)
+        : 0;
+
+    slidingSlopePoints.push({
+      distance: current.distance,
+      point: current,
+      slope,
+      slopeType: getSlopeType(slope),
+      slopeSize: getSlopeSize(slope),
+    });
+  });
+
+  return slidingSlopePoints;
+}
+
+export const getSlopeType = (slope: number): SlopeType => {
+  if (slope > 1) return 'up';
+  if (slope < -1) return 'down';
+  return 'flat';
+};
+
+export const getSlopeSize = (slope: number): SlopeSize => {
+  const abs = Math.abs(slope);
+  if (abs < 5) return 'small';
+  if (abs < 10) return 'medium';
+  if (abs < 15) return 'large';
+  return 'xlarge';
 };

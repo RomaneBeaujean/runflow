@@ -17,18 +17,23 @@
     >
       <div class="flex flex-col gap-1">
         <Button
-          v-tooltip.bottom="'Ajout séparateur'"
+          v-tooltip.bottom="'Ajouter séparateur'"
           icon="pi pi-arrows-v"
           text
           @click="() => addSeparatorOnClickedPoint(false)"
         />
         <Button
-          v-tooltip.bottom="'Ajout ravitaillement'"
+          v-tooltip.bottom="'Ajouter ravitaillement'"
           icon="pi pi-shopping-cart"
           text
           @click="() => addSeparatorOnClickedPoint(true)"
         />
-        <Button icon="pi pi-times" text @click="closeTooltip" />
+        <Button
+          icon="pi pi-times"
+          text
+          @click="closeTooltip"
+          v-tooltip="'Fermer'"
+        />
       </div>
     </div>
   </div>

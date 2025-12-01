@@ -1,117 +1,34 @@
 import { GpxParse, smoothPointsByDistance } from '@/lib/gpx/GpxParse';
 import { GpxPoint } from '@/types/GpxPoint';
-import { SlopeType } from '@/types/Slope';
+import { SlidingSlopePoint, SlopeType } from '@/types/Slope';
 import { roundOneNumber } from '../utils';
+import { computeSlidingSlope } from './SlopeMetrix';
 
 type TransitionType = 'summit' | 'valley';
-
-type SlopeSize = 'small' | 'medium' | 'large' | 'xlarge';
-
-interface SlidingSlopePoint {
-  distance: number;
-  point: GpxPoint;
-  slope: number;
-  slopeSize: SlopeSize;
-  slopeType: SlopeType;
-}
 
 export class ClimbDetector {
   public separators: number[];
 
-  constructor(xml: string) {
+  constructor(
+    xml: string,
+    smoothWindowSizeKm = 1,
+    slidingSlopeSizeKm = 0.2,
+    transitionWindowSizeKm = 0.5
+  ) {
     const parsed = new GpxParse(xml);
     const exactPoints = parsed.points.sort((a, b) => a.distance - b.distance);
-    const smoothedPoints = smoothPointsByDistance(exactPoints, 1);
-    const points = computeSlidingSlope(smoothedPoints, 0.2);
-    this.separators = detectTransitions(exactPoints, points, 0.5);
-  }
-}
-
-export function computeSlidingSlope(
-  points: GpxPoint[],
-  windowSize: number
-): SlidingSlopePoint[] {
-  if (points.length < 2) return [];
-  const totalDistance = points[points.length - 1].distance;
-
-  let slidingSlopePoints = [];
-
-  for (let i = 0; i < points.length; i++) {
-    const current = points[i];
-
-    const currDistance = points[i].distance;
-    const startDistance = Math.max(0, currDistance - windowSize / 2);
-    const endDistance = Math.min(currDistance + windowSize / 2, totalDistance);
-    const startPoint = points.find((el) => el.distance >= startDistance);
-    const endPoint = points.find((el) => el.distance >= endDistance);
-
-    const deltaElevation = endPoint.elevation - startPoint.elevation;
-    const deltaDistance = endPoint.distance - startPoint.distance;
-    const slope =
-      deltaDistance > 0 ? (deltaElevation / deltaDistance) * 100 : 0;
-
-    slidingSlopePoints.push({
-      distance: current.distance,
-      point: current,
-      slope,
-      slopeType: getSlopeType(slope),
-      slopeSize: getSlopeSize(slope),
-    });
-  }
-
-  return slidingSlopePoints;
-}
-
-export function computeSlidingSlopeKm(
-  points: GpxPoint[],
-  windowSize: number
-): SlidingSlopePoint[] {
-  if (points.length < 2) return [];
-  const totalDistance = points[points.length - 1].distance;
-
-  let slidingSlopePoints = [];
-
-  points.forEach((current, i) => {
-    const currDistance = points[i].distance;
-    const startDistance = Math.max(0, currDistance - windowSize / 2);
-    const endDistance = Math.min(currDistance + windowSize / 2, totalDistance);
-    const startPoint = points.find((el) => el.distance >= startDistance);
-    const endPoint = points.find((el) => el.distance >= endDistance);
-
-    const deltaElevation = endPoint.elevation - startPoint.elevation;
-    const deltaDistance = roundOneNumber(
-      (endPoint.distance - startPoint.distance) * 1000
+    const smoothedPoints = smoothPointsByDistance(
+      exactPoints,
+      smoothWindowSizeKm
     );
-    const slope =
-      deltaDistance > 0
-        ? roundOneNumber((deltaElevation / deltaDistance) * 100)
-        : 0;
-
-    slidingSlopePoints.push({
-      distance: current.distance,
-      point: current,
-      slope,
-      slopeType: getSlopeType(slope),
-      slopeSize: getSlopeSize(slope),
-    });
-  });
-
-  return slidingSlopePoints;
+    const points = computeSlidingSlope(smoothedPoints, slidingSlopeSizeKm);
+    this.separators = detectTransitions(
+      exactPoints,
+      points,
+      transitionWindowSizeKm
+    );
+  }
 }
-
-const getSlopeType = (slope: number): SlopeType => {
-  if (slope > 3) return 'up';
-  if (slope < -3) return 'down';
-  return 'flat';
-};
-
-const getSlopeSize = (slope: number): SlopeSize => {
-  const abs = Math.abs(slope);
-  if (abs < 5) return 'small';
-  if (abs < 10) return 'medium';
-  if (abs < 15) return 'large';
-  return 'xlarge';
-};
 
 const detectTransitions = (
   exactPoints: GpxPoint[],

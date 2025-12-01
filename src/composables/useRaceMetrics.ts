@@ -62,15 +62,6 @@ export function useRaceMetrics() {
   function getClosestSeparator(targetDistance: number): Separator | null {
     if (!targetDistance || separators.value.length === 0) return null;
 
-    // const max = roundOneNumber(targetDistance + 0.3);
-    // const min = roundOneNumber(targetDistance - 0.3);
-    // return (
-    //   separators.value.find(
-    //     (el) =>
-    //       roundOneNumber(el.distance) >= min &&
-    //       roundOneNumber(el.distance) <= max
-    //   ) || null
-    // );
     let left = 0;
     let right = separators.value.length - 1;
 
