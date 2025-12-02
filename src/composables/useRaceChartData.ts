@@ -51,6 +51,8 @@ const {
   showPaceLine,
   showPointDuration,
   showPointTime,
+  showSeparator,
+  showSeparatorDistance,
 } = useRaceChartParams();
 
 const AREA_LINE_COLOR = '#bfbfbf';
@@ -225,7 +227,10 @@ export default function useRaceChartData() {
   const chartSeparators = computed(() => {
     return separators.value
       .filter((s) => {
-        return s && s.distance !== totalDistance.value;
+        const isRefuel = s.refuel;
+        const condition1 = s && s.distance !== totalDistance.value;
+        const condition2 = isRefuel || (!isRefuel && showSeparator.value);
+        return condition1 && condition2;
       })
       .sort((a, b) => a.distance - b.distance);
   });
@@ -262,7 +267,7 @@ export default function useRaceChartData() {
           symbol: 'none',
           lineStyle: { color: '#024264', type: 'dashed', width: 1 },
           label: {
-            show: true,
+            show: showSeparatorDistance.value ? true : false,
             position: 'end',
             color: '#035581',
             fontWeight: 'bold',
@@ -501,41 +506,26 @@ export default function useRaceChartData() {
   // Chart options
   // =========================
 
-  const chartOptions = ref({
-    legend: {
-      show: !isMobile.value,
-    },
-    tooltip: {
-      show: true,
-      trigger: 'axis',
-      renderMode: 'html',
-      backgroundColor: 'transparent',
-      borderWidth: 0,
-      textStyle: {
-        color: '#fff',
-        fontSize: 12,
-      },
-      padding: 0,
-      position: (point, params, dom, rect, size) => {
-        return getPointerTooltipPosition(point, size);
-      },
-      formatter: (params: any) => {
-        return getPointerTooltip(params);
-      },
-    },
-    grid: {
+  const grid = computed(() => {
+    return {
       top: 40,
       right: 16,
       bottom: isMobile.value ? 0 : 60,
       left: 8,
-    },
-    xAxis: {
+    };
+  });
+
+  const xAxis = computed(() => {
+    return {
       type: 'value',
       boundaryGap: false,
       min: 0,
       max: totalDistance ?? 0,
-    },
-    yAxis: [
+    };
+  });
+
+  const yAxis = computed(() => {
+    return [
       {
         type: 'value',
         position: 'left',
@@ -558,7 +548,31 @@ export default function useRaceChartData() {
           },
         },
       },
-    ],
+    ];
+  });
+
+  const chartOptions = ref({
+    tooltip: {
+      show: true,
+      trigger: 'axis',
+      renderMode: 'html',
+      backgroundColor: 'transparent',
+      borderWidth: 0,
+      textStyle: {
+        color: '#fff',
+        fontSize: 12,
+      },
+      padding: 0,
+      position: (point, params, dom, rect, size) => {
+        return getPointerTooltipPosition(point, size);
+      },
+      formatter: (params: any) => {
+        return getPointerTooltip(params);
+      },
+    },
+    grid: grid.value,
+    xAxis: xAxis.value,
+    yAxis: yAxis.value,
     series: [
       ...splitsSeries.value,
       ...splitsColoredSeries.value,
@@ -678,33 +692,8 @@ export default function useRaceChartData() {
   const updateChartData = () => {
     const options = {
       ...chartOptions.value,
-      legend: {
-        show: !isMobile.value,
-      },
-      yAxis: [
-        {
-          type: 'value',
-          position: 'left',
-          show: isMobile.value ? false : true,
-          axisLabel: {
-            formatter: (v: number) => (v % 100 === 0 ? `${v} m` : ''),
-          },
-        },
-        {
-          type: 'value',
-          position: 'right',
-          show: isMobile.value ? false : true,
-          min: Math.max(paceToNumber(minPace.value) - 3, 2.5),
-          max: Math.min(paceToNumber(maxPace.value) + 5, 25),
-          axisLabel: {
-            formatter: (v: number) => {
-              const minutes = Math.floor(v);
-              const seconds = Math.round((v - minutes) * 60);
-              return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
-            },
-          },
-        },
-      ],
+      grid: grid.value,
+      yAxis: yAxis.value,
       series: [
         ...splitsSeries.value,
         ...splitsColoredSeries.value,
@@ -740,6 +729,8 @@ export default function useRaceChartData() {
       showSlopeAreaColor,
       showPaceLine,
       dragPaceValue,
+      showSeparator,
+      showSeparatorDistance,
       dragSeparatorDistance,
     ],
     () => {

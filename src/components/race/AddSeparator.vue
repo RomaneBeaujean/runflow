@@ -62,7 +62,7 @@
   </template>
 </template>
 <script setup lang="ts">
-import InputDistance from '@/components/race/inputs/InputDistance.vue';
+import InputDistance from '@/components/inputs/InputDistance.vue';
 import { useRace } from '@/composables/useRace';
 import { Separator } from '@/types/entities/Separator';
 import { Button, ToggleSwitch } from 'primevue';

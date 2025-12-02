@@ -1,21 +1,12 @@
 <template>
   <div class="pl-[20px] pr-[20px] select-none">
-    <div class="w-full relative pt-10 pb-5">
-      <!-- Bullette de valeur -->
-      <div
-        class="absolute top-0 transform -translate-x-1/2 bg-primary-400 text-white px-2 py-1 rounded"
-        :style="{ left: thumbPosition + '%' }"
-      >
-        <span class="flex flex-nowrap whitespace-nowrap items-center">
-          <b>{{ currentPace }}</b> <small class="ml-1">min/km</small>
-        </span>
-      </div>
-
+    <div class="w-full relative pt-5 pb-5">
       <!-- Barre + curseur -->
       <div
         class="relative h-2 cursor-pointer"
         ref="sliderRef"
         @mousedown="startDrag"
+        @touchstart="startDrag"
         @click="onClick"
       >
         <!-- Track -->
@@ -34,11 +25,10 @@
           class="absolute top-1/2 w-3.5 h-3.5 bg-white border-2 border-primary-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
           :style="{ left: thumbPosition + '%' }"
           @mousedown.stop="startDrag"
+          @touchstart.stop="startDrag"
         ></div>
       </div>
-
-      <!-- Graduation avec valeurs -->
-      <div class="flex justify-between" v-if="!hideGraduation">
+      <div class="flex justify-between">
         <div
           v-for="tick in ticks"
           :key="tick"
@@ -54,8 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { numberToPace } from '@/lib/time';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: number): void;
@@ -66,7 +55,6 @@ const props = defineProps<{
   min?: number;
   max?: number;
   step?: number;
-  hideGraduation?: boolean;
 }>();
 
 const sliderRef = ref<HTMLElement | null>(null);
@@ -78,28 +66,36 @@ const thumbPosition = ref(0);
 
 let dragging = false;
 
-const ticks = computed(() => {
-  const result: number[] = [];
-  for (let i = min.value; i <= max.value; i += 2) {
-    result.push(i);
-  }
-  return result;
-});
-
-const currentPace = computed(() => {
-  return numberToPace(value.value);
-});
+const ticks = ['Débutant', 'Moyen', 'Expert'];
 
 const updateThumbPosition = () => {
   thumbPosition.value =
     ((value.value - min.value) / (max.value - min.value)) * 100;
 };
 
-const setValueFromEvent = (event: MouseEvent) => {
+const getClientX = (event: MouseEvent | TouchEvent): number | null => {
+  if ('clientX' in event && typeof event.clientX === 'number') {
+    return event.clientX;
+  }
+
+  const te = event as TouchEvent;
+  const touch =
+    te.touches && te.touches[0]
+      ? te.touches[0]
+      : te.changedTouches && te.changedTouches[0]
+        ? te.changedTouches[0]
+        : null;
+  return touch ? touch.clientX : null;
+};
+
+const setValueFromEvent = (event: MouseEvent | TouchEvent) => {
   if (!sliderRef.value) return;
 
+  const clientX = getClientX(event);
+  if (clientX === null) return;
+
   const rect = sliderRef.value.getBoundingClientRect();
-  const x = event.clientX - rect.left;
+  const x = clientX - rect.left;
   const ratio = Math.min(Math.max(x / rect.width, 0), 1);
 
   const raw = min.value + ratio * (max.value - min.value);
@@ -113,15 +109,19 @@ const startDrag = () => {
   dragging = true;
   document.addEventListener('mousemove', onDrag);
   document.addEventListener('mouseup', stopDrag);
+  document.addEventListener('touchmove', onDrag);
+  document.addEventListener('touchend', stopDrag);
 };
 
 const stopDrag = () => {
   dragging = false;
   document.removeEventListener('mousemove', onDrag);
   document.removeEventListener('mouseup', stopDrag);
+  document.removeEventListener('touchmove', onDrag);
+  document.removeEventListener('touchend', stopDrag);
 };
 
-const onDrag = (e: MouseEvent) => {
+const onDrag = (e: MouseEvent | TouchEvent) => {
   if (dragging) setValueFromEvent(e);
 };
 

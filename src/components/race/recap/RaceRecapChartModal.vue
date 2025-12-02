@@ -40,6 +40,11 @@
           <div class="flex-1">
             <SwitchToggle
               :display="isMobile ? 'col' : 'row'"
+              label="Distance split"
+              v-model="params.splitDistance"
+            />
+            <SwitchToggle
+              :display="isMobile ? 'col' : 'row'"
               label="Allure split"
               v-model="params.splitPace"
             />
@@ -122,6 +127,7 @@ const params = ref<RecapChartParams>({
   splitDuration: true,
   splitElevation: true,
   splitSlope: true,
+  splitDistance: false,
 });
 
 const closeModal = () => {

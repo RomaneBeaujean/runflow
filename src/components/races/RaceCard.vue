@@ -41,9 +41,7 @@
               {{ minutesToFormattedDuration(race.totalDuration) }}
             </ColorTag>
             <ColorTag v-if="race.totalDuration" color="pink" icon="pi pi-bolt">
-              {{
-                getAveragePace(race.splits, race.separators, race.totalDistance)
-              }}
+              {{ getAveragePace(race.splits, race.separators) }}
               <small>min/km</small>
             </ColorTag>
           </div>

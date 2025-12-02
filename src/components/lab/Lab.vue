@@ -71,7 +71,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { InputNumber } from 'primevue';
 import { computed, onMounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
-import InputPaceDuration from '../race/inputs/InputPaceDuration.vue';
+import InputPaceDuration from '../inputs/InputPaceDuration.vue';
 
 use([
   CanvasRenderer,

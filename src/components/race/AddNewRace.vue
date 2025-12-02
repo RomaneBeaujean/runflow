@@ -141,8 +141,8 @@ import {
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import GpxDropzone from '../GpxDropzone.vue';
-import InputPaceDuration from './inputs/InputPaceDuration.vue';
-import InputTime from './inputs/InputTime.vue';
+import InputPaceDuration from '../inputs/InputPaceDuration.vue';
+import InputTime from '../inputs/InputTime.vue';
 
 const currentStep = ref('1');
 const visible = ref<boolean>(false);

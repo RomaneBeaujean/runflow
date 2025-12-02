@@ -243,11 +243,11 @@
 </template>
 
 <script setup lang="ts">
+import InputDistance from '@/components/inputs/InputDistance.vue';
+import InputPaceDuration from '@/components/inputs/InputPaceDuration.vue';
+import InputRefuelStopDuration from '@/components/inputs/InputRefuelStopDuration.vue';
+import InputTime from '@/components/inputs/InputTime.vue';
 import AddSeparatorMobile from '@/components/race/AddSeparatorMobile.vue';
-import InputDistance from '@/components/race/inputs/InputDistance.vue';
-import InputPaceDuration from '@/components/race/inputs/InputPaceDuration.vue';
-import InputRefuelStopDuration from '@/components/race/inputs/InputRefuelStopDuration.vue';
-import InputTime from '@/components/race/inputs/InputTime.vue';
 import ColorTag from '@/components/tags/ColorTag.vue';
 import SlopeTag from '@/components/tags/SlopeTag.vue';
 import { useRace } from '@/composables/useRace';

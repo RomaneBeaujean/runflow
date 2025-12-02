@@ -25,7 +25,7 @@
           </div>
           <div class="flex flex-col gap-2 items-center">
             <div
-              class="text-xs text-neutral-600 pb-3"
+              class="text-xs md:text-sm text-neutral-600 pb-3"
               v-if="(race.date || race.startTime) && !editing"
             >
               <span v-if="race.date">
@@ -49,18 +49,18 @@
               />
             </div>
 
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2 justify-center">
               <ColorTag color="primary"
                 >{{ totalDistance }} <small>km</small></ColorTag
               >
               <ColorTag color="amber"
                 >{{ race.totalElevation }}m <small>d+</small></ColorTag
               >
+              <ColorTag color="green" icon="pi pi-stopwatch">
+                Durée prévue: {{ totalDuration }}
+              </ColorTag>
               <ColorTag color="deep-purple" icon="pi pi-bolt">
                 Allure moyenne: {{ averagePace }} <small>min/km</small>
-              </ColorTag>
-              <ColorTag color="green" icon="pi pi-stopwatch">
-                Durée totale: {{ totalDuration }}
               </ColorTag>
             </div>
           </div>
@@ -93,7 +93,7 @@ import {
 import { Race } from '@/types/entities/Race';
 import { Button, DatePicker, InputText } from 'primevue';
 import { computed, ref } from 'vue';
-import InputTime from '../inputs/InputTime.vue';
+import InputTime from '../../inputs/InputTime.vue';
 import RaceBreadcrumbs from './RaceBreadcrumbs.vue';
 
 const stores = useStores();

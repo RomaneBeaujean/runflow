@@ -32,6 +32,15 @@
       <div class="font-xs font-semibold">Séparateurs</div>
 
       <SwitchToggle
+        v-model:model-value="showSeparator"
+        label="Afficher les séparateurs"
+      />
+      <SwitchToggle
+        v-model:model-value="showSeparatorDistance"
+        label="Afficher la distance"
+      />
+
+      <SwitchToggle
         v-model:model-value="showSeparatorDuration"
         label="Afficher le temps écoulé"
       />
@@ -76,6 +85,8 @@ const {
   showSeparatorDuration,
   showPointTime,
   showPointSlope,
+  showSeparator,
+  showSeparatorDistance,
   showPointPace,
   showPointDuration,
   showPaceLine,

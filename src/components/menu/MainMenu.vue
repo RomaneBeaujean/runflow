@@ -29,9 +29,11 @@
     </div>
     <Drawer v-model:visible="drawerVisible">
       <template #header>
-        <img src="@/assets/logo.png" alt="Logo" class="h-6" />
+        <div class="flex justify-center w-full">
+          <AppLogo class="w-[150px]" />
+        </div>
       </template>
-      <div class="flex flex-col items-stretch">
+      <div class="flex flex-col items-stretch mt-8 select-none">
         <div
           class="mobile-menu-item"
           v-for="item in items"
@@ -108,6 +110,7 @@ const selectItem = (path: string) => {
   color: var(--color-grey-700);
   font-weight: 700;
   border-radius: 4px;
+  margin-bottom: 8px;
 
   &[data-active] {
     color: var(--p-primary-600);

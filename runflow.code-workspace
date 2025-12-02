@@ -4,13 +4,17 @@
 			"name": "Root",
 			"path": "."
 		},
-    	{
+    {
 			"name": "Views",
 			"path": "./src/views"
 		},
 		{
 			"name": "Components",
 			"path": "./src/components"
+		},
+    {
+			"name": "Lib",
+			"path": "./src/lib"
 		},
     {
 			"name": "Composables",

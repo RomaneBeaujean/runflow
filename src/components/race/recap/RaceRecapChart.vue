@@ -44,6 +44,7 @@ export interface RecapChartParams {
   timeBarrier: boolean;
   splitElevation: boolean;
   splitSlope: boolean;
+  splitDistance: boolean;
 }
 
 use([
@@ -110,50 +111,21 @@ const splitMarkArea = (split: Split) => {
   const splitDuration = minutesToFormattedDuration(getSplitDuration(split));
 
   return [
-    // Split Pace
-    [
-      {
-        xAxis: split.startDistance,
-        label: {
-          position: 'insideBottom',
-          color: '#61325c',
-          offset: props.params.splitPace ? [0, -25] : [],
-          backgroundColor: '#F4F0F8BF',
-          formatter: () =>
-            props.params.splitPace ? `{b|${split.pace}}\n{s|min/km}` : '',
-        },
-      },
-      {
-        xAxis: split.endDistance,
-      },
-    ],
-    // Split Duration
-    [
-      {
-        xAxis: split.startDistance,
-        label: {
-          position: 'insideTop',
-          color: '#075985',
-          offset: [0, 25],
-          backgroundColor: '#EFF6FFBF',
-          formatter: () =>
-            props.params.splitDuration ? `{b|${splitDuration}}` : '',
-        },
-      },
-      {
-        xAxis: split.endDistance,
-      },
-    ],
     // Distance du split
     [
       {
         xAxis: split.startDistance,
         label: {
           position: 'insideTop',
-          color: '#0C4A6E',
-          backgroundColor: '#F0F9FFBF',
+          color: '#0C0A09',
+          fontSize: 10,
+          backgroundColor: '#E5E7EBBF',
+          rotate: 90,
+          offset: [-20, -10],
           formatter: () =>
-            `{b|${roundOneNumber(split.endDistance - split.startDistance)}} {s|km}`,
+            props.params.splitDistance
+              ? `{b|${roundOneNumber(split.endDistance - split.startDistance)}} {s|km}`
+              : '',
         },
       },
       {
@@ -169,15 +141,41 @@ const splitMarkArea = (split: Split) => {
           position: 'inside',
           color,
           fontWeight: 'bold',
-          rotate: 0,
+          rotate: 90,
+          fontSize: 11,
+          offset: [50, 0],
           backgroundColor: `${background}BF`,
           formatter: () =>
             props.params.splitElevation && props.params.splitSlope
-              ? `${elevation}\n${getSplitSlopePercent(split).major}%`
+              ? `${elevation} (${getSplitSlopePercent(split).major}%)`
               : props.params.splitElevation
                 ? `${elevation}`
                 : props.params.splitSlope
                   ? `${getSplitSlopePercent(split).major}%`
+                  : '',
+        },
+      },
+      {
+        xAxis: split.endDistance,
+      },
+    ],
+    // Split Pace
+    [
+      {
+        xAxis: split.startDistance,
+        label: {
+          position: 'insideBottom',
+          color: '#61325c',
+          rotate: 90,
+          offset: [90, 10],
+          backgroundColor: '#F4F0F8BF',
+          formatter: () =>
+            props.params.splitPace && props.params.splitDuration
+              ? `{b|${split.pace}}{s|/km} (${splitDuration})`
+              : props.params.splitPace
+                ? `{b|${split.pace}}{s|/km}`
+                : props.params.splitDuration
+                  ? `${splitDuration}`
                   : '',
         },
       },
@@ -264,11 +262,12 @@ const markareaTime = computed(() => {
       yAxis: 0,
       label: {
         position: 'insideBottom',
-        color: '#054b3a',
-        rotate: 0,
-        offset: [0, 0],
+        rotate: 90,
+        offset: [15, 10],
+        color: '#172554',
+        fontSize: '12px',
         fontWeight: 'bold',
-        backgroundColor: '#e7f7f3',
+        backgroundColor: '#DBEAFE',
         formatter: () => `${getFormattedTimeToDistance(sep.distance)}`,
       },
     },
@@ -289,11 +288,10 @@ const markareaTimeBarrier = computed(() => {
         position: 'bottom',
         color: '#BE123C',
         fontSize: '10px',
-        offset: [0, -15],
         backgroundColor: '#FCE7F3',
         formatter: () => {
           if (!sep.timeBarrier) return '';
-          return `Max: ${dateToFormattedTime(parseDate(sep.timeBarrier))}`;
+          return `Max: {b|${dateToFormattedTime(parseDate(sep.timeBarrier))}}`;
         },
       },
     },
@@ -316,10 +314,8 @@ const separatorsSeries = computed(() => {
       label: {
         show: true,
         position: 'end',
-        color: '#035581',
         fontWeight: 'bold',
         fontSize: 11,
-        backgroundColor: '#B1D5E8',
         padding: 4,
         rotate: 45,
         offset: [20, 10],
@@ -332,8 +328,8 @@ const separatorsSeries = computed(() => {
       data: chartSeparators.value.map((sep: Separator) => ({
         xAxis: sep.distance,
         label: {
-          color: sep.refuel ? '#C026D3' : '#035581',
-          backgroundColor: sep.refuel ? '#F5D0FE' : '#B1D5E8',
+          color: sep.refuel ? '#C026D3' : '#44403C',
+          backgroundColor: sep.refuel ? '#F5D0FE' : '#F5F5F5',
         },
         lineStyle: {
           color: sep.refuel ? '#C026D3' : '#035581',

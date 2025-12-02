@@ -22,12 +22,16 @@ export function getTotalDuration(
   return splitsDuration + refuelDuration;
 }
 
-export function getAveragePace(
-  splits: Split[],
-  separators: Separator[],
-  totalDistance: number
-) {
+export function getTotalDistance(splits: Split[]): number {
+  return splits.reduce(
+    (acc, curr) => (acc += curr.endDistance - curr.startDistance),
+    0
+  );
+}
+
+export function getAveragePace(splits: Split[], separators: Separator[]) {
   const totalDuration = getTotalDuration(splits, separators);
+  const totalDistance = getTotalDistance(splits);
   const pace = totalDuration / totalDistance;
   const minutes = Math.floor(pace);
   const seconds = Math.round((pace - minutes) * 60);
