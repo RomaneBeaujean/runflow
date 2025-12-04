@@ -89,25 +89,42 @@ export function computeSlidingSlope(
   windowSize: number
 ): SlidingSlopePoint[] {
   if (points.length < 2) return [];
-  const totalDistance = points[points.length - 1].distance;
 
-  let slidingSlopePoints = [];
+  const n = points.length;
+  const totalDistance = points[n - 1].distance;
+  const result: SlidingSlopePoint[] = [];
 
-  for (let i = 0; i < points.length; i++) {
+  let start = 0;
+  let end = 0;
+
+  for (let i = 0; i < n; i++) {
     const current = points[i];
+    const center = current.distance;
+    const half = windowSize / 2;
 
-    const currDistance = points[i].distance;
-    const startDistance = Math.max(0, currDistance - windowSize / 2);
-    const endDistance = Math.min(currDistance + windowSize / 2, totalDistance);
-    const startPoint = points.find((el) => el.distance >= startDistance);
-    const endPoint = points.find((el) => el.distance >= endDistance);
+    const windowStart = Math.max(0, center - half);
+    const windowEnd = Math.min(totalDistance, center + half);
+
+    // avancer start
+    while (start < n && points[start].distance < windowStart) {
+      start++;
+    }
+
+    // avancer end
+    while (end < n && points[end].distance < windowEnd) {
+      end++;
+    }
+
+    const startPoint = points[start];
+    const endPoint = points[end];
 
     const deltaElevation = endPoint.elevation - startPoint.elevation;
     const deltaDistance = endPoint.distance - startPoint.distance;
+
     const slope =
       deltaDistance > 0 ? (deltaElevation / deltaDistance) * 100 : 0;
 
-    slidingSlopePoints.push({
+    result.push({
       distance: current.distance,
       point: current,
       slope,
@@ -116,44 +133,62 @@ export function computeSlidingSlope(
     });
   }
 
-  return slidingSlopePoints;
+  return result;
 }
-
 export function computeSlidingSlopeKm(
   points: GpxPoint[],
   windowSize: number
 ): SlidingSlopePoint[] {
   if (points.length < 2) return [];
-  const totalDistance = points[points.length - 1].distance;
 
-  let slidingSlopePoints = [];
+  const n = points.length;
+  const totalDistance = points[n - 1].distance;
+  const result: SlidingSlopePoint[] = [];
 
-  points.forEach((current, i) => {
-    const currDistance = points[i].distance;
-    const startDistance = Math.max(0, currDistance - windowSize / 2);
-    const endDistance = Math.min(totalDistance, currDistance + windowSize / 2);
-    const startPoint = points.find((el) => el.distance >= startDistance);
-    const endPoint = points.find((el) => el.distance >= endDistance);
+  let start = 0;
+  let end = 0;
+
+  for (let i = 0; i < n; i++) {
+    const current = points[i];
+    const center = current.distance;
+    const half = windowSize / 2;
+
+    const windowStart = Math.max(0, center - half);
+    const windowEnd = Math.min(totalDistance, center + half);
+
+    // avancer start
+    while (start < n && points[start].distance < windowStart) {
+      start++;
+    }
+
+    // avancer end
+    while (end < n && points[end].distance < windowEnd) {
+      end++;
+    }
+
+    const startPoint = points[start];
+    const endPoint = points[end];
 
     const deltaElevation = endPoint.elevation - startPoint.elevation;
     const deltaDistance = roundOneNumber(
       (endPoint.distance - startPoint.distance) * 1000
-    );
+    ); // conversion en mètres
+
     const slope =
       deltaDistance > 0
         ? roundOneNumber((deltaElevation / deltaDistance) * 100)
         : 0;
 
-    slidingSlopePoints.push({
+    result.push({
       distance: current.distance,
       point: current,
       slope,
       slopeType: getSlopeType(slope),
       slopeSize: getSlopeSize(slope),
     });
-  });
+  }
 
-  return slidingSlopePoints;
+  return result;
 }
 
 export const getSlopeType = (slope: number): SlopeType => {

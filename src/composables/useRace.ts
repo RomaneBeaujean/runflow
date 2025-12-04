@@ -19,20 +19,20 @@ const maxElevation = ref<number>(null);
 const slidingSlopesPoints = ref<SlidingSlopePoint[]>([]);
 const slopeMax = ref<number>();
 const slopeMin = ref<number>();
-const xml = ref<string>(null);
+const parsedFile = ref<GpxParse>();
 
 export function useRace() {
   const initRace = (initialRace: Race) => {
     race.value = initialRace;
 
-    const parser = new GpxParse(initialRace.gpxContent);
-
-    xml.value = initialRace.gpxContent;
+    parsedFile.value = new GpxParse(initialRace.gpxContent);
 
     // POINTS
-    points.value = smoothPointsByDistance([...parser.points], 0.3);
+    points.value = smoothPointsByDistance([...parsedFile.value.points], 0.3);
     slidingSlopesPoints.value = computeSlidingSlopeKm(points.value, 0.5);
-    maxElevation.value = Math.max(...parser.points.map((el) => el.elevation));
+    maxElevation.value = Math.max(
+      ...parsedFile.value.points.map((el) => el.elevation)
+    );
     slopeMax.value = Math.max(
       ...slidingSlopesPoints.value.map((it) => it.slope)
     );
@@ -41,7 +41,7 @@ export function useRace() {
     );
 
     // TOTAL DISTANCE
-    totalDistance.value = parser.totalDistance;
+    totalDistance.value = parsedFile.value.totalDistance;
 
     // SEPARATORS
     const sep = [...(initialRace.separators || [])].sort(
@@ -122,7 +122,7 @@ export function useRace() {
     maxElevation,
     totalDistance,
     slopeMax,
-    xml,
+    parsedFile,
     slopeMin,
     slidingSlopesPoints,
     addSeparator,

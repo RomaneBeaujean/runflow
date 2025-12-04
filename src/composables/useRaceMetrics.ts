@@ -244,7 +244,7 @@ export function useRaceMetrics() {
   }
 
   const averagePace = computed(() => {
-    return getAveragePace(splits.value, separators.value, totalDistance.value);
+    return getAveragePace(splits.value, separators.value);
   });
 
   const maxPace = computed(() => {

@@ -40,15 +40,14 @@
       </div>
 
       <!-- Graduation avec valeurs -->
-      <div class="flex justify-between" v-if="!hideGraduation">
+      <div class="relative w-full h-5 mt-2" v-if="!hideGraduation">
         <div
           v-for="tick in ticks"
           :key="tick"
-          class="text-center w-px relative"
+          class="absolute top-0 transform -translate-x-1/2 text-center"
+          :style="{ left: tickToPercent(tick) + '%' }"
         >
-          <div class="absolute transform -translate-x-1/2">
-            <span class="text-sm text-gray-600">{{ tick }}</span>
-          </div>
+          <span class="text-sm text-gray-600">{{ tick }}</span>
         </div>
       </div>
     </div>
@@ -70,6 +69,10 @@ const props = defineProps<{
   step?: number;
   hideGraduation?: boolean;
 }>();
+
+const tickToPercent = (tick: number) => {
+  return ((tick - min.value) / (max.value - min.value)) * 100;
+};
 
 const sliderRef = ref<HTMLElement | null>(null);
 const value = ref(props.modelValue);

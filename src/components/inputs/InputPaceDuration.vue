@@ -69,7 +69,7 @@ watch(currentDurationMinutes, (newDuration, oldDuration) => {
   const newPace = paceFromMinutesAndDistance(newDuration, props.distance);
   const oldPace = currentPace.value;
 
-  if (!oldPace.match(newPace)) {
+  if (!oldPace || !oldPace.match(newPace)) {
     currentPace.value = newPace;
   }
 });

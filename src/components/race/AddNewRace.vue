@@ -4,28 +4,37 @@
       label="Ajouter un plan de course"
       icon="pi pi-plus"
       rounded
-      @click="visible = true"
+      @click="dialogOpened = true"
     />
 
-    <Dialog v-model:visible="visible" modal class="md:w-4xl max-w-[90%]">
+    <Dialog v-model:visible="dialogOpened" modal>
       <template #header>
         <span class="font-bold">Ajouter un plan de course</span>
       </template>
-      <div class="max-w-full">
-        <Stepper :value="currentStep" :linear="gpxFile == null">
+      <div class="md:w-[700px] w-[85vw]">
+        <Stepper v-model:value="currentStep" :linear="gpxFile == null">
           <!-- STEP 1 : Upload GPX -->
           <StepItem value="1">
             <Step>Importer un fichier GPX</Step>
             <StepPanel v-slot="{ activateCallback }">
-              <div class="flex flex-col gap-4 w-full max-w-ful">
+              <div class="flex flex-col gap-4">
                 <GpxDropzone @select="addFile" @remove="removeFile" />
+                <div class="flex justify-center">
+                  <Button
+                    label="Suivant"
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
+                    :disabled="!gpxFile"
+                    @click="activateCallback('2')"
+                  />
+                </div>
               </div>
             </StepPanel>
           </StepItem>
 
           <!-- STEP 2 : Formulaire -->
           <StepItem value="2">
-            <Step>Détails de la course</Step>
+            <Step>Informations sur la course</Step>
             <StepPanel v-slot="{ activateCallback }">
               <div
                 class="flex flex-1 flex-col"
@@ -33,7 +42,7 @@
               >
                 <div>
                   <label class="block mb-2 text-sm font-medium text-gray-700">
-                    Nom du plan de course
+                    Nom du plan de course *
                   </label>
                   <InputText
                     v-model="raceName"
@@ -66,43 +75,28 @@
                     />
                   </div>
                 </div>
+              </div>
+              <div class="mt-8 flex justify-center">
+                <Button
+                  label="Suivant"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  :disabled="raceName?.length < 1"
+                  @click="activateCallback('3')"
+                />
+              </div>
+            </StepPanel>
+          </StepItem>
 
-                <Divider />
-
-                <div class="flex flex-col gap-2">
-                  <div class="font-semibold text-primary-700">Objectifs</div>
-                  <div class="flex flex-1">
-                    <div class="flex flex-1 text-sm font-medium text-gray-700">
-                      Allure moyenne
-                    </div>
-                    <div class="flex flex-1 text-sm font-medium text-gray-700">
-                      Temps total
-                    </div>
-                  </div>
-
-                  <div class="flex flex-1">
-                    <InputPaceDuration
-                      size="default"
-                      :pace="pace"
-                      :distance="totalDistance || 0"
-                      @update="(newPace) => (pace = newPace.pace)"
-                    ></InputPaceDuration>
-                  </div>
-
-                  <Divider />
-
-                  <div class="flex items-center gap-2">
-                    <Checkbox
-                      v-model="automaticSeparators"
-                      inputId="automatic_separators"
-                      name="generateGpxOptions"
-                      value="automatic"
-                    />
-                    <label for="automatic_separators" class="text-sm">
-                      Détecter automatiquement les segments (montées/descentes)
-                    </label>
-                  </div>
-                </div>
+          <StepItem value="3">
+            <Step>Objectifs et temps de course</Step>
+            <StepPanel>
+              <div v-if="parsedFile">
+                <PaceSimulator
+                  :parsedFile="parsedFile"
+                  v-model="splits"
+                  onlyAveragePace
+                />
               </div>
             </StepPanel>
           </StepItem>
@@ -112,7 +106,7 @@
         <Button label="Fermer" text severity="secondary" @click="close" />
         <Button
           label="Créer le plan de course"
-          variant="outlined"
+          :disabled="gpxFile == null || raceName == '' || !section3Opened"
           @click="createCourse"
         />
       </template>
@@ -122,52 +116,53 @@
 
 <script setup lang="ts">
 import { useStores } from '@/composables/useStores';
-import { ClimbDetector } from '@/lib/gpx/ClimbDetector';
 import { GpxParse } from '@/lib/gpx/GpxParse';
 import { roundOneNumber } from '@/lib/utils';
 import { Separator } from '@/types/entities/Separator';
+import { Split } from '@/types/Split';
 import {
   Button,
-  Checkbox,
   DatePicker,
   Dialog,
-  Divider,
   InputText,
   Step,
   StepItem,
   StepPanel,
   Stepper,
 } from 'primevue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import GpxDropzone from '../GpxDropzone.vue';
-import InputPaceDuration from '../inputs/InputPaceDuration.vue';
 import InputTime from '../inputs/InputTime.vue';
+import PaceSimulator from './PaceSimulator.vue';
 
 const currentStep = ref('1');
-const visible = ref<boolean>(false);
+const dialogOpened = ref<boolean>(false);
 const stores = useStores();
 const router = useRouter();
 const gpxFile = ref<{ content: string; name: string }>(null);
+const parsedFile = ref();
 const raceName = ref<string | null>(null);
 const raceDate = ref<Date | null>(null);
 const startTime = ref<Date | null>(null);
-const automaticSeparators = ref<string>(null);
-const pace = ref<string>(null);
+const splits = ref<Split[]>([]);
+const section3Opened = ref(false);
 
 const removeFile = () => {
+  currentStep.value = '1';
+  section3Opened.value = false;
   raceName.value = null;
   gpxFile.value = null;
   raceDate.value = null;
   startTime.value = null;
-  automaticSeparators.value = null;
-  pace.value = null;
+  parsedFile.value = null;
 };
 
 const addFile = async (file: File) => {
   const content = await file.text();
   const name = file.name;
   gpxFile.value = { content, name };
+  parsedFile.value = new GpxParse(content);
 
   if (raceName.value === '' || raceName.value === null) {
     raceName.value = name;
@@ -183,40 +178,20 @@ const totalDistance = computed(() => {
 });
 
 function close() {
-  visible.value = false;
+  dialogOpened.value = false;
   raceName.value = null;
   gpxFile.value = null;
   raceDate.value = null;
   startTime.value = null;
-  automaticSeparators.value = null;
-  pace.value = null;
+  currentStep.value = '1';
 }
 
 async function createCourse() {
   if (!gpxFile.value || !raceName.value) return;
 
-  const gpxParser = new GpxParse(gpxFile.value.content);
-
-  const transitions =
-    automaticSeparators.value == 'automatic'
-      ? new ClimbDetector(gpxFile.value.content).separators
-      : [roundOneNumber(gpxParser.totalDistance)];
-
-  if (!transitions.includes(gpxParser.totalDistance)) {
-    transitions.push(gpxParser.totalDistance);
-  }
-
-  const splits = [];
-
-  transitions.forEach((distance: number, index: number) => {
-    const startDistance = index === 0 ? 0 : splits[index - 1].endDistance;
-    const endDistance = distance;
-    const splitPace = pace.value || '06:30';
-    splits.push({ startDistance, endDistance, pace: splitPace });
-  });
-
-  const separators = splits
+  const separators = splits.value
     .map((el) => el.endDistance)
+    .filter((el) => roundOneNumber(el) !== roundOneNumber(totalDistance.value))
     .map((it) => new Separator({ distance: it }));
 
   const id = await stores.races.addRace({
@@ -224,7 +199,7 @@ async function createCourse() {
     gpxContent: gpxFile.value.content,
     date: raceDate.value,
     startTime: startTime.value,
-    splits,
+    splits: splits.value,
     separators,
   });
 
@@ -234,6 +209,10 @@ async function createCourse() {
 function goToCourse(id: string) {
   router.push(`/races/${id}`);
 }
+
+watch([currentStep], () => {
+  if (currentStep.value === '3') section3Opened.value = true;
+});
 </script>
 
 <style lang="scss" scoped>

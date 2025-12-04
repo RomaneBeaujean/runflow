@@ -2,19 +2,19 @@
   <VChart
     autoresize
     ref="automaticPaceChartRef"
-    class="min-h-[250px] md:h-[400px]"
+    class="h-full"
     :option="chartOptions"
   />
 </template>
 
 <script setup lang="ts">
-import { useRace } from '@/composables/useRace';
-import { useRaceMetrics } from '@/composables/useRaceMetrics';
 import { useViewport } from '@/composables/useViewport';
 import { getMarkLineColorStops, getPaceColor } from '@/lib/colors';
 import { getAveragePace } from '@/lib/gpx/Metrics';
 import { getSlopeColors } from '@/lib/gpx/SlopeMetrix';
 import { numberToPace, paceToNumber } from '@/lib/time';
+import { GpxPoint } from '@/types/GpxPoint';
+import { SlidingSlopePoint } from '@/types/Slope';
 import { Split } from '@/types/Split';
 import { LineChart } from 'echarts/charts';
 import {
@@ -43,11 +43,16 @@ use([
 
 const props = defineProps<{
   splits: Split[];
+  points: GpxPoint[];
+  slidingSlopesPoints: SlidingSlopePoint[];
 }>();
 
-const { points, totalDistance } = useRace();
-const { getSlopeFromDistance } = useRaceMetrics();
 const { isMobile } = useViewport();
+
+const totalDistance = computed(() => {
+  if (props.splits.length == 0) return 0;
+  return props.splits[props.splits.length - 1].endDistance;
+});
 
 const finalPaces = computed(() => {
   const paces = props.splits.map((it) => paceToNumber(it.pace));
@@ -68,7 +73,7 @@ const series = computed(() => {
       smooth: false,
       showSymbol: false,
       type: 'line',
-      data: points.value.map((p) => [p.distance, p.elevation]),
+      data: props.points.map((p) => [p.distance, p.elevation]),
       lineStyle: { color: '#DEDEDE', width: 1 },
       areaStyle: { color: '#DEDEDE' },
       emphasis: {
@@ -167,6 +172,15 @@ const yAxis = computed(() => {
   ];
 });
 
+const grid = computed(() => {
+  return {
+    top: 40,
+    right: 16,
+    bottom: isMobile.value ? 0 : 60,
+    left: 8,
+  };
+});
+
 const chartOptions = ref({
   tooltip: {
     show: true,
@@ -186,12 +200,7 @@ const chartOptions = ref({
       return getTooltipContent(params);
     },
   },
-  grid: {
-    top: 40,
-    right: 16,
-    bottom: isMobile.value ? 0 : 60,
-    left: 8,
-  },
+  grid: grid.value,
   xAxis: {
     type: 'value',
     boundaryGap: false,
@@ -241,19 +250,26 @@ const getTooltipContent = (params: any) => {
 };
 
 function getIndexFromDistance(distance: number) {
-  return points.value.findIndex((el) => el.distance >= distance);
+  return props.points.findIndex((el) => el.distance >= distance);
 }
 
 function getPointsFromSplit(split: Partial<Split>) {
   const startIndex = getIndexFromDistance(split.startDistance);
   const endIndex = getIndexFromDistance(split.endDistance);
-  return points.value.slice(startIndex, endIndex + 1);
+  return props.points.slice(startIndex, endIndex + 1);
+}
+
+function getSlopeFromDistance(targetDistance: number): number {
+  const closestPoint = props.slidingSlopesPoints.find(
+    (el) => el.distance >= targetDistance
+  );
+  return closestPoint?.slope || 0;
 }
 
 const updateChartData = () => {
   const options = {
     ...chartOptions.value,
-    legend: { show: !isMobile.value },
+    grid: grid.value,
     yAxis: yAxis.value,
     series: [...series.value],
   };

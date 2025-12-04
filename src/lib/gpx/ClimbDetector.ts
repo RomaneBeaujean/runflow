@@ -2,7 +2,7 @@ import { GpxParse, smoothPointsByDistance } from '@/lib/gpx/GpxParse';
 import { GpxPoint } from '@/types/GpxPoint';
 import { SlidingSlopePoint, SlopeType } from '@/types/Slope';
 import { roundOneNumber } from '../utils';
-import { computeSlidingSlope } from './SlopeMetrix';
+import { computeSlidingSlopeKm } from './SlopeMetrix';
 
 type TransitionType = 'summit' | 'valley';
 
@@ -10,18 +10,20 @@ export class ClimbDetector {
   public separators: number[];
 
   constructor(
-    xml: string,
+    parsedFile: GpxParse,
     smoothWindowSizeKm = 1,
     slidingSlopeSizeKm = 0.2,
     transitionWindowSizeKm = 0.5
   ) {
-    const parsed = new GpxParse(xml);
-    const exactPoints = parsed.points.sort((a, b) => a.distance - b.distance);
+    const exactPoints = parsedFile.points.sort(
+      (a, b) => a.distance - b.distance
+    );
     const smoothedPoints = smoothPointsByDistance(
       exactPoints,
       smoothWindowSizeKm
     );
-    const points = computeSlidingSlope(smoothedPoints, slidingSlopeSizeKm);
+    const points = computeSlidingSlopeKm(smoothedPoints, slidingSlopeSizeKm);
+
     this.separators = detectTransitions(
       exactPoints,
       points,

@@ -1,6 +1,7 @@
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { kmhToPace, numberToPace, paceToKmh } from '../time';
+import { GpxParse } from './GpxParse';
 import { chunkerizeSegments } from './Segments';
 import { computeSegmentSlopeKm } from './SlopeMetrix';
 
@@ -17,11 +18,11 @@ export class PaceCalculator {
   slopeMin: number;
   slopeMax: number;
 
-  constructor({ points, totalDistance, slopeMin, slopeMax }) {
-    this.points = points;
-    this.totalDistance = totalDistance;
-    this.slopeMax = slopeMax;
-    this.slopeMin = slopeMin;
+  constructor(parsedFile: GpxParse) {
+    this.points = parsedFile.smoothedPoints;
+    this.totalDistance = parsedFile.totalDistance;
+    this.slopeMax = parsedFile.slopeMax;
+    this.slopeMin = parsedFile.slopeMin;
   }
 
   createSpeedModel({ vMax, sOpt, pUp, pDown, vMinDown, vMinUp }) {

@@ -1,5 +1,4 @@
 import Lab from '@/components/lab/Lab.vue';
-import Home from '@/views/Home.vue';
 import Race from '@/views/Race.vue';
 import Races from '@/views/Races.vue';
 import { createRouter, createWebHistory } from 'vue-router';
@@ -7,10 +6,14 @@ import { createRouter, createWebHistory } from 'vue-router';
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    // {
+    //   path: '/',
+    //   name: 'Home',
+    //   component: Home,
+    // },
     {
       path: '/',
-      name: 'Home',
-      component: Home,
+      redirect: '/races',
     },
     {
       path: '/races',

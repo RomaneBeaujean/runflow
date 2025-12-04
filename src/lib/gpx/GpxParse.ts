@@ -1,6 +1,7 @@
 import { GpxPoint } from '@/types/GpxPoint';
 import GpxParser, { Point } from 'gpxparser';
 import { roundOneNumber, roundThreeNumber } from '../utils';
+import { computeSlidingSlopeKm } from './SlopeMetrix';
 
 export class GpxParse {
   public points: GpxPoint[];
@@ -8,6 +9,8 @@ export class GpxParse {
   public smoothedPoints: GpxPoint[];
   public smoothedPointsMeters: GpxPoint[];
   public totalDistance: number;
+  public slopeMax: number;
+  public slopeMin: number;
 
   constructor(xml: string) {
     const gpxParser = new GpxParser();
@@ -59,6 +62,10 @@ export class GpxParse {
     });
 
     this.totalDistance = roundOneNumber(track?.distance.total / 1000);
+
+    const slopes = computeSlidingSlopeKm(this.points, 0.5).map((p) => p.slope);
+    this.slopeMin = Math.min(...slopes);
+    this.slopeMax = Math.max(...slopes);
   }
 
   get totalElevation() {
@@ -70,27 +77,44 @@ export class GpxParse {
   }
 }
 
-export function smoothPointsByDistance(data: GpxPoint[], windowSize: number) {
-  const totalDistance = data[data.length - 1].distance;
-  const smoothed = [];
-  for (let i = 0; i < data.length; i++) {
-    const currDistance = data[i].distance;
-    const startDistance = currDistance - windowSize / 2;
-    const endDistance = Math.min(currDistance + windowSize / 2, totalDistance);
+export function smoothPointsByDistance(
+  data: GpxPoint[],
+  windowSize: number
+): GpxPoint[] {
+  const n = data.length;
+  if (n === 0) return [];
 
-    const startDistanceIndex = data.findIndex(
-      (el) => el.distance >= startDistance
-    );
-    const endDistanceIndex = data.findIndex((el) => el.distance >= endDistance);
+  const smoothed: GpxPoint[] = [];
+  let start = 0;
+  let end = 0;
+  let sumElevation = 0;
 
-    const start = Math.max(0, startDistanceIndex);
-    const end = endDistanceIndex;
+  for (let i = 0; i < n; i++) {
+    const centerDistance = data[i].distance;
+    const halfWindow = windowSize / 2;
+    const windowStart = centerDistance - halfWindow;
+    const windowEnd = centerDistance + halfWindow;
 
-    const subset = start === end ? [data[i]] : data.slice(start, end);
-    const avgElevation =
-      subset.reduce((sum, p) => sum + p.elevation, 0) / subset.length;
+    // Avancer start jusqu’à être dans la fenêtre
+    while (start < n && data[start].distance < windowStart) {
+      sumElevation -= data[start].elevation;
+      start++;
+    }
 
-    smoothed.push({ ...data[i], elevation: avgElevation });
+    // Avancer end tant qu’on est dans la fenêtre
+    while (end < n && data[end].distance <= windowEnd) {
+      sumElevation += data[end].elevation;
+      end++;
+    }
+
+    const count = end - start;
+    const avgElevation = sumElevation / count;
+
+    smoothed.push({
+      ...data[i],
+      elevation: avgElevation,
+    });
   }
+
   return smoothed;
 }
