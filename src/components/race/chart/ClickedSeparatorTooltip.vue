@@ -53,6 +53,8 @@ const handleUpdateRefuel = () => {
     ...clickedSeparator.value,
     refuel: isRefuel.value,
   });
+
+  closeTooltip();
 };
 
 const handleDeleteSeparator = () => {

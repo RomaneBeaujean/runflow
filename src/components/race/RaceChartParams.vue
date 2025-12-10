@@ -1,7 +1,16 @@
 <template>
   <Button
+    v-if="!isMobile"
     icon="pi pi-cog"
-    text
+    outlined
+    severity="secondary"
+    label="Paramètres d'affichage"
+    size="small"
+    @click="opened = true"
+  ></Button>
+  <Button
+    v-else
+    icon="pi pi-cog"
     severity="secondary"
     size="small"
     @click="opened = true"
@@ -74,10 +83,11 @@
 
 <script setup lang="ts">
 import { useRaceChartParams } from '@/composables/useRaceChartParams';
+import { useViewport } from '@/composables/useViewport';
 import { Button, Divider, Drawer } from 'primevue';
 import { ref } from 'vue';
 import SwitchToggle from '../SwitchToggle.vue';
-
+const { isMobile } = useViewport();
 const opened = ref(false);
 const {
   stickyChart,

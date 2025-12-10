@@ -4,18 +4,18 @@
       <!-- Table Header -->
       <div class="row header-row text-neutral-600">
         <div class="header"></div>
-        <div class="header">Type</div>
-        <div class="header border-l-1 border-gray-200">Distance</div>
+        <div class="header"></div>
+        <div class="header border-l-1 border-gray-200">Distance totale</div>
         <div class="header">Dénivelé total</div>
         <div class="header border-l-1 border-gray-200">Split</div>
         <div class="header">Dénivelé split</div>
         <div class="header">Pente split</div>
-        <div class="header">Allure / durée</div>
+        <div class="header">Allure / durée du split</div>
+        <!-- <div class="header border-l-1 border-gray-200">Nutrition</div> -->
         <div class="header border-l-1 border-gray-200">Temps d'arrêt</div>
-        <div class="header border-l-1 border-gray-200">
-          Heure - Durée totale
-        </div>
-        <div class="header border-l-1 border-gray-200">Barrière horraire</div>
+        <div class="header border-l-1 border-gray-200">Temps écoulé</div>
+        <div class="header">Heure</div>
+        <div class="header">Barrière horraire (heure)</div>
         <div
           class="header border-l-1 border-gray-200"
           v-if="editableMode"
@@ -32,7 +32,7 @@
         >
           <RaceSplitDesktop :split="split" />
         </div>
-        <AddSeparator />
+        <AddSeparator v-if="editableMode" />
       </template>
     </template>
     <template v-else>

@@ -1,4 +1,3 @@
-1
 <template>
   <div class="cell w-[24px] font-semibold">
     <span v-if="isNotFirstLine" class="text-xs"> #{{ split.index }} </span>
@@ -76,7 +75,7 @@
       </SlopeTag>
     </div>
   </div>
-  <div class="cell border-r-1 border-gray-200">
+  <div class="cell">
     <div
       v-if="isNotFirstLine && !edition"
       class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
@@ -100,7 +99,8 @@
       />
     </div>
   </div>
-  <div class="cell border-r-1 border-gray-200">
+  <!-- Temps d'arrêt -->
+  <div class="cell border-l-1 border-gray-200">
     <template v-if="split.refuel && isNotFirstLine && !edition">
       <ColorTag color="pink">
         {{ split.stopDuration }} <span class="xsmall">min</span>
@@ -113,7 +113,18 @@
       />
     </template>
   </div>
-  <div class="cell border-r-1 border-gray-200">
+  <!-- Temps écoulé -->
+  <div class="cell border-l-1 border-gray-200">
+    <div class="w-[70px] inline-block">
+      <template v-if="isNotFirstLine">
+        <ColorTag icon="pi pi-stopwatch" color="green" v-if="isNotFirstLine">
+          {{ minutesToFormattedDuration(split.cumulDuration) }}
+        </ColorTag>
+      </template>
+    </div>
+  </div>
+  <!-- Heure -->
+  <div class="cell">
     <div class="w-[70px] inline-block">
       <template v-if="isNotFirstLine || (!isNotFirstLine && !edition)">
         <ColorTag
@@ -123,9 +134,6 @@
           v-if="split.time"
         >
           {{ dateToFormattedTime(split.time) }}
-        </ColorTag>
-        <ColorTag icon="pi pi-stopwatch" color="green" v-if="isNotFirstLine">
-          {{ minutesToFormattedDuration(split.cumulDuration) }}
         </ColorTag>
       </template>
       <template v-if="edition && !isNotFirstLine">

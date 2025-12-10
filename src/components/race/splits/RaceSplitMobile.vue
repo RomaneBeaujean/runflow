@@ -183,13 +183,13 @@
           <div class="flex flex-row">
             <div class="flex flex-1 flex-col gap-2 items-center">
               <span class="flex text-xs font-semibold justify-center">
-                Durée totale
+                Temps écoulé / Heure
               </span>
               <div class="flex gap-2">
-                <ColorTag color="green">
+                <ColorTag color="primary" icon="pi pi-stopwatch">
                   {{ minutesToFormattedDuration(split.cumulDuration) }}
                 </ColorTag>
-                <ColorTag icon="pi pi-clock" color="primary" v-if="split.time">
+                <ColorTag icon="pi pi-clock" color="green" v-if="split.time">
                   {{ dateToFormattedTime(split.time) }}
                 </ColorTag>
               </div>
@@ -200,17 +200,10 @@
 
               <div class="flex flex-1 flex-col gap-2 items-center">
                 <span class="flex text-xs font-semibold">
-                  Barrière horraire
+                  Barrière horraire (heure)
                 </span>
                 <div class="flex gap-2">
                   <template v-if="!edition">
-                    <ColorTag
-                      :color="split.timeBarrierValid ? 'bright-green' : 'red'"
-                    >
-                      {{
-                        minutesToFormattedDuration(split.timeBarrierDuration)
-                      }}
-                    </ColorTag>
                     <ColorTag
                       icon="pi pi-clock"
                       :color="split.timeBarrierValid ? 'bright-green' : 'red'"
@@ -236,7 +229,10 @@
       </template>
     </Fieldset>
 
-    <div class="flex justify-center mt-2" v-if="editableMode">
+    <div
+      class="flex justify-center mt-2"
+      v-if="editableMode && split.distance !== totalDistance"
+    >
       <AddSeparatorMobile />
     </div>
   </div>

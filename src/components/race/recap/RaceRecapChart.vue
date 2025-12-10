@@ -256,26 +256,29 @@ const markareaTotalDuration = computed(() => {
 
 const markareaTime = computed(() => {
   if (!props.params.time) return [];
-  return chartSeparators.value.map((sep: Separator) => [
-    {
-      xAxis: sep.distance,
-      yAxis: 0,
-      label: {
-        position: 'insideBottom',
-        rotate: 90,
-        offset: [15, 10],
-        color: '#172554',
-        fontSize: '12px',
-        fontWeight: 'bold',
-        backgroundColor: '#DBEAFE',
-        formatter: () => `${getFormattedTimeToDistance(sep.distance)}`,
+  return chartSeparators.value.map((sep: Separator) => {
+    const time = getFormattedTimeToDistance(sep.distance);
+    return [
+      {
+        xAxis: sep.distance,
+        yAxis: 0,
+        label: {
+          position: 'insideBottom',
+          rotate: 90,
+          offset: [15, 10],
+          color: '#172554',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          backgroundColor: '#DBEAFE',
+          formatter: () => `${time}`,
+        },
       },
-    },
-    {
-      xAxis: sep.distance,
-      yAxis: 0,
-    },
-  ]);
+      {
+        xAxis: sep.distance,
+        yAxis: 0,
+      },
+    ];
+  });
 });
 
 const markareaTimeBarrier = computed(() => {
@@ -388,7 +391,7 @@ onMounted(() => {
   updateChartData();
 });
 
-watch(props.params, () => {
+watch([chartSeparators, props.params, splits], () => {
   updateChartData();
 });
 </script>

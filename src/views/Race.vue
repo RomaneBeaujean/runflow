@@ -11,16 +11,16 @@
     <div class="w-full relative">
       <RaceHeader />
     </div>
-    <div class="p-5 flex justify-center">
-      <RaceAutomaticPace />
-    </div>
 
     <div :class="[stickyChart && 'sticky top-0 z-40']">
       <Card>
         <template #title>
           <div class="flex justify-between">
             <div>Profil de la course</div>
-            <div><RaceChartParams /></div>
+            <div class="flex gap-2">
+              <RaceAutomaticPace v-if="editableMode" />
+              <RaceChartParams />
+            </div>
           </div>
         </template>
         <template #content>

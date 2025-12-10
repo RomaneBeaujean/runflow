@@ -1,10 +1,20 @@
 <template>
   <Button
+    v-if="!isMobile"
     label="Simulateur d'allures"
+    outlined
+    severity="secondary"
     icon="pi pi-android"
+    size="small"
     @click="show = true"
   />
-
+  <Button
+    v-else
+    severity="secondary"
+    icon="pi pi-android"
+    size="small"
+    @click="show = true"
+  ></Button>
   <Dialog v-model:visible="show" modal class="w-[80%] h-4xl">
     <template #header>
       <span class="font-bold text-xl">
@@ -41,6 +51,7 @@
 <script setup lang="ts">
 import PaceSimulator from '@/components/race/PaceSimulator.vue';
 import { useRace } from '@/composables/useRace';
+import { useViewport } from '@/composables/useViewport';
 import { recomputeSplits } from '@/lib/Splits';
 import { Separator } from '@/types/entities/Separator';
 import { Split } from '@/types/Split';
@@ -51,7 +62,7 @@ const { totalDistance, separators, splits, parsedFile } = useRace();
 const show = ref(false);
 const newSplits = ref<Split[]>([]);
 const averagePace = ref<string>('');
-
+const { isMobile } = useViewport();
 const close = () => {
   show.value = false;
 };

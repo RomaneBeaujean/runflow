@@ -66,11 +66,11 @@ const drawerVisible = ref(false);
 const items = [
   // { label: 'Accueil', path: '', illustration: 'pi pi-home' },
   { label: 'Plans de course', path: 'races', illustration: 'pi pi-trophy' },
-  // {
-  //   label: "Plans d'entrainement",
-  //   path: 'trainings',
-  //   illustration: 'pi pi-bolt',
-  // },
+  {
+    label: "Plans d'entrainement",
+    path: 'trainings',
+    illustration: 'pi pi-bolt',
+  },
   // {
   //   label: 'Planificateur de randonnées',
   //   path: 'trails',

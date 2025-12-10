@@ -248,6 +248,7 @@ export default function useRaceChartData() {
 
     return chartSeparators.value.map((separator) => {
       const isDragged = separator.distance == dragSeparator.value?.distance;
+      const isClicked = separator.distance == clickedSeparator.value?.distance;
       const distance = isDragged
         ? dragSeparatorDistance.value
         : separator.distance;
@@ -265,7 +266,9 @@ export default function useRaceChartData() {
         markLine: {
           animation: false,
           symbol: 'none',
-          lineStyle: { color: '#024264', type: 'dashed', width: 1 },
+          lineStyle: isClicked
+            ? { color: CLICKED_SEPARATOR_BG_COLOR, type: 'dashed', width: 3 }
+            : { color: '#024264', type: 'dashed', width: 1 },
           label: {
             show: showSeparatorDistance.value ? true : false,
             position: 'end',
@@ -286,10 +289,16 @@ export default function useRaceChartData() {
             {
               xAxis: distance,
               label: {
-                color: separator.refuel ? REFUEL_COLOR : SEP_COLOR,
-                backgroundColor: separator.refuel
-                  ? REFUEL_BG_COLOR
-                  : SEP_BG_COLOR,
+                color: isClicked
+                  ? CLICKED_SEPARATOR_COLOR
+                  : separator.refuel
+                    ? REFUEL_COLOR
+                    : SEP_COLOR,
+                backgroundColor: isClicked
+                  ? CLICKED_SEPARATOR_BG_COLOR
+                  : separator.refuel
+                    ? REFUEL_BG_COLOR
+                    : SEP_BG_COLOR,
               },
             },
           ],
@@ -359,7 +368,7 @@ export default function useRaceChartData() {
         backgroundColor: '#ffe79c',
         padding: 4,
         borderRadius: 4,
-        formatter: (params: any) => `${roundOneNumber(params.value)}`,
+        formatter: (params: any) => `${roundOneNumber(params.value)} km`,
       },
       data: clickedPoint.value?.distance
         ? [{ xAxis: roundOneNumber(clickedPoint.value.distance) }]
