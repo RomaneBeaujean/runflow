@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import MainMenu from '@/components/menu/MainMenu.vue';
+import MainMenu from '@/ui/components/menu/MainMenu.vue';
 </script>
 
 <style lang="scss">

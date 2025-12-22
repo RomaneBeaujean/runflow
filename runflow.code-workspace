@@ -1,36 +1,8 @@
 {
 	"folders": [
 		{
-			"name": "Root",
+			"name": "RunFlow",
 			"path": "."
-		},
-    {
-			"name": "Views",
-			"path": "./src/views"
-		},
-		{
-			"name": "Components",
-			"path": "./src/components"
-		},
-    {
-			"name": "Lib",
-			"path": "./src/lib"
-		},
-    {
-			"name": "Composables",
-			"path": "./src/composables"
-		},
-    {
-			"name": "Store",
-			"path": "./src/stores"
-		},
-    {
-			"name": "Types",
-			"path": "./src/types"
-		},
-    {
-			"name": "Router",
-			"path": "./src/router"
 		},
 	],
 	"settings": {

@@ -1,5 +1,5 @@
-import { GpxParse } from '@/lib/gpx/GpxParse';
-import { getTotalDuration } from '@/lib/gpx/Metrics';
+import { getTotalDuration } from '@/domain/GpxMetrics';
+import { GpxParse } from '@/domain/GpxParse';
 import { GpxPoint } from '@/types/GpxPoint';
 import { Split } from '@/types/Split';
 import { Separator } from '@/types/entities/Separator';

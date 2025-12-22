@@ -1,11 +1,10 @@
-import '@/main.scss';
-import 'primeicons/primeicons.css';
-
 import App from '@/App.vue';
-import { configurePrimeVue } from '@/config/primevue-config';
-import router from '@/router/router';
-import { AppLoader } from '@/stores/AppLoader';
-import '@/style.css';
+import { AppLoader } from '@/infrastructure/stores/AppLoader';
+import router from '@/ui/router/router';
+import { configurePrimeVue } from '@/ui/styles/config/primevue-config';
+import '@/ui/styles/main.scss';
+import '@/ui/styles/style.css';
+import 'primeicons/primeicons.css';
 import Tooltip from 'primevue/tooltip';
 import { createApp } from 'vue';
 
