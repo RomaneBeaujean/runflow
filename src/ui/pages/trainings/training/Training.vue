@@ -6,7 +6,7 @@
     </div>
 
     <div class="p-8">
-      <TrainingPlanWeeks />
+      <TrainingCalendar />
     </div>
   </div>
 </template>
@@ -17,7 +17,7 @@ import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
 import { Breadcrumb } from 'primevue';
 import type { MenuItem } from 'primevue/menuitem';
 import { onMounted, ref, watch } from 'vue';
-import TrainingPlanWeeks from './TrainingPlanWeeks.vue';
+import TrainingCalendar from './TrainingCalendar.vue';
 
 const props = defineProps<{ id: string }>();
 const stores = useStores();

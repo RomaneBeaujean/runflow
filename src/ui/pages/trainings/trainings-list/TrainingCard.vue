@@ -43,7 +43,6 @@ function nevigateToTrainingPlan(id: string) {
 }
 
 function deleteTrainingPlan(e: MouseEvent, id: string) {
-  console.log(id);
   e.stopPropagation();
   deleteById(id);
 }

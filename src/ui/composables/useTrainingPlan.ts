@@ -5,6 +5,7 @@ import { useTrainingPlanWatchers } from './useTrainingPlanWatchers';
 const trainingPlanId = ref();
 const trainingWeeks = ref<TrainingWeek[]>([]);
 const trainingPlanName = ref<string>('');
+const activeDay = ref(null);
 
 export function useTrainingPlan() {
   const init = (tp: TrainingPlan) => {
@@ -63,6 +64,7 @@ export function useTrainingPlan() {
     deleteWeek,
     updateDay,
     trainingWeeks,
+    activeDay,
     trainingPlanId,
     trainingPlanName,
   };
