@@ -1,4 +1,4 @@
-import { Split } from '@/types/Split';
+import { Split } from '@/domain/types/Split';
 import { useEcharts } from '@/ui/composables/useEcharts';
 import { useRaceMetrics } from '@/ui/composables/useRaceMetrics';
 import { ref } from 'vue';

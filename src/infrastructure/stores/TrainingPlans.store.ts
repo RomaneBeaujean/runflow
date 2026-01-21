@@ -1,5 +1,6 @@
+import { createTrainingPlan } from '@/domain/factories/TrainingPlanFactory';
+import { TrainingPlan } from '@/domain/types/TrainingPlan';
 import { db } from '@/infrastructure/dexie/DexieDatabase';
-import { TrainingPlan } from '@/types/entities/TrainingPlan';
 import { nanoid } from 'nanoid';
 import { reactive, toRaw } from 'vue';
 
@@ -12,7 +13,7 @@ export class TrainingPlansStore {
 
   init = async () => {
     const raw = await db.training_plans.toArray();
-    this.state = raw.map((r) => new TrainingPlan(r));
+    this.state = raw.map((r) => createTrainingPlan(r));
   };
 
   getById = (id: string | null): TrainingPlan | null => {
@@ -24,7 +25,7 @@ export class TrainingPlansStore {
       throw new Error('Le nom du plan est requis');
     }
 
-    const newOne = new TrainingPlan({
+    const newOne = createTrainingPlan({
       ...tp,
       id: nanoid(),
       createdAt: new Date().toISOString(),
@@ -51,7 +52,7 @@ export class TrainingPlansStore {
         id,
         JSON.parse(JSON.stringify(toRaw(newTrainingPlan)))
       );
-      this.state[index] = new TrainingPlan(newTrainingPlan);
+      this.state[index] = createTrainingPlan(newTrainingPlan);
       return newTrainingPlan;
     } catch (err) {
       console.error('❌ Update training plan error', err);
@@ -61,8 +62,7 @@ export class TrainingPlansStore {
 
   deleteById = async (id: string) => {
     await db.training_plans.delete(id);
-    const index = this.state.findIndex((r) => r.id === id);
-    if (index !== -1) this.state.splice(index, 1);
+    this.state = [...this.state].filter((el) => el.id !== id)
   };
 
   clearAll = async () => {
@@ -79,6 +79,6 @@ export class TrainingPlansStore {
     }
 
     await db.training_plans.put(planObj);
-    this.state.push(new TrainingPlan(planObj));
+    this.state.push(createTrainingPlan(planObj));
   };
 }

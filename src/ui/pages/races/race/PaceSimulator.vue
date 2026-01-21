@@ -140,17 +140,17 @@
 </template>
 
 <script setup lang="ts">
-import { ClimbDetector } from '@/domain/ClimbDetector';
 import {
   roundOneNumber,
   roundThreeNumber,
 } from '@/domain/helpers/RoundNumbers.helper';
 import { paceToNumber } from '@/domain/helpers/Time.helper';
 import { GpxParse } from '@/domain/lib/gpx/GpxParse';
-import { PaceCalculator } from '@/domain/PaceCalculator';
-import { computeSlidingSlopeKm } from '@/domain/Slopes';
-import { computeSplits } from '@/domain/Splits';
-import { Split } from '@/types/Split';
+import { ClimbDetector } from '@/domain/services/ClimbDetector';
+import { PaceCalculator } from '@/domain/services/PaceCalculator';
+import { computeSlidingSlopeKm } from '@/domain/services/Slopes';
+import { computeSplits } from '@/domain/services/Splits';
+import { Split } from '@/domain/types/Split';
 import DifficultiesSlider from '@/ui/components/sliders/DifficultiesSlider.vue';
 import DurationSlider from '@/ui/components/sliders/DurationSlider.vue';
 import PaceSlider from '@/ui/components/sliders/PaceSlider.vue';

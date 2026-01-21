@@ -2,8 +2,8 @@ import {
   roundOneNumber,
   roundThreeNumber,
 } from '@/domain/helpers/RoundNumbers.helper';
-import { computeSlidingSlopeKm } from '@/domain/Slopes';
-import { GpxPoint } from '@/types/GpxPoint';
+import { computeSlidingSlopeKm } from '@/domain/services/Slopes';
+import { GpxPoint } from '@/domain/types/GpxPoint';
 import GpxParser, { Point } from 'gpxparser';
 
 export class GpxParse {

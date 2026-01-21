@@ -1,6 +1,6 @@
 import { dateToMinutes, parseDate } from '@/domain/helpers/Time.helper';
-import { Separator } from '@/types/entities/Separator';
-import { SplitItem } from '@/types/SplitItem';
+import { Separator } from '@/domain/types/Separator';
+import { SplitItem } from '@/domain/types/SplitItem';
 import { useRace } from '@/ui/composables/useRace';
 import useRaceChartSplitHover from '@/ui/composables/useRaceChartSplitHover';
 import { useRaceMetrics } from '@/ui/composables/useRaceMetrics';

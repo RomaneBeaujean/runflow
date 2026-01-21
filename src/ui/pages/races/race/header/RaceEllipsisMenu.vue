@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { Race } from '@/types/entities/Race';
+import { Race } from '@/domain/types/Race';
 import { useRaceRecap } from '@/ui/composables/useRaceRecap';
 import { useStores } from '@/ui/composables/useStores';
 import { Button, Menu } from 'primevue';

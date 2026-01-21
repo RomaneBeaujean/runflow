@@ -66,7 +66,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Separator } from '@/types/entities/Separator';
+import { Separator } from '@/domain/types/Separator';
 import InputDistance from '@/ui/components/inputs/InputDistance.vue';
 import { useRace } from '@/ui/composables/useRace';
 import { Button, Divider, Panel, ToggleSwitch } from 'primevue';

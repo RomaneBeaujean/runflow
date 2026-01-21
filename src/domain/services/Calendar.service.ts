@@ -27,8 +27,8 @@ export class CalendarService {
   }
 
   getDayString(year: number, month: number, day: number) {
-    const dayNumber = new Date(year, month, day).getDay();
-    return this.daysValue[dayNumber];
+    const dayOfWeek = new Date(year, month, day).getDay();
+    return this.daysValue[dayOfWeek];
   }
 
   getDayIndex(day: string) {

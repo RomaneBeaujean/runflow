@@ -1,8 +1,8 @@
 import { durationFromPaceAndDistance } from '@/domain/helpers/Time.helper';
-import { Separator } from '@/types/entities/Separator';
-import { GpxPoint } from '@/types/GpxPoint';
-import { GpxSegment } from '@/types/GpxSegment';
-import { Split } from '@/types/Split';
+import { GpxPoint } from '@/domain/types/GpxPoint';
+import { GpxSegment } from '@/domain/types/GpxSegment';
+import { Separator } from '@/domain/types/Separator';
+import { Split } from '@/domain/types/Split';
 
 export function getTotalDuration(
   splits: Split[],

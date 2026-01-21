@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { ExcelRaceRecapExporter } from '@/domain/ExcelRaceRecapExporter';
+import { ExcelRaceRecapExporter } from '@/domain/services/ExcelRaceRecapExporter';
 import SwitchToggle from '@/ui/components/inputs/SwitchToggle.vue';
 import { useRace } from '@/ui/composables/useRace';
 import { useRaceRecap } from '@/ui/composables/useRaceRecap';

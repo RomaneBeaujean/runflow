@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
 
-import { Race } from '@/types/entities/Race';
+import { Race } from '@/domain/types/Race';
 import { Breadcrumb } from 'primevue';
 import type { MenuItem } from 'primevue/menuitem';
 

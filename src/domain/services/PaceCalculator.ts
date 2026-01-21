@@ -1,12 +1,12 @@
-import { chunkerizeSegments } from '@/domain/Segments';
-import { computeSegmentSlopeKm } from '@/domain/Slopes';
 import {
   kmhToPace,
   numberToPace,
   paceToKmh,
 } from '@/domain/helpers/Time.helper';
-import { GpxPoint } from '@/types/GpxPoint';
-import { Split } from '@/types/Split';
+import { chunkerizeSegments } from '@/domain/services/Segments';
+import { computeSegmentSlopeKm } from '@/domain/services/Slopes';
+import { GpxPoint } from '@/domain/types/GpxPoint';
+import { Split } from '@/domain/types/Split';
 import { GpxParse } from './GpxParse';
 
 export interface SplitWithDuration {

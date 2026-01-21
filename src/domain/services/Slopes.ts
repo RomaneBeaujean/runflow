@@ -1,8 +1,8 @@
-import { getDistance } from '@/domain/GpxMetrics';
 import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
-import { GpxPoint } from '@/types/GpxPoint';
-import { GpxSegment } from '@/types/GpxSegment';
-import { SlidingSlopePoint, SlopeSize, SlopeType } from '@/types/Slope';
+import { getDistance } from '@/domain/services/GpxMetrics';
+import { GpxPoint } from '@/domain/types/GpxPoint';
+import { GpxSegment } from '@/domain/types/GpxSegment';
+import { SlidingSlopePoint, SlopeSize, SlopeType } from '@/domain/types/Slope';
 
 export function computeSegmentSlope(segments: GpxPoint[][]): GpxSegment[] {
   return segments.map((seg) => {

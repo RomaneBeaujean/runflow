@@ -85,7 +85,7 @@ import {
   dateToFormattedTime,
   minutesToFormattedDuration,
 } from '@/domain/helpers/Time.helper';
-import { Race } from '@/types/entities/Race';
+import { Race } from '@/domain/types/Race';
 import InputTime from '@/ui/components/inputs/InputTime.vue';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
 import { useRace } from '@/ui/composables/useRace';

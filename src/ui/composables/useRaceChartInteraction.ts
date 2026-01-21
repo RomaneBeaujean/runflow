@@ -1,8 +1,8 @@
 import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
 import { numberToPace } from '@/domain/helpers/Time.helper';
-import { GpxPoint } from '@/types/GpxPoint';
-import { Position } from '@/types/Position';
-import { Separator } from '@/types/entities/Separator';
+import { GpxPoint } from '@/domain/types/GpxPoint';
+import { Position } from '@/domain/types/Position';
+import { Separator } from '@/domain/types/Separator';
 import { useEcharts } from '@/ui/composables/useEcharts';
 import { useRaceChartParams } from '@/ui/composables/useRaceChartParams';
 import { useRaceMetrics } from '@/ui/composables/useRaceMetrics';

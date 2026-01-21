@@ -2,7 +2,7 @@ import Lab from '@/ui/pages/lab/Lab.vue';
 import Races from '@/ui/pages/races/Races.vue';
 import Race from '@/ui/pages/races/race/Race.vue';
 import Trainings from '@/ui/pages/trainings/Trainings.vue';
-import Training from '@/ui/pages/trainings/training/Training.vue';
+import TrainingPlan from '@/ui/pages/trainings/training/TrainingPlan.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -28,7 +28,7 @@ const router = createRouter({
       name: 'trainings',
       component: Trainings,
     },
-    { path: '/trainings/:id', component: Training, props: true },
+    { path: '/trainings/:id', component: TrainingPlan, props: true },
   ],
 });
 

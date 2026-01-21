@@ -1,5 +1,5 @@
-import { Race } from '@/types/entities/Race';
-import { TrainingPlan } from '@/types/entities/TrainingPlan';
+import { Race } from '@/domain/types/Race';
+import { TrainingPlan } from '@/domain/types/TrainingPlan';
 import Dexie from 'dexie';
 
 class RunflowDB extends Dexie {

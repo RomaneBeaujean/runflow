@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { Separator } from '@/types/entities/Separator';
+import { Separator } from '@/domain/types/Separator';
 import { useRace } from '@/ui/composables/useRace';
 import useRaceChartInteraction from '@/ui/composables/useRaceChartInteraction';
 import { Button } from 'primevue';

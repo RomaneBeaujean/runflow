@@ -1,71 +1,204 @@
-import { TrainingPlan, TrainingWeek } from '@/types/entities/TrainingPlan';
-import { ref } from 'vue';
+import {
+  createSport,
+  createTrainingPlan,
+  createTrainingWeek,
+  createWeekTheme,
+} from '@/domain/factories/TrainingPlanFactory';
+import { Sport } from '@/domain/types/Sport';
+import {
+  TrainingDay,
+  TrainingPlan,
+  TrainingWeek,
+  WeekTheme,
+  Workout,
+} from '@/domain/types/TrainingPlan';
+import { computed, ref } from 'vue';
 import { useTrainingPlanWatchers } from './useTrainingPlanWatchers';
 
-const trainingPlanId = ref();
-const trainingWeeks = ref<TrainingWeek[]>([]);
-const trainingPlanName = ref<string>('');
-const activeDay = ref(null);
+const id = ref();
+const weeks = ref<TrainingWeek[]>([]);
+const weekThemes = ref<WeekTheme[]>([]);
+const sports = ref<Sport[]>([]);
+const workoutModels = ref<Workout[]>([]);
+const name = ref<string>('');
 
 export function useTrainingPlan() {
-  const init = (tp: TrainingPlan) => {
-    trainingPlanName.value = tp.name;
-    trainingWeeks.value = tp.training_weeks;
-    trainingPlanId.value = tp.id;
+  // Computed values
+  const totalWeeks = computed(() => weeks.value.length);
+  const totalWorkouts = computed(() =>
+    weeks.value.reduce(
+      (total, week) =>
+        total +
+        week.days.reduce((dayTotal, day) => dayTotal + day.workouts.length, 0),
+      0
+    )
+  );
 
-    if (trainingWeeks.value.length === 0) {
-      trainingWeeks.value.push(new TrainingWeek({ week_number: 1 }));
-    }
-
-    useTrainingPlanWatchers();
+  // Helper: Trouve et met à jour une semaine
+  const updateWeek = (
+    weekNumber: number,
+    updater: (week: TrainingWeek) => TrainingWeek
+  ): void => {
+    weeks.value = weeks.value.map((week) =>
+      week.weekNumber === weekNumber ? updater(week) : week
+    );
   };
 
-  const addNewWeek = () => {
-    const week_number = trainingWeeks.value.length + 1;
-    const newWeek = new TrainingWeek({ week_number });
-    trainingWeeks.value = [...trainingWeeks.value, newWeek];
-  };
-
+  // Helper: Trouve et met à jour un jour dans une semaine
   const updateDay = (
-    day_number: number,
-    week_number: number,
-    training: string
-  ) => {
-    trainingWeeks.value = trainingWeeks.value.map((week) => {
-      if (week.week_number === week_number) {
+    weekNumber: number,
+    dayNumber: number,
+    updater: (day: TrainingDay) => TrainingDay
+  ): void => {
+    updateWeek(weekNumber, (week) => ({
+      ...week,
+      days: week.days.map((day) =>
+        day.dayNumber === dayNumber ? updater(day) : day
+      ),
+    }));
+  };
+
+  // Helper: Met à jour tous les workouts correspondant à un ID
+  const updateWorkoutById = (
+    workoutId: string,
+    updater: (workout: Workout) => Workout
+  ): void => {
+    weeks.value = weeks.value.map((week) => ({
+      ...week,
+      days: week.days.map((day) => ({
+        ...day,
+        workouts: day.workouts.map((workout) =>
+          workout.id === workoutId ? updater(workout) : workout
+        ),
+      })),
+    }));
+  };
+
+  const init = (tp: TrainingPlan): void => {
+    try {
+      const trainingPlan = createTrainingPlan(tp);
+      id.value = trainingPlan.id;
+      name.value = trainingPlan.name;
+      weeks.value = trainingPlan.weeks;
+      weekThemes.value = trainingPlan.weekThemes;
+      sports.value = trainingPlan.sports;
+      workoutModels.value = trainingPlan.workoutModels;
+
+      useTrainingPlanWatchers();
+    } catch (error) {
+      console.error('Failed to initialize training plan:', error);
+      throw error;
+    }
+  };
+
+  const addNewWeek = (): void => {
+    const weekNumber = weeks.value.length + 1;
+    const newWeek = createTrainingWeek({ weekNumber });
+    weeks.value.push(newWeek);
+  };
+
+  const planifyWorkout = (wo: Workout, day: TrainingDay): void => {
+    updateDay(day.weekNumber, day.dayNumber, (currentDay) => ({
+      ...currentDay,
+      workouts: [...currentDay.workouts, wo],
+    }));
+  };
+
+  const updatePlannedWorkout = (day: TrainingDay, updated: Workout): void => {
+    updateDay(day.weekNumber, day.dayNumber, (currentDay) => ({
+      ...currentDay,
+      workouts: currentDay.workouts.map((workout) =>
+        workout.id === updated.id ? updated : workout
+      ),
+    }));
+  };
+
+  const updateWorkoutModel = (updated: Workout): void => {
+    // Met à jour dans les modèles
+    workoutModels.value = workoutModels.value.map((model) =>
+      model.id === updated.id ? updated : model
+    );
+
+    // Met à jour dans toutes les semaines
+    updateWorkoutById(updated.id, () => updated);
+  };
+
+  const updateWorkoutsOnDay = (wos: Workout[], day: TrainingDay): void => {
+    updateDay(day.weekNumber, day.dayNumber, (currentDay) => ({
+      ...currentDay,
+      workouts: wos,
+    }));
+  };
+
+  const removeWorkout = (wo: Workout, day: TrainingDay): void => {
+    updateDay(day.weekNumber, day.dayNumber, (currentDay) => ({
+      ...currentDay,
+      workouts: currentDay.workouts.filter((workout) => workout.id !== wo.id),
+    }));
+  };
+
+  const removeWorkoutModel = (toDelete: Workout): void => {
+    workoutModels.value = workoutModels.value.filter(
+      (wo) => wo.id !== toDelete.id
+    );
+  };
+
+  const addWorkoutModel = (wo: Workout): void => {
+    workoutModels.value.push(wo);
+  };
+
+  const addWeekTheme = (wt: Partial<WeekTheme>): void => {
+    const newWeekTheme = createWeekTheme(wt);
+    weekThemes.value.push(newWeekTheme);
+  };
+
+  const addSport = (newItem: Partial<Sport>): void => {
+    const newSport = createSport(newItem);
+    sports.value.push(newSport);
+  };
+
+  const deleteWeek = (weekNumber: number): void => {
+    weeks.value = weeks.value
+      .filter((week) => week.weekNumber !== weekNumber)
+      .map((week, index) => {
+        const newWeekNumber = index + 1;
         return {
           ...week,
-          training_days: week.training_days.map((day) => {
-            if (day.day_number === day_number) {
-              return { ...day, training };
-            }
-            return day;
-          }),
-        };
-      }
-      return week;
-    });
-  };
-
-  const deleteWeek = (weekNumber: number) => {
-    trainingWeeks.value = [...trainingWeeks.value]
-      .filter((el) => el.week_number !== weekNumber)
-      .map((el, index) => {
-        return {
-          ...el,
-          week_number: index + 1,
+          weekNumber: newWeekNumber,
+          days: week.days.map((day) => ({
+            ...day,
+            weekNumber: newWeekNumber,
+          })),
         };
       });
+  };
+
+  const updateWeekTheme = (weekNumber: number, weekTheme: WeekTheme): void => {
+    updateWeek(weekNumber, (week) => ({
+      ...week,
+      theme: weekTheme,
+    }));
   };
 
   return {
     init,
     addNewWeek,
     deleteWeek,
-    updateDay,
-    trainingWeeks,
-    activeDay,
-    trainingPlanId,
-    trainingPlanName,
+    addWeekTheme,
+    updateWeekTheme,
+    addSport,
+    planifyWorkout,
+    addWorkoutModel,
+    updateWorkoutsOnDay,
+    updateWorkoutModel,
+    removeWorkout,
+    updatePlannedWorkout,
+    removeWorkoutModel,
+    weeks,
+    id,
+    name,
+    weekThemes,
+    workoutModels,
+    sports,
   };
 }

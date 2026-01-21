@@ -1,5 +1,5 @@
+import { Race } from '@/domain/types/Race';
 import { db } from '@/infrastructure/dexie/DexieDatabase';
-import { Race } from '@/types/entities/Race';
 import { nanoid } from 'nanoid';
 import { reactive, toRaw } from 'vue';
 

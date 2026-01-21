@@ -1,11 +1,11 @@
-import { GpxParse, smoothPointsByDistance } from '@/domain/GpxParse';
 import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
-import { computeSlidingSlopeKm } from '@/domain/Slopes';
-import { Race } from '@/types/entities/Race';
-import { Separator } from '@/types/entities/Separator';
-import { GpxPoint } from '@/types/GpxPoint';
-import { SlidingSlopePoint } from '@/types/Slope';
-import { Split } from '@/types/Split';
+import { GpxParse, smoothPointsByDistance } from '@/domain/services/GpxParse';
+import { computeSlidingSlopeKm } from '@/domain/services/Slopes';
+import { GpxPoint } from '@/domain/types/GpxPoint';
+import { Race } from '@/domain/types/Race';
+import { Separator } from '@/domain/types/Separator';
+import { SlidingSlopePoint } from '@/domain/types/Slope';
+import { Split } from '@/domain/types/Split';
 import { ref } from 'vue';
 import { useRaceWatchers } from './useRaceWatchers';
 

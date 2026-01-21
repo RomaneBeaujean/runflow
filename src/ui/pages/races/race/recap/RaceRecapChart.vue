@@ -15,9 +15,9 @@ import {
   minutesToFormattedDuration,
   parseDate,
 } from '@/domain/helpers/Time.helper';
-import { getSlopeColors } from '@/domain/Slopes';
-import { Separator } from '@/types/entities/Separator';
-import { Split } from '@/types/Split';
+import { getSlopeColors } from '@/domain/services/Slopes';
+import { Separator } from '@/domain/types/Separator';
+import { Split } from '@/domain/types/Split';
 import { useRace } from '@/ui/composables/useRace';
 import { useRaceMetrics } from '@/ui/composables/useRaceMetrics';
 import { LineChart } from 'echarts/charts';
