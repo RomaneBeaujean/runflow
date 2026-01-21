@@ -1,12 +1,6 @@
 <template>
   <td :class="{ 'out-month': day == null }">
-    <div
-      :class="[
-        'day-cell',
-        isToday() ? 'today' : '',
-        isActive() ? 'active' : '',
-      ]"
-    >
+    <div :class="['day-cell', isToday() ? 'today' : '']">
       <div class="planned-trainings">
         <!-- Tags -->
       </div>
@@ -38,10 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { CalendarService } from '@/domain/Calendar.service';
-import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
+import { CalendarService } from '@/domain/services/Calendar.service';
 
-const { activeDay } = useTrainingPlan();
+// const { activeDay } = useTrainingPlan();
 
 const props = defineProps<{
   year: number;
@@ -64,7 +57,7 @@ const setActiveDay = () => {
 };
 
 const isActive = () => {
-  return props.day === activeDay.value;
+  // return props.day === activeDay.value;
 };
 
 const isTrainingActive = (id: string) => {

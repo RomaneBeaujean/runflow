@@ -1,8 +1,8 @@
-import { getTotalDuration } from '@/domain/GpxMetrics';
-import { GpxParse } from '@/domain/GpxParse';
-import { GpxPoint } from '@/types/GpxPoint';
-import { Split } from '@/types/Split';
-import { Separator } from '@/types/entities/Separator';
+import { getTotalDuration } from '@/domain/services/GpxMetrics';
+import { GpxParse } from '@/domain/services/GpxParse';
+import { GpxPoint } from '@/domain/types/GpxPoint';
+import { Separator } from '@/domain/types/Separator';
+import { Split } from '@/domain/types/Split';
 
 export class Race {
   id: string;

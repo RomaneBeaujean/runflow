@@ -49,9 +49,9 @@
 </template>
 
 <script setup lang="ts">
-import { recomputeSplits } from '@/domain/Splits';
-import { Separator } from '@/types/entities/Separator';
-import { Split } from '@/types/Split';
+import { recomputeSplits } from '@/domain/services/Splits';
+import { Separator } from '@/domain/types/Separator';
+import { Split } from '@/domain/types/Split';
 import { useRace } from '@/ui/composables/useRace';
 import { useViewport } from '@/ui/composables/useViewport';
 import PaceSimulator from '@/ui/pages/races/race/PaceSimulator.vue';

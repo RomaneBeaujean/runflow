@@ -1,4 +1,4 @@
-import { Split } from '@/types/Split';
+import { Split } from '@/domain/types/Split';
 
 export function computeSplits(separators: number[]): Partial<Split>[] {
   return separators

@@ -62,13 +62,13 @@
 </template>
 
 <script setup lang="ts">
-import { getAveragePace } from '@/domain/GpxMetrics';
 import {
   dateToFormatted,
   dateToFormattedTime,
   minutesToFormattedDuration,
 } from '@/domain/helpers/Time.helper';
-import { Race } from '@/types/entities/Race';
+import { getAveragePace } from '@/domain/services/GpxMetrics';
+import { Race } from '@/domain/types/Race';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
 import { useStores } from '@/ui/composables/useStores';
 import { Button, Card } from 'primevue';

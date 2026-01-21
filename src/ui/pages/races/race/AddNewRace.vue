@@ -115,10 +115,10 @@
 </template>
 
 <script setup lang="ts">
-import { GpxParse } from '@/domain/GpxParse';
 import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
-import { Separator } from '@/types/entities/Separator';
-import { Split } from '@/types/Split';
+import { GpxParse } from '@/domain/services/GpxParse';
+import { Separator } from '@/domain/types/Separator';
+import { Split } from '@/domain/types/Split';
 import GpxDropzone from '@/ui/components/inputs/GpxDropzone.vue';
 import InputTime from '@/ui/components/inputs/InputTime.vue';
 import { useStores } from '@/ui/composables/useStores';

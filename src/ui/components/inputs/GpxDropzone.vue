@@ -1,16 +1,6 @@
 <template>
-  <FileUpload
-    name="gpx[]"
-    accept=".gpx"
-    ref="fileUploadRef"
-    :multiple="false"
-    :customUpload="true"
-    @select="onSelect"
-    @upload="onUpload"
-    @clear="onClear"
-    @remove="onRemove"
-    class="w-full"
-  >
+  <FileUpload name="gpx[]" accept=".gpx" ref="fileUploadRef" :multiple="false" :customUpload="true" @select="onSelect"
+    @upload="onUpload" @clear="onClear" @remove="onRemove" class="w-full">
     <template #header="{ files, chooseCallback }">
       <template v-if="files?.length == 0">
         <div
@@ -18,41 +8,30 @@
           :class="{
             'border-primary bg-primary-50': dragActive,
             'border-surface-300 bg-surface-50 dark:bg-surface-900': !dragActive,
-          }"
-          @click="chooseCallback()"
-          @dragover.prevent="dragActive = true"
-          @dragleave.prevent="dragActive = false"
-          @drop.prevent="handleDrop"
-        >
+          }" @click="chooseCallback()" @dragover.prevent="dragActive = true" @dragleave.prevent="dragActive = false"
+          @drop.prevent="handleDrop">
           <i class="pi pi-upload text-4xl text-surface-400"></i>
           <p class="m-0 font-medium text-center">
             Déposez votre fichier GPX ici
           </p>
           <p class="text-sm text-surface-500 -mt-2">ou</p>
 
-          <Button
-            label="Choisir un fichier"
-            icon="pi pi-file-import"
-            @click.stop="chooseCallback()"
-          />
+          <Button label="Choisir un fichier" icon="pi pi-file-import" @click.stop="chooseCallback()" />
         </div>
       </template>
       <template v-else>
-        <div
-          class="flex flex-col items-center justify-center gap-3 w-full h-full"
-        >
+        <div class="flex flex-col items-center justify-center gap-3 w-full h-full">
           <div class="text-sm mb-2 font-medium">Fichier sélectionné :</div>
           <ColorTag color="neutral">
-            <div class="max-w-[250px] min-w-0 truncate">
-              {{ files[0].name }}
+            <div>
+              <div class="max-w-[250px] min-w-0 truncate">
+                {{ files[0].name }}
+              </div>
+              <button type="button" class="m-1 text-grey-600 hover:text-grey-900 font-bold cursor-pointer"
+                @click="removeFile(files[0], $event)">
+                ×
+              </button>
             </div>
-            <button
-              type="button"
-              class="m-1 text-grey-600 hover:text-grey-900 font-bold cursor-pointer"
-              @click="removeFile(files[0], $event)"
-            >
-              ×
-            </button>
           </ColorTag>
         </div>
       </template>

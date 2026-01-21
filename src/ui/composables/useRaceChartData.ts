@@ -4,15 +4,18 @@ import {
   numberToPace,
   paceToNumber,
 } from '@/domain/helpers/Time.helper';
-import { getMarkLineColorStops, getPaceColor } from '@/domain/PaceColors';
-import { chunkerizeSegments } from '@/domain/Segments';
+import {
+  getMarkLineColorStops,
+  getPaceColor,
+} from '@/domain/services/PaceColors';
+import { chunkerizeSegments } from '@/domain/services/Segments';
 import {
   computeSegmentSlopeKm,
   getAreaSlopeColors,
   getSlopeColors,
-} from '@/domain/Slopes';
-import { GpxSegment } from '@/types/GpxSegment';
-import { Split } from '@/types/Split';
+} from '@/domain/services/Slopes';
+import { GpxSegment } from '@/domain/types/GpxSegment';
+import { Split } from '@/domain/types/Split';
 import { useEcharts } from '@/ui/composables/useEcharts';
 import { useRace } from '@/ui/composables/useRace';
 import useRaceChartInteraction from '@/ui/composables/useRaceChartInteraction';

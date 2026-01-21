@@ -8,13 +8,16 @@
 </template>
 
 <script setup lang="ts">
-import { getAveragePace } from '@/domain/GpxMetrics';
-import { getMarkLineColorStops, getPaceColor } from '@/domain/PaceColors';
-import { getSlopeColors } from '@/domain/Slopes';
 import { numberToPace, paceToNumber } from '@/domain/helpers/Time.helper';
-import { GpxPoint } from '@/types/GpxPoint';
-import { SlidingSlopePoint } from '@/types/Slope';
-import { Split } from '@/types/Split';
+import { getAveragePace } from '@/domain/services/GpxMetrics';
+import {
+  getMarkLineColorStops,
+  getPaceColor,
+} from '@/domain/services/PaceColors';
+import { getSlopeColors } from '@/domain/services/Slopes';
+import { GpxPoint } from '@/domain/types/GpxPoint';
+import { SlidingSlopePoint } from '@/domain/types/Slope';
+import { Split } from '@/domain/types/Split';
 import { useViewport } from '@/ui/composables/useViewport';
 import { LineChart } from 'echarts/charts';
 import {

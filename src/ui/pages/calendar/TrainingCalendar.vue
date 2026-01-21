@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { CalendarService } from '@/domain/Calendar.service';
+import { CalendarService } from '@/domain/services/Calendar.service';
 import { ref } from 'vue';
 import CalendarCell from './CalendarCell.vue';
 

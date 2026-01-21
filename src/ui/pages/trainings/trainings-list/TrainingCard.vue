@@ -19,7 +19,7 @@
             size="small"
             icon="pi pi-trash"
             aria-label="Delete"
-            @click.capture="(e) => deleteTrainingPlan(e, trainingPlan.id)"
+            @click.capture.stop="deleteTrainingPlan(trainingPlan.id)"
           />
         </div>
       </div>
@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { TrainingPlan } from '@/types/entities/TrainingPlan';
+import { TrainingPlan } from '@/domain/types/TrainingPlan';
 import { useStores } from '@/ui/composables/useStores';
 import { Button, Card } from 'primevue';
 import { useRouter } from 'vue-router';
@@ -42,8 +42,7 @@ function nevigateToTrainingPlan(id: string) {
   router.push(`/trainings/${id}`);
 }
 
-function deleteTrainingPlan(e: MouseEvent, id: string) {
-  e.stopPropagation();
+function deleteTrainingPlan(id: string) {
   deleteById(id);
 }
 </script>

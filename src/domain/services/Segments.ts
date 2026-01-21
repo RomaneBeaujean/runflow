@@ -1,4 +1,4 @@
-import { GpxPoint } from '@/types/GpxPoint';
+import { GpxPoint } from '@/domain/types/GpxPoint';
 
 export function chunkerizeSegments(
   points: GpxPoint[],

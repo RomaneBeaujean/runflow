@@ -1,4 +1,4 @@
-import { Repository } from '@/types/Repository';
+import { Repository } from '@/domain/types/Repository';
 import Dexie from 'dexie';
 import { reactive } from 'vue';
 

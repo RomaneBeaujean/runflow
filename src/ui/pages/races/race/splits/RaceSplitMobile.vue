@@ -243,7 +243,7 @@ import {
   dateToFormattedTime,
   minutesToFormattedDuration,
 } from '@/domain/helpers/Time.helper';
-import { SplitItem } from '@/types/SplitItem';
+import { SplitItem } from '@/domain/types/SplitItem';
 import InputDistance from '@/ui/components/inputs/InputDistance.vue';
 import InputPaceDuration from '@/ui/components/inputs/InputPaceDuration.vue';
 import InputRefuelStopDuration from '@/ui/components/inputs/InputRefuelStopDuration.vue';

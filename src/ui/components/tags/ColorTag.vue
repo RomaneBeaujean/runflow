@@ -1,15 +1,24 @@
 <template>
-  <Tag :icon="icon || null" :value="label" :style="tagStyle">
-    <slot></slot>
-  </Tag>
+  <div class="tag inline-flex min-w-0 max-w-full items-center gap-2 truncate" :style="tagStyle">
+    <div class="left flex-0 flex items-center flex-shrink-0 empty:hidden">
+      <i :class="icon" v-if="icon" />
+      <slot name="left"></slot>
+    </div>
+    <div class="middle flex-1 min-w-0">
+      {{ label }}
+      <slot></slot>
+    </div>
+    <div class="right flex-0 flex-shrink-0 flex items-center empty:hidden">
+      <slot name="right"></slot>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import Tag from 'primevue/tag';
 import { computed } from 'vue';
 
 export type TagColor =
-  | 'primary'
+  'primary'
   | 'neutral'
   | 'red'
   | 'pink'
@@ -231,4 +240,11 @@ const tagStyle = computed(() => {
 });
 </script>
 
-<style></style>
+<style scoped lang="scss">
+.tag {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+</style>

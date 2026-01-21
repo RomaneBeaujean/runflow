@@ -1,4 +1,3 @@
-import { getAveragePace } from '@/domain/GpxMetrics';
 import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
 import {
   dateToFormattedTime,
@@ -8,9 +7,10 @@ import {
   paceToNumber,
   parseDate,
 } from '@/domain/helpers/Time.helper';
-import { Separator } from '@/types/entities/Separator';
-import { GpxPoint } from '@/types/GpxPoint';
-import { Split } from '@/types/Split';
+import { getAveragePace } from '@/domain/services/GpxMetrics';
+import { GpxPoint } from '@/domain/types/GpxPoint';
+import { Separator } from '@/domain/types/Separator';
+import { Split } from '@/domain/types/Split';
 import { useRace } from '@/ui/composables/useRace';
 import { computed } from 'vue';
 

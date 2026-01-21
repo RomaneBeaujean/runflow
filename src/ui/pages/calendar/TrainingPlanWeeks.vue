@@ -1,8 +1,7 @@
-<template>
+<!-- <template>
   <div class="mx-auto">
     <div class="overflow-x-auto">
       <div class="min-w-max">
-        <!-- En-tête des jours -->
         <div class="grid grid-cols-8 gap-2 mb-2">
           <div class="font-semibold text-gray-700 text-center py-3"></div>
           <div
@@ -15,9 +14,8 @@
           <div></div>
         </div>
 
-        <!-- Lignes des semaines -->
         <div
-          v-for="week in trainingWeeks"
+          v-for="week in weeks"
           :key="week.id"
           class="grid grid-cols-8 gap-2 mb-2 group"
         >
@@ -25,11 +23,11 @@
             class="flex items-center justify-center font-medium text-gray-700"
           >
             <div class="relative h-[24px]">
-              Semaine {{ week.week_number }}
+              Semaine {{ week.weekNumber }}
 
               <div
                 class="absolute left-[100%] top-0"
-                v-if="week.week_number > 1"
+                v-if="week.weekNumber > 1"
               >
                 <Button
                   icon="pi pi-trash"
@@ -37,23 +35,22 @@
                   rounded
                   severity="danger"
                   size="small"
-                  @click="deleteWeek(week.week_number)"
+                  @click="deleteWeek(week.weekNumber)"
                 />
               </div>
             </div>
           </div>
 
           <div
-            v-for="day in week.training_days"
-            :key="day.day_number"
+            v-for="day in week.days"
+            :key="day.dayOfWeek"
             class="min-h-24 cursor-pointer rounded-sm"
           >
             <Textarea
               class="w-full h-full text-center resize-none border-0 focus:ring-0"
               v-model="day.training"
               @input="
-                (e) =>
-                  updateDay(day.day_number, week.week_number, e.target.value)
+                (e) => updateDay(day.dayOfWeek, week.weekNumber, e.target.value)
               "
             >
             </Textarea>
@@ -73,7 +70,6 @@
 
 <script setup>
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
-import { Button, Textarea } from 'primevue';
 
 const daysOfWeek = [
   'Lundi',
@@ -85,7 +81,7 @@ const daysOfWeek = [
   'Dimanche',
 ];
 
-const { trainingWeeks, updateDay, addNewWeek, deleteWeek } = useTrainingPlan();
+const { weeks, updateDay, addNewWeek, deleteWeek } = useTrainingPlan();
 </script>
 
 <style scoped>
@@ -101,4 +97,4 @@ const { trainingWeeks, updateDay, addNewWeek, deleteWeek } = useTrainingPlan();
   align-items: center;
   justify-content: center;
 }
-</style>
+</style> -->

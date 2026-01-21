@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { SplitItem } from '@/types/SplitItem';
+import { SplitItem } from '@/domain/types/SplitItem';
 import { useRaceChartParams } from '@/ui/composables/useRaceChartParams';
 import useRaceChartSplitHover from '@/ui/composables/useRaceChartSplitHover';
 import useRaceSplits from '@/ui/composables/useRaceSplits';
