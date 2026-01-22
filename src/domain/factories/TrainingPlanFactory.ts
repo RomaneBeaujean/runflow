@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { DEFAULT_SPORTS } from '../constants/sports';
 import { DEFAULT_WEEK_THEMES } from '../constants/weekThemes';
 import { Sport } from '../types/Sport';
@@ -5,13 +6,13 @@ import {
   TrainingDay,
   TrainingPlan,
   TrainingWeek,
-  WeekTheme,
 } from '../types/TrainingPlan';
+import { WeekTheme } from '../types/WeekTheme';
 import { createWorkout } from './WorkoutFactory';
 
 export function createTrainingPlan(data?: Partial<TrainingPlan>): TrainingPlan {
   const plan: TrainingPlan = {
-    id: data?.id ?? null,
+    id: data?.id ?? nanoid(),
     name: data?.name ?? null,
     createdAt: data?.createdAt ?? new Date().toISOString(),
     startDate: data?.startDate ?? null,
@@ -53,15 +54,35 @@ export function createTrainingDay(data?: Partial<TrainingDay>): TrainingDay {
 }
 
 export function createWeekThemes(data?: WeekTheme[]): WeekTheme[] {
-  return [...new Set([...(data || []), ...DEFAULT_WEEK_THEMES])];
+   const combined = [...(data || []), ...DEFAULT_WEEK_THEMES];
+  const seen = new Map<string | null, WeekTheme>();
+  
+  combined.forEach(weekTheme => {
+    const key = weekTheme.id ?? weekTheme.label; // Utiliser id ou label comme clé unique
+    if (!seen.has(key)) {
+      seen.set(key, weekTheme);
+    }
+  });
+
+   return Array.from(seen.values());
 }
 
 export function createSports(data?: Sport[]): Sport[] {
-  return [...new Set([...(data || []), ...DEFAULT_SPORTS])];
+  const combined = [...(data || []), ...DEFAULT_SPORTS];
+  const seen = new Map<string | null, Sport>();
+  
+  combined.forEach(sport => {
+    const key = sport.id ?? sport.label; // Utiliser id ou label comme clé unique
+    if (!seen.has(key)) {
+      seen.set(key, sport);
+    }
+  });
+  
+  return Array.from(seen.values());
 }
-
 export function createWeekTheme(data?: Partial<WeekTheme>): WeekTheme {
   return {
+    id: data.id ?? nanoid(),
     label: data.label ?? '',
     color: data.color ?? null,
   };
@@ -69,6 +90,7 @@ export function createWeekTheme(data?: Partial<WeekTheme>): WeekTheme {
 
 export function createSport(data?: Partial<Sport>): Sport {
   return {
+    id: data.id ?? nanoid(),
     label: data.label ?? '',
     color: data.color ?? null,
     icon: data.icon ?? '',

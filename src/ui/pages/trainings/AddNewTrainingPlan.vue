@@ -1,65 +1,56 @@
 <template>
   <div>
-    <Button
-      label="Ajouter un plan d'entrainement"
-      icon="pi pi-plus"
-      rounded
-      @click="dialogOpened = true"
-    />
+    <Button label="Ajouter un plan d'entrainement" icon="pi pi-plus" rounded @click="dialogOpened = true" />
 
-    <Dialog v-model:visible="dialogOpened" modal>
+    <Dialog v-model:visible="dialogOpened" modal :style="{ width: '30vw' }"
+      :breakpoints="{ '1199px': '50vw', '575px': '90vw' }">
       <template #header>
         <span class="font-bold">Ajouter un plan d'entrainement</span>
       </template>
-      <div class="md:w-[700px] w-[85vw]">
-        <InputText
-          v-model="trainingPlanName"
-          placeholder="Nom du plan d'entrainement"
-        />
+      <div class="flex flex-col gap-2">
+        <FloatLabel variant="in">
+          <InputText id="name" v-model="trainingPlanName" :invalid="isNameExist" />
+          <label for="name">Nom du plan d'entrainement</label>
+        </FloatLabel>
+        <Message v-if="isNameExist" severity="error" variant="simple">
+          Ce nom de plan d'entrainement existe déjà. Veuillez en choisir un autre.
+        </Message>
       </div>
       <template #footer>
         <Button label="Fermer" text severity="secondary" @click="close" />
-        <Button
-          label="Créer le plan d'entrainement"
-          :disabled="!trainingPlanName"
-          @click="createTrainingPlan"
-        />
+        <Button label="Créer" :disabled="isButtonDisabled" @click="handleCreateTrainingPlan" />
       </template>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useStores } from '@/ui/composables/useStores';
-import { Button, Dialog, InputText } from 'primevue';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useTrainingPlans } from '@/ui/composables/useTrainingPlans';
+import { Button, Dialog, FloatLabel, InputText, Message } from 'primevue';
+import { computed, ref } from 'vue';
 
 const dialogOpened = ref<boolean>(false);
-const stores = useStores();
-const router = useRouter();
 const trainingPlanName = ref<string | null>(null);
 const startDate = ref<Date | null>(null);
+const { isTrainingPlanNameExist, navigateToTrainingPlan, createTrainingPlan } = useTrainingPlans();
 
-function close() {
+const isNameExist = computed(() => {
+  return isTrainingPlanNameExist(trainingPlanName.value)
+});
+
+const isButtonDisabled = computed(() => {
+  return isNameExist.value || !trainingPlanName.value
+})
+
+const close = () => {
   dialogOpened.value = false;
   trainingPlanName.value = null;
   startDate.value = null;
 }
 
-async function createTrainingPlan() {
-  if (!trainingPlanName.value) return;
-
-  const id = await stores.training_plans_store.create({
-    name: trainingPlanName.value,
-    startDate: startDate.value,
-  });
-
+const handleCreateTrainingPlan = async () => {
+  const id = await createTrainingPlan(trainingPlanName.value);
   navigateToTrainingPlan(id);
-}
-
-function navigateToTrainingPlan(id: string) {
-  router.push(`/trainings/${id}`);
 }
 </script>
 

@@ -14,7 +14,7 @@ import { Split } from '@/domain/types/Split';
 import { useRace } from '@/ui/composables/useRace';
 import { computed } from 'vue';
 
-const { points, separators, splits, totalDistance, race, slidingSlopesPoints } =
+const { points, separators, splits, race, slidingSlopesPoints } =
   useRace();
 
 export function useRaceMetrics() {

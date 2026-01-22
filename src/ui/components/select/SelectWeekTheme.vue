@@ -1,22 +1,14 @@
 <template>
   <div class="w-[300px]">
-    <Select
-      v-model="selectedTheme"
-      :options="options"
-      optionLabel="label"
-      placeholder="Sélectionner ou créer un thème"
-      class="w-full"
-    >
+    <Select v-model="selectedTheme" :options="options" optionLabel="label"
+      placeholder="Sélectionner le thème de la semaine" class="w-full">
       <!-- Valeur sélectionnée -->
       <template #value="slotProps">
         <div v-if="slotProps.value" class="flex items-center">
-          <span
-            class="color-dot"
-            :style="{
-              backgroundColor: slotProps.value.color,
-              marginRight: '8px',
-            }"
-          />
+          <span class="color-dot" :style="{
+            backgroundColor: slotProps.value.color,
+            marginRight: '8px',
+          }" />
           <div>{{ slotProps.value.label }}</div>
         </div>
         <div v-else>
@@ -35,7 +27,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { TrainingWeek, WeekTheme } from '@/domain/types/TrainingPlan';
+import { TrainingWeek } from '@/domain/types/TrainingPlan';
+import { WeekTheme } from '@/domain/types/WeekTheme';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
 import Select from 'primevue/select';
 import { computed, ref, watch } from 'vue';

@@ -1,11 +1,6 @@
 <template>
-  <InputMask
-    v-model="currentDurationFormatted"
-    mask="99h99"
-    placeholder="hh:mm"
-    style="max-width: 100px"
-    size="small"
-  />
+  <InputMask v-model="currentDurationFormatted" mask="99h99" placeholder="hh:mm" style="max-width: 100px"
+    size="small" />
 </template>
 
 <script setup lang="ts">
@@ -16,19 +11,17 @@ import {
 import { InputMask } from 'primevue';
 import { ref, watch } from 'vue';
 
-const emit = defineEmits(['update']);
+const emit = defineEmits(['update:duration']);
 
-const props = defineProps<{ duration: number }>();
+const props = defineProps<{ duration: number | null }>();
 
-const currentDurationMinutes = ref<number>(props.duration);
+const currentDurationMinutes = ref<number>(props.duration ?? null);
 const currentDurationFormatted = ref<string>(
-  minutesToFormattedDuration(currentDurationMinutes.value)
+  props.duration ? minutesToFormattedDuration(currentDurationMinutes.value) : null
 );
 
 watch(currentDurationMinutes, () => {
-  emit('update', {
-    duration: currentDurationMinutes.value,
-  });
+  emit('update:duration', currentDurationMinutes.value);
 });
 
 watch(

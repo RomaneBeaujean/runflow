@@ -1,32 +1,17 @@
 <template>
-  <Select
-    v-model="inputValue"
-    :options="filteredOptions"
-    :inputId="inputId"
-    optionLabel="label"
-    :showClear="showClear"
-    :placeholder="placeholder"
-    :editable="autocomplete"
-    :size="size"
-    class="w-full"
-    ref="selectRef"
-    @change="handleChange"
-    @hide="handleHide"
-  >
+  <Select v-model="inputValue" :options="filteredOptions" :inputId="inputId" optionLabel="label" :showClear="showClear"
+    :placeholder="placeholder" :editable="autocomplete" :size="size" class="w-full" ref="selectRef"
+    @change="handleChange" @hide="handleHide">
     <!-- Valeur sélectionnée -->
     <template #value="slotProps">
       <div v-if="slotProps.value" class="flex items-center gap-3">
-        <span
-          v-if="slotProps.value.color"
-          class="color-dot"
-          :style="{
-            backgroundColor: slotProps.value.color,
-          }"
-        />
+        <span v-if="slotProps.value.color" class="color-dot" :style="{
+          backgroundColor: slotProps.value.color,
+        }" />
         <i v-if="slotProps.value.icon" :class="slotProps.value.icon" />
         <div>{{ slotProps.value.label }}</div>
       </div>
-      <div v-else class="min-h-[23px]">
+      <div v-else class="min-h-[21px]">
         {{ placeholder }}
       </div>
     </template>
@@ -34,11 +19,7 @@
     <!-- Options -->
     <template #option="{ option }">
       <div class="flex items-center gap-3">
-        <span
-          v-if="option.color"
-          class="w-[12px] h-[12px] rounded-[50%]"
-          :style="{ backgroundColor: option.color }"
-        />
+        <span v-if="option.color" class="w-[12px] h-[12px] rounded-[50%]" :style="{ backgroundColor: option.color }" />
         <i v-if="option.icon" :class="option.icon" />
         <span>{{ option.label }}</span>
       </div>

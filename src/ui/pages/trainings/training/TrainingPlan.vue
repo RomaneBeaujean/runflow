@@ -1,14 +1,32 @@
 <template>
   <div v-if="id" id="training" class="p-5 flex flex-col w-full h-full">
-    <div id="breadcrumb">
-      <Breadcrumb :model="items" class="text-sm"></Breadcrumb>
+    <div id="header" class="flex justify-between items-center">
+      <Breadcrumb :model="breadcrumbItems" class="text-sm"></Breadcrumb>
+      <div id="menu">
+        <div v-if="!editing" class="flex flex-row flex-0">
+          <TrainingPlanEllipsisMenu :trainingPlanId="id" :edit="startEditing" />
+        </div>
+        <div v-if="editing" class="flex gap-1">
+          <Button icon="pi pi-check" rounded @click="saveEdit" :disabled="isButtonDisabled" />
+          <Button icon="pi pi-times" rounded @click="cancelEdit" />
+        </div>
+      </div>
     </div>
     <div id="card" class="flex-1 min-h-0">
       <Card class="training-card w-full h-full relative">
         <template #title>
           <div class="flex justify-between items-center">
-            <div>
+            <div v-if="!editing">
               {{ name }}
+            </div>
+            <div v-else>
+              <FloatLabel variant="in">
+                <InputText id="name" v-model="editableName" :invalid="isNameExist" />
+                <label for="name">Nom du plan d'entrainement</label>
+              </FloatLabel>
+              <Message v-if="isNameExist" severity="error" variant="simple">
+                Ce nom de plan d'entrainement existe déjà. Veuillez en choisir un autre.
+              </Message>
             </div>
             <div>
               <Button :text="!showWorkoutModels" icon="fa-solid fa-book-bookmark" label="Bibliothèque de séances"
@@ -42,19 +60,37 @@
 import { useStores } from '@/ui/composables/useStores';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
 import { useTrainingPlanParams } from '@/ui/composables/useTrainingPlanParams';
-import { Breadcrumb, Button, Card } from 'primevue';
-import type { MenuItem } from 'primevue/menuitem';
-import { onMounted, ref, watch } from 'vue';
+import { useTrainingPlans } from '@/ui/composables/useTrainingPlans';
+import { Breadcrumb, Button, Card, InputText } from 'primevue';
+import { computed, onMounted, ref, watch } from 'vue';
 import AddWorkout from './AddWorkout.vue';
+import TrainingPlanEllipsisMenu from './TrainingPlanEllipsisMenu.vue';
 import TrainingPlanWeek from './TrainingPlanWeek.vue';
 import WorkoutDetails from './WorkoutDetails.vue';
 import WorkoutModels from './WorkoutModels.vue';
 
+const editing = ref(false);
+const editableName = ref('');
 const props = defineProps<{ id: string }>();
 const stores = useStores();
-const items = ref<MenuItem[]>([]);
 const { showWorkoutModels, handleShowWorkoutModels, handleCloseWorkoutModels } = useTrainingPlanParams();
-const { init, addNewWeek, name, weeks } = useTrainingPlan();
+const { init, addNewWeek, updateName, id, name, weeks } = useTrainingPlan();
+const { isTrainingPlanNameExist } = useTrainingPlans();
+
+const isNameExist = computed(() => {
+  return isTrainingPlanNameExist(editableName.value)
+});
+
+const isButtonDisabled = computed(() => {
+  return isNameExist.value || !editableName.value
+})
+
+const breadcrumbItems = computed(() => {
+  return [
+    { label: "Plans d'entrainement", url: '/trainings' },
+    { label: name.value, disabled: true },
+  ];
+})
 
 const initComposables = async () => {
   if (!props.id) return;
@@ -71,13 +107,26 @@ const handleShowModels = () => {
   }
 }
 
+const startEditing = () => {
+  if (!id.value) return;
+  editing.value = true;
+  editableName.value = name.value;
+};
+
+
+const cancelEdit = () => {
+  editing.value = false;
+  editableName.value = name.value;
+};
+
+const saveEdit = async () => {
+  if (!id.value) return;
+  updateName(editableName.value);
+  editing.value = false;
+};
+
 onMounted(() => {
   initComposables();
-  if (!props.id) return;
-  items.value = [
-    { label: "Plans d'entrainement", url: '/trainings' },
-    { label: name.value, disabled: true },
-  ];
 });
 
 watch(

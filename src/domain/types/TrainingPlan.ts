@@ -1,4 +1,5 @@
 import { Sport } from './Sport';
+import { WeekTheme } from './WeekTheme';
 
 export interface TrainingPlan {
   id: string | null;
@@ -15,11 +16,6 @@ export interface TrainingWeek {
   weekNumber: number;
   theme: WeekTheme | null;
   days: TrainingDay[];
-}
-
-export interface WeekTheme {
-  label: string;
-  color: string;
 }
 
 export interface TrainingDay {

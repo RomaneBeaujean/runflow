@@ -4,9 +4,9 @@
     <template #header v-if="showAddWorkout">
       <div class="font-bold text-xl">Ajouter une séance</div>
       <div class="font-regular text-md mt-2 flex gap-2">
-        <ColorTag :label="'Semaine ' + showAddWorkoutDay.weekNumber" />
-        <ColorTag :label="'J' + getRealDayNumber(showAddWorkoutDay)" />
-        <ColorTag :label="getWeekDayLabel(showAddWorkoutDay)" />
+        <ColorTag color="primary"
+          :label="'Semaine ' + showAddWorkoutDay.weekNumber + ' · ' + getWeekDayLabel(showAddWorkoutDay)" />
+        <ColorTag color="orange" :label="'J' + getRealDayNumber(showAddWorkoutDay)" />
       </div>
 
     </template>
@@ -68,7 +68,6 @@ const workout = ref<Workout>({
   distance: null,
 });
 const saveModelOnLibrary = ref<boolean>(true);
-
 /**
  * Computed
  */
@@ -146,6 +145,7 @@ watch(
 
     const model = workoutFromModelId.value;
     if (!model) return;
+
 
     const isSame =
       newWorkout.title === model.title &&

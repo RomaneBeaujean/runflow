@@ -1,6 +1,7 @@
 <template>
   <FloatLabel class="w-full" variant="in">
-    <Select :items="sportsOptions" v-model:selected="selectedItem" inputId="sport" :disabled="readonly" />
+    <Select :items="sportsOptions" v-model:selected="selectedItem" inputId="sport" :disabled="readonly"
+      :showClear="showClear" />
     <label for="sport">Sport pratiqué</label>
   </FloatLabel>
 </template>
@@ -15,6 +16,7 @@ import Select, { Item } from './Select.vue';
 const { sports } = useTrainingPlan();
 const props = defineProps<{
   selectedSport: Sport | null;
+  showClear?: boolean;
   readonly?: boolean;
 }>();
 const emit = defineEmits(['update:selectedSport']);

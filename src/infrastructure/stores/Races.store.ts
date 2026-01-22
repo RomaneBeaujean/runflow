@@ -12,7 +12,8 @@ export class RacesStore {
 
   init = async () => {
     const rawRaces = await db.races.toArray();
-    this.state = rawRaces.map((r) => new Race(r));
+    const races = rawRaces.map((r) => new Race(r));
+    this.state.splice(0, this.state.length, ...races);
   };
 
   getById = (id: string | null): Race | null => {

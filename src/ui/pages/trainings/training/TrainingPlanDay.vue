@@ -25,23 +25,24 @@
           <div @click.stop="handleShowWorkoutDetails(trainingDay, workout)"
             class="cursor-pointer active:cursor-grabbing group">
 
-            <ColorTag :color="createSportTagColor(workout.sport?.color)" class="drag-handle">
+            <CardTag :color="workout.sport?.color" class="drag-handle">
               <template #left v-if="workout.sport?.icon">
-                <div class="relative pl-1">
-                  <i
-                    class="cursor-grab absolute left-[-50%] top-[20%] fa-solid fa-grip-vertical text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity active:cursor-grabbing mr-2" />
-                  <i :class="workout.sport?.icon" />
-                </div>
+                <Icon :icon="workout.sport?.icon" class="group-hover:opacity-0" />
+                <Icon icon="fa-solid fa-grip-vertical"
+                  class="cursor-grab absolute  text-gray-500 opacity-0 group-hover:opacity-100" />
               </template>
               <div class="min-w-0 truncate">
-                {{ workout.title }}
+                <span>{{ workout.title }}</span>
+              </div>
+              <div v-if="workout.distance || workout.duration" class="min-w-0 truncate text-gray-400 text-xs">
+                <span v-if="workout.distance">{{ workout.distance }} km</span>
+                <span v-if="workout.distance && workout.duration"> - </span>
+                <span v-if="workout.duration">{{ minutesToFormattedDuration(workout.duration) }}</span>
               </div>
               <template #right>
-                <div class="inline-flex items-center justify-center h-[20px] w-[20px]">
-                  <i class="pi pi-times" @click.stop="removeWorkout(workout)" />
-                </div>
+                <Icon icon="pi pi-trash" action size="xsmall" @click.stop="removeWorkout(workout, trainingDay)" />
               </template>
-            </ColorTag>
+            </CardTag>
           </div>
         </template>
       </draggable>
@@ -50,18 +51,21 @@
 </template>
 
 <script setup lang="ts">
-import { createSportTagColor } from '@/domain/factories/WorkoutFactory';
+import { minutesToFormattedDuration } from '@/domain/helpers/Time.helper';
 import { TrainingDay, Workout } from '@/domain/types/TrainingPlan';
-import ColorTag from '@/ui/components/tags/ColorTag.vue';
+import Icon from '@/ui/components/Icon.vue';
+import CardTag from '@/ui/components/tags/CardTag.vue';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
 import { useTrainingPlanParams } from '@/ui/composables/useTrainingPlanParams';
 import { ref, watch } from 'vue';
 import draggable from 'vuedraggable';
 
+
+
 const { handleShowAddWorkout, showAddWorkoutDay, isDragging, handleShowWorkoutDetails, getRealDayNumber, getWeekDayLabel } =
   useTrainingPlanParams();
 
-const { updateWorkoutsOnDay } = useTrainingPlan();
+const { updateWorkoutsOnDay, removeWorkout } = useTrainingPlan();
 
 const props = defineProps<{
   trainingDay: TrainingDay;
@@ -72,11 +76,6 @@ const workouts = ref<Workout[]>(props.trainingDay.workouts);
 const showAddWorkoutOnDay = () => {
   handleShowAddWorkout(props.trainingDay)
 };
-
-const removeWorkout = (workout: Workout) => {
-  const workoutIndex = workouts.value.findIndex((el) => el.id == workout.id);
-  workouts.value = [...workouts.value].filter((_el, idx) => idx !== workoutIndex);
-}
 
 watch(props, () => {
   workouts.value = props.trainingDay.workouts;
@@ -90,22 +89,12 @@ watch(workouts, () => {
 </script>
 
 <style lang="scss" scoped>
-.drop-zone.is-dragging {
-  // ::after {
-  //   content: 'Déposer une séance ici';
-  //   font-size: 10px;
-  //   color: #9ca3af;
-  //   display: flex;
-  //   align-items: center;
-  //   justify-content: center;
-  //   height: 100%;
-  // }
-}
-
 :deep(.draggable-item) {
   opacity: 0.5;
 
-  .buttons {
+  .buttons,
+  .description,
+  .tags {
     display: none;
   }
 }

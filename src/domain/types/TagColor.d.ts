@@ -1,0 +1,18 @@
+export type TagColor =
+  'primary'
+  | 'neutral'
+  | 'red'
+  | 'pink'
+  | 'purple'
+  | 'deep-purple'
+  | 'cyan'
+  | 'teal'
+  | 'green'
+  | 'bright-green'
+  | 'lime'
+  | 'yellow'
+  | 'amber'
+  | 'orange'
+  | 'deep-orange'
+  | 'brown'
+  | 'white';

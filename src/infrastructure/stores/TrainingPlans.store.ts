@@ -13,7 +13,8 @@ export class TrainingPlansStore {
 
   init = async () => {
     const raw = await db.training_plans.toArray();
-    this.state = raw.map((r) => createTrainingPlan(r));
+    const plans = raw.map((r) => createTrainingPlan(r));
+    this.state.splice(0, this.state.length, ...plans);
   };
 
   getById = (id: string | null): TrainingPlan | null => {
@@ -42,43 +43,41 @@ export class TrainingPlansStore {
   };
 
   updateById = async (id: string, updated: Partial<TrainingPlan>) => {
-    const index = this.state.findIndex((r) => r.id === id);
-    if (index === -1) return null;
+    const existing = await db.training_plans.get(id);
+    if (!existing) return;
 
-    const newTrainingPlan = { ...this.state[index], ...updated };
+    const newOne = { ...existing, ...updated };
+    const cleaned = JSON.parse(JSON.stringify(toRaw(newOne)));
 
     try {
-      await db.training_plans.update(
-        id,
-        JSON.parse(JSON.stringify(toRaw(newTrainingPlan)))
-      );
-      this.state[index] = createTrainingPlan(newTrainingPlan);
-      return newTrainingPlan;
+      await db.training_plans.update(id, cleaned);
+      await this.init();
+      return newOne;
     } catch (err) {
-      console.error('❌ Update training plan error', err);
-      throw err;
+      console.error('❌ Dexie updateRace error', err, cleaned);
     }
   };
 
   deleteById = async (id: string) => {
     await db.training_plans.delete(id);
-    this.state = [...this.state].filter((el) => el.id !== id)
+    await this.init();
   };
 
   clearAll = async () => {
     await db.training_plans.clear();
-    this.state.splice(0);
+     this.state = [];
   };
 
   importTrainingPlan = async (file: File) => {
     const text = await file.text();
-    const planObj = JSON.parse(text);
+    const jsonFile = JSON.parse(text);
 
-    if (this.getById(planObj.id)) {
+    if (this.getById(jsonFile.id)) {
       throw new Error('Ce plan existe déjà');
     }
 
-    await db.training_plans.put(planObj);
-    this.state.push(createTrainingPlan(planObj));
+    await db.training_plans.put(jsonFile);
+    await this.init();
+    alert('Plan d\'entrainement importé avec succès !');
   };
 }
