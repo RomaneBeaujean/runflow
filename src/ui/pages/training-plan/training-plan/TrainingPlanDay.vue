@@ -14,7 +14,6 @@
       <div class="rounded-md hover:bg-neutral-200 p-1 cursor-pointer inline-flex items-center justify-center">
         <i class="pi pi-plus"></i>
       </div>
-
     </div>
 
     <div class="flex flex-col gap-2 pt-5">
@@ -59,8 +58,6 @@ import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
 import { useTrainingPlanParams } from '@/ui/composables/useTrainingPlanParams';
 import { ref, watch } from 'vue';
 import draggable from 'vuedraggable';
-
-
 
 const { handleShowAddWorkout, showAddWorkoutDay, isDragging, handleShowWorkoutDetails, getRealDayNumber, getWeekDayLabel } =
   useTrainingPlanParams();

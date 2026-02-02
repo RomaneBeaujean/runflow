@@ -1,5 +1,5 @@
 <template>
-  <div class="tag inline-flex min-w-0 max-w-full items-center gap-2 truncate" :style="tagStyle">
+  <div class="tag inline-flex min-w-0 max-w-full items-center gap-2 truncate text-sm" :style="tagStyle">
     <div class="left flex-0 flex items-center flex-shrink-0 empty:hidden">
       <i :class="icon" v-if="icon" />
       <slot name="left"></slot>
@@ -31,18 +31,15 @@ const props = defineProps<{
 
 
 const colorKey = computed(() => props.color ?? 'neutral');
-const fontSize = computed(() =>
-  props.size === 'medium' ? '14px' : props.size === 'xsmall' ? '10px' : '12px'
-);
 const variantKey = computed(() => props.variant ?? 'soft');
 
 const tagStyle = computed(() => {
-  const cfg = getTagColor(colorKey.value, variantKey.value)
+  const cfg = getTagColor(colorKey.value, variantKey.value);
   return {
     backgroundColor: cfg.background,
     color: cfg.color,
-    fontSize: fontSize.value,
     width: props.fluid ? '100%' : 'auto',
+    height: props.size === "medium" ? '24px' : "20px"
   };
 });
 </script>

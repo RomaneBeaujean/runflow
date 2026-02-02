@@ -2,17 +2,22 @@
 <template>
   <div class="flex flex-col gap-3" v-if="workout && !readonly">
 
+    <div class="flex gap-1">
+      <div class="w-[180px]">
+        <SelectSport v-model:selectedSport="internalWorkout.sport" v-if="!readonly" />
+      </div>
+      <div class="flex-1">
+        <FloatLabel variant="in" v-if="!readonly">
+          <InputText id="title" v-model="internalWorkout.title" class="w-full"
+            :invalid="titleMessage?.severity == 'error'" />
+          <label for="title">Titre de la séance</label>
 
-    <SelectSport v-model:selectedSport="internalWorkout.sport" v-if="!readonly" />
-    <FloatLabel variant="in" v-if="!readonly">
-      <InputText id="title" v-model="internalWorkout.title" class="w-full"
-        :invalid="titleMessage?.severity == 'error'" />
-      <label for="title">Titre de la séance</label>
-
-      <Message v-if="titleMessage" :severity="titleMessage.severity" variant="simple">
-        {{ titleMessage.message }}
-      </Message>
-    </FloatLabel>
+          <Message v-if="titleMessage" :severity="titleMessage.severity" variant="simple">
+            {{ titleMessage.message }}
+          </Message>
+        </FloatLabel>
+      </div>
+    </div>
 
 
     <FloatLabel variant="in">

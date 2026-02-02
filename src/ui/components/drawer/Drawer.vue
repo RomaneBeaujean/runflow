@@ -58,6 +58,7 @@ const drawerClasses = computed(() => {
     props.opened ? 'opened' : 'closed',
     props.position,
     props.overlay ? 'overlay' : '',
+    !props.overlay && props.position === 'right' ? 'border-l border-l-gray-200' : ''
   ].join(' ');
 });
 

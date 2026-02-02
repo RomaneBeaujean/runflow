@@ -1,5 +1,5 @@
 <template>
-  <Drawer v-model:opened="showWorkoutModels" position="right" class="border-l border-l-gray-200">
+  <Drawer v-model:opened="showWorkoutModels" position="right">
 
     <template #header v-if="showWorkoutModels">
       <div class="flex justify-between items-center">
@@ -24,7 +24,7 @@
             <SelectSport v-model:selectedSport="searchSportValue" showClear />
           </div>
         </div>
-        <WorkoutModelList @showEditModel="handleShowEditModel" v-model:workoutModels="displayedModels" />
+        <WorkoutsList @showEditModel="handleShowEditModel" v-model:workoutModels="displayedModels" />
       </div>
       <div v-if="showEditModel">
         <div class="flex flex-col gap-3">
@@ -76,7 +76,7 @@ import { Workout } from '@/domain/types/TrainingPlan';
 import SelectSport from '@/ui/components/select/SelectSport.vue';
 import WorkoutForm from '@/ui/components/workout/WorkoutForm.vue';
 import { useTrainingPlanHelper } from '@/ui/composables/useTrainingPlanHelper';
-import WorkoutModelList from './WorkoutModelList.vue';
+import WorkoutsList from './WorkoutsList.vue';
 const { showWorkoutModels, handleCloseWorkoutModels } = useTrainingPlanParams();
 const { isSameWorkout } = useTrainingPlanHelper();
 const { workoutModels, updateWorkoutModel, addWorkoutModel } = useTrainingPlan();

@@ -1,6 +1,6 @@
 <!-- AddWorkout.vue -->
 <template>
-  <Drawer v-model:opened="showAddWorkout" overlay position="right" showCloseButton id="addWorkout">
+  <Drawer v-model:opened="showAddWorkout" position="right" showCloseButton id="addWorkout">
     <template #header v-if="showAddWorkout">
       <div class="font-bold text-xl">Ajouter une séance</div>
       <div class="font-regular text-md mt-2 flex gap-2">

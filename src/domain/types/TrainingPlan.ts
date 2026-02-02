@@ -14,7 +14,7 @@ export interface TrainingPlan {
 
 export interface TrainingWeek {
   weekNumber: number;
-  theme: WeekTheme | null;
+  theme: string | null;
   days: TrainingDay[];
 }
 

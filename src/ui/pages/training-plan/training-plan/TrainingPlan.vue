@@ -40,7 +40,7 @@
               <TrainingPlanWeek v-for="tw in weeks" :key="tw.weekNumber" :trainingWeek="tw" />
             </div>
             <AddWorkout />
-            <WorkoutModels />
+            <WorkoutsLibrary />
             <WorkoutDetails />
           </div>
         </template>
@@ -61,13 +61,13 @@ import { useStores } from '@/ui/composables/useStores';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
 import { useTrainingPlanParams } from '@/ui/composables/useTrainingPlanParams';
 import { useTrainingPlans } from '@/ui/composables/useTrainingPlans';
-import { Breadcrumb, Button, Card, InputText } from 'primevue';
+import { Breadcrumb, Button, Card, FloatLabel, InputText, Message } from 'primevue';
 import { computed, onMounted, ref, watch } from 'vue';
-import AddWorkout from './AddWorkout.vue';
 import TrainingPlanEllipsisMenu from './TrainingPlanEllipsisMenu.vue';
 import TrainingPlanWeek from './TrainingPlanWeek.vue';
-import WorkoutDetails from './WorkoutDetails.vue';
-import WorkoutModels from './WorkoutModels.vue';
+import AddWorkout from './workouts/AddWorkout.vue';
+import WorkoutDetails from './workouts/WorkoutDetails.vue';
+import WorkoutsLibrary from './workouts/WorkoutsLibrary.vue';
 
 const editing = ref(false);
 const editableName = ref('');
