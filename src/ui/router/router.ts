@@ -1,9 +1,9 @@
 import Lab from '@/ui/pages/lab/Lab.vue';
 import Races from '@/ui/pages/races/Races.vue';
 import Race from '@/ui/pages/races/race/Race.vue';
-import Trainings from '@/ui/pages/trainings/Trainings.vue';
-import TrainingPlan from '@/ui/pages/trainings/training/TrainingPlan.vue';
 import { createRouter, createWebHistory } from 'vue-router';
+import TrainingPlans from '../pages/training-plan/TrainingPlans.vue';
+import TrainingPlan from '../pages/training-plan/training-plan/TrainingPlan.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -26,7 +26,7 @@ const router = createRouter({
     {
       path: '/trainings',
       name: 'trainings',
-      component: Trainings,
+      component: TrainingPlans,
     },
     { path: '/trainings/:id', component: TrainingPlan, props: true },
   ],

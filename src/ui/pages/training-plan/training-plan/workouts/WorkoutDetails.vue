@@ -1,5 +1,5 @@
 <template>
-  <Drawer v-model:opened="showWorkoutDetails" overlay position="right" id="workoutDetails" showCloseButton>
+  <Drawer v-model:opened="showWorkoutDetails" position="right" id="workoutDetails" showCloseButton>
     <template #header v-if="showWorkoutDetailsDay">
       <div class="font-bold text-xl">Détail de la séance</div>
       <div class="flex justify-between">
