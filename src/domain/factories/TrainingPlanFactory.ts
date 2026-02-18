@@ -17,8 +17,8 @@ export function createTrainingPlan(data?: Partial<TrainingPlan>): TrainingPlan {
     createdAt: data?.createdAt ?? new Date().toISOString(),
     startDate: data?.startDate ?? null,
     weeks: data?.weeks ?? [createTrainingWeek({ weekNumber: 1 })],
-    weekThemes: createWeekThemes(data.weekThemes),
-    sports: createSports(data?.sports),
+    weekThemes: data.weekThemes || [...DEFAULT_WEEK_THEMES],
+    sports: data?.sports || [...DEFAULT_SPORTS],
     workoutModels: data?.workoutModels?.map((el) => createWorkout(el)) || [],
   };
   return plan;
@@ -54,21 +54,21 @@ export function createTrainingDay(data?: Partial<TrainingDay>): TrainingDay {
 }
 
 export function createWeekThemes(data?: WeekTheme[]): WeekTheme[] {
-   const combined = [...(data || []), ...DEFAULT_WEEK_THEMES];
+  const combined = [...data];
   const seen = new Map<string | null, WeekTheme>();
   
   combined.forEach(weekTheme => {
-    const key = weekTheme.id ?? weekTheme.label; // Utiliser id ou label comme clé unique
+    const key = weekTheme.label;
     if (!seen.has(key)) {
       seen.set(key, weekTheme);
     }
   });
 
-   return Array.from(seen.values());
+  return Array.from(seen.values());
 }
 
 export function createSports(data?: Sport[]): Sport[] {
-  const combined = [...(data || []), ...DEFAULT_SPORTS];
+  const combined = [...(data || [])];
   const seen = new Map<string | null, Sport>();
   
   combined.forEach(sport => {
@@ -82,7 +82,7 @@ export function createSports(data?: Sport[]): Sport[] {
 }
 export function createWeekTheme(data?: Partial<WeekTheme>): WeekTheme {
   return {
-    id: data.id ?? nanoid(),
+    id: nanoid(),
     label: data.label ?? '',
     color: data.color ?? null,
   };

@@ -2,7 +2,9 @@
   <div :class="[
     'icon-wrapper',
     `icon-${size}`,
-    { 'icon-action': action }
+    `text-${color}`,
+    { 'icon-action': action },
+    { 'active': active }
   ]">
     <i :class="icon" />
   </div>
@@ -13,8 +15,10 @@
 
 const props = defineProps<{
   icon?: string;
+  color?: string;
   size?: "xsmall" | "small" | "medium" | "large" | "xlarge";
   action?: boolean;
+  active?: boolean;
 }>();
 
 </script>
@@ -25,13 +29,18 @@ const props = defineProps<{
   align-items: center;
   justify-content: center;
 
-  // Tailles d'icône
+  i {
+    color: inherit;
+    line-height: 1;
+    display: block;
+  }
+
   &.icon-xsmall {
     width: 16px;
     height: 16px;
 
-    >i {
-      font-size: 0.75rem;
+    i {
+      font-size: 12px;
     }
   }
 
@@ -39,8 +48,8 @@ const props = defineProps<{
     width: 20px;
     height: 20px;
 
-    >i {
-      font-size: 1rem;
+    i {
+      font-size: 14px;
     }
   }
 
@@ -48,8 +57,8 @@ const props = defineProps<{
     width: 24px;
     height: 24px;
 
-    >i {
-      font-size: 1.25rem;
+    i {
+      font-size: 18px;
     }
   }
 
@@ -57,40 +66,23 @@ const props = defineProps<{
     width: 32px;
     height: 32px;
 
-    >i {
-      font-size: 1.5rem;
+    i {
+      font-size: 24px;
     }
   }
 
-  &.icon-xlarge {
-    width: 40px;
-    height: 40px;
-
-    >i {
-      font-size: 2rem;
-    }
-  }
-
-  // Mode action (interactif)
   &.icon-action {
     cursor: pointer;
     border-radius: 4px;
-    transition: all 0.2s ease;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: var(--color-neutral-200);
     }
 
+    &.active,
     &:active {
-      background-color: rgba(0, 0, 0, 0.1);
+      background-color: var(--color-neutral-300);
     }
-  }
-
-  i {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
   }
 }
 </style>

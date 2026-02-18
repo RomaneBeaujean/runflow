@@ -1,5 +1,5 @@
-import { TagColor } from "@/ui/components/tags/ColorTag.vue";
 import { nanoid } from "nanoid";
+import { TagColor } from "../types/TagColor";
 import { Workout } from "../types/TrainingPlan";
 
 export function createWorkout(data?: Partial<Workout>): Workout {

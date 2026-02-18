@@ -178,7 +178,11 @@ const palette: Record<TagColor, Record<'soft' | 'strong', TagPalette>> = {
   },
 };
 
-export function getTagColor(color: string, variant = "soft"): TagPalette {
+export function getTagColor(color: TagColor, variant = "soft"): TagPalette {
   if(!palette[color]) return palette['primary'][variant]
   return palette[color][variant]
+}
+
+export function getAvailableTagColors(): TagColor[] {
+  return Object.keys(palette) as TagColor[];
 }

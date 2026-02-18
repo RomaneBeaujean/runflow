@@ -1,28 +1,34 @@
-import { WeekTheme } from '../types/TrainingPlan';
+import { WeekTheme } from "../types/WeekTheme";
 
 export const DEFAULT_WEEK_THEMES: WeekTheme[] = [
   {
+    id: 'ppg',
     label: 'PPG - Préparation physique',
-    color: '#3B82F6',
+    color: 'amber',
   },
   {
+    id: 'foncier',
     label: 'Foncier / Endurance',
-    color: '#10B981',
+    color: 'bright-green',
   },
   {
+    id: 'vitesse',
     label: 'Vitesse / VMA',
-    color: '#EF4444',
+    color: 'pink',
   },
   {
+    id: 'spe',
     label: 'Travail spécifique',
-    color: '#F59E0B',
+    color: 'deep-orange',
   },
   {
+    id: 'affutage',
     label: 'Affûtage',
-    color: '#8B5CF6',
+    color: 'brown',
   },
   {
+    id: 'recup',
     label: 'Récupération',
-    color: '#6B7280',
+    color: 'primary',
   },
 ];

@@ -178,19 +178,47 @@ export function useTrainingPlan() {
       });
   };
 
-  const updateWeekTheme = (weekNumber: number, weekTheme: WeekTheme): void => {
+  const updateThemeOfWeek = (weekNumber: number, weekTheme: WeekTheme): void => {
     updateWeek(weekNumber, (week) => ({
       ...week,
-      theme: weekTheme,
+      theme: weekTheme?.id || null,
     }));
   };
+
+  const updateWeekTheme = (updated: WeekTheme): void => {
+    weekThemes.value = weekThemes.value.map((el) => {
+      if(el.id === updated.id) {
+        return updated
+      }
+      return el;
+    });
+  }
+
+  const deleteWeekTheme = (deleted: WeekTheme): void => {
+    if(!deleted) return;
+    
+    weekThemes.value = weekThemes.value.filter((el) => el.id !== deleted.id);
+    
+    weeks.value = weeks.value
+      .map((week) => {
+        if(week.theme == deleted.id) {
+          return {
+            ...week,
+            theme: null
+          }
+        }
+       return week;
+      });
+  }
 
   return {
     init,
     addNewWeek,
     deleteWeek,
     addWeekTheme,
+    updateThemeOfWeek,
     updateWeekTheme,
+    deleteWeekTheme,
     addSport,
     planifyWorkout,
     addWorkoutModel,

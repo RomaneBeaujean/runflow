@@ -1,3 +1,5 @@
+import { DEFAULT_SPORTS } from "@/domain/constants/sports";
+import { DEFAULT_WEEK_THEMES } from "@/domain/constants/weekThemes";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useStores } from "./useStores";
@@ -21,6 +23,8 @@ export function useTrainingPlans() {
 
     const id = await stores.training_plans_store.create({
       name: name,
+      weekThemes: [...DEFAULT_WEEK_THEMES],
+      sports: [...DEFAULT_SPORTS],
     });
 
     return id;

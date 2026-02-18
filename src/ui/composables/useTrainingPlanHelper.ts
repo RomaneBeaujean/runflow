@@ -1,10 +1,15 @@
 import { DEFAULT_SPORTS } from "@/domain/constants/sports";
 import { Sport } from "@/domain/types/Sport";
 import { TrainingWeek, Workout } from "@/domain/types/TrainingPlan";
+import { useTrainingPlan } from "./useTrainingPlan";
 
+const { weekThemes } = useTrainingPlan();
 
 export function useTrainingPlanHelper() {
 
+  const getWeekTheme = (id: string) => {
+    return weekThemes.value.find((el) => el.id === id);
+  }
 
   const isSameWorkout = (workout1: Workout, workout2: Workout) => {
     if (!workout1 || !workout2) return false;
@@ -14,8 +19,6 @@ export function useTrainingPlanHelper() {
       workout1.duration === workout2.duration &&
       workout1.sport?.label === workout2.sport?.label
   }
-
-  
 
   const getSportStat = (sport: Sport, week: TrainingWeek) => {
     const totalDistance = week.days.reduce((sum, day) => {
@@ -46,6 +49,7 @@ export function useTrainingPlanHelper() {
 
   return {
     isSameWorkout,
-    getWeekStats
+    getWeekStats,
+    getWeekTheme
   }
 }
