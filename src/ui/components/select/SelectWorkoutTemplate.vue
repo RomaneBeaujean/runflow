@@ -1,29 +1,32 @@
 <template>
-  <FloatLabel variant="in">
-    <Select :items="options" id="workoutModelId" v-model:selected="selectedItem" showClear
-      emptyMessage="Aucun modèle enregistré dans la bibliothèque" class="w-full" />
-    <label for="workoutModelId">Choisir un modèle de séance dans la bibliothèque</label>
-  </FloatLabel>
+  <Select :items="options" v-model:selected="selectedItem" showClear
+    emptyMessage="Aucun modèle enregistré dans la bibliothèque" class="w-full" :disabled="options.length === 0"
+    placeholder="Choisissez une séance" />
 </template>
 
 <script setup lang="ts">
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
-import { FloatLabel } from 'primevue';
+import { useTrainingPlanHelper } from '@/ui/composables/useTrainingPlanHelper';
 import { computed, ref, watch } from 'vue';
 import Select from './Select.vue';
 
 const props = defineProps<{
   selectedModelId: string | null;
 }>();
+
 const selectedItem = ref(null);
+
 const { workoutModels } = useTrainingPlan();
-const emit = defineEmits(['update:selectedModelId'])
+const { getSport } = useTrainingPlanHelper();
+
+const emit = defineEmits(['update:selectedModelId']);
+
 const options = computed(() => {
   return workoutModels.value.map((el) => {
     return {
       value: el.id,
       label: el.title,
-      icon: el.sport?.icon || null,
+      icon: getSport(el.sportId)?.icon || null,
     }
   });
 });

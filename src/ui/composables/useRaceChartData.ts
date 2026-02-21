@@ -1,9 +1,9 @@
-import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
+import { roundOneNumber } from '@/domain/helpers/round-number';
 import {
   minutesToFormattedDuration,
   numberToPace,
   paceToNumber,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import {
   getMarkLineColorStops,
   getPaceColor,

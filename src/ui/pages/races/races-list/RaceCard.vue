@@ -1,8 +1,5 @@
 <template>
-  <Card
-    class="flex-1 race-card hover:cursor-pointer"
-    @click="goToCourse(race.id)"
-  >
+  <Card class="flex-1 race-card hover:cursor-pointer" @click="goToCourse(race.id)">
     <template #title>
       <div class="full-w">
         <div class="overflow-hidden text-ellipsis whitespace-nowrap">
@@ -25,19 +22,11 @@
       <div class="full-w full-h relative">
         <div class="flex flex-col gap-2">
           <div class="flex gap-2">
-            <ColorTag color="primary"
-              >{{ race.totalDistance }} <small>km</small></ColorTag
-            >
-            <ColorTag color="amber"
-              >{{ race.totalElevation }}m <small>d+</small></ColorTag
-            >
+            <ColorTag color="primary">{{ race.totalDistance }} <small>km</small></ColorTag>
+            <ColorTag color="amber">{{ race.totalElevation }}m <small>d+</small></ColorTag>
           </div>
           <div class="flex gap-2">
-            <ColorTag
-              v-if="race.totalDuration"
-              color="green"
-              icon="pi pi-stopwatch"
-            >
+            <ColorTag v-if="race.totalDuration" color="green" icon="pi pi-stopwatch">
               {{ minutesToFormattedDuration(race.totalDuration) }}
             </ColorTag>
             <ColorTag v-if="race.totalDuration" color="pink" icon="pi pi-bolt">
@@ -47,14 +36,8 @@
           </div>
         </div>
         <div class="absolute bottom-0 right-0 flex gap-2">
-          <Button
-            text
-            severity="secondary"
-            size="small"
-            icon="pi pi-trash"
-            aria-label="Delete"
-            @click.capture="(e) => deleteCourse(e, race.id)"
-          />
+          <Button text severity="secondary" size="small" icon="pi pi-trash" aria-label="Delete"
+            @click.capture="(e) => deleteCourse(e, race.id)" />
         </div>
       </div>
     </template>
@@ -66,7 +49,7 @@ import {
   dateToFormatted,
   dateToFormattedTime,
   minutesToFormattedDuration,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import { getAveragePace } from '@/domain/services/GpxMetrics';
 import { Race } from '@/domain/types/Race';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';

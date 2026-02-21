@@ -1,9 +1,6 @@
 <template>
   <div class="relative">
-    <div
-      class="absolute right-0 top-0 bg-white flex justify-center"
-      v-if="editableMode"
-    >
+    <div class="absolute right-0 top-0 bg-white flex justify-center" v-if="editableMode">
       <div v-if="!edition">
         <Button icon="pi pi-pencil" text rounded @click="editRow" />
       </div>
@@ -12,35 +9,19 @@
         <Button icon="pi pi-times" @click="uneditRow" rounded />
       </div>
     </div>
-    <div
-      class="absolute bottom-0 right-0 translate-y-[-50%] bg-white"
-      v-if="editableMode"
-    >
-      <Button
-        icon="pi pi-trash"
-        text
-        rounded
-        v-if="isNotFirstLine && isNotLastLine"
-        @click="deleteRow"
-      />
+    <div class="absolute bottom-0 right-0 translate-y-[-50%] bg-white" v-if="editableMode">
+      <Button icon="pi pi-trash" text rounded v-if="isNotFirstLine && isNotLastLine" @click="deleteRow" />
     </div>
     <Fieldset :legend="isNotFirstLine ? `${split.distance} km` : 'Départ'">
       <template #legend>
         <div class="flex items-center">
-          <div
-            :class="
-              'font-bold' +
-              (split.refuel ? ' text-pink-800' : ' text-primary-800')
-            "
-            v-if="!edition || !isNotFirstLine || !isNotLastLine"
-          >
+          <div :class="'font-bold' +
+            (split.refuel ? ' text-pink-800' : ' text-primary-800')
+            " v-if="!edition || !isNotFirstLine || !isNotLastLine">
             {{ isNotFirstLine ? `${split.distance} km` : 'Départ' }}
           </div>
           <div v-else>
-            <InputDistance
-              :distance="split.distance"
-              @update="updateDistance"
-            />
+            <InputDistance :distance="split.distance" @update="updateDistance" />
           </div>
           <div v-if="split.refuel && !edition" class="ml-3">
             <ColorTag color="pink" icon="pi pi-cart-arrow-down" size="xsmall">
@@ -49,17 +30,9 @@
           </div>
           <div v-if="edition && isNotFirstLine" class="ml-3">
             <div class="flex flex-wrap gap-2 items-center justify-center">
-              <ToggleSwitch
-                :id="'refuel' + split.id"
-                name="refuel"
-                v-model="newRowData.refuel"
-              />
-              <label
-                :for="'refuel' + split.id"
-                class="text-xs cursor-pointer"
-                @click="newRowData.refuel = !newRowData.refuel"
-                >Ravitaillement</label
-              >
+              <ToggleSwitch :id="'refuel' + split.id" name="refuel" v-model="newRowData.refuel" />
+              <label :for="'refuel' + split.id" class="text-xs cursor-pointer"
+                @click="newRowData.refuel = !newRowData.refuel">Ravitaillement</label>
             </div>
           </div>
         </div>
@@ -75,12 +48,7 @@
             <span class="text-xs" v-else> Non renseigné </span>
           </div>
           <div v-else class="w-[90px]">
-            <InputTime
-              :time="split.time"
-              :reference="split.time"
-              size="small"
-              @update="updateStartTime"
-            />
+            <InputTime :time="split.time" :reference="split.time" size="small" @update="updateStartTime" />
           </div>
         </div>
       </template>
@@ -91,14 +59,10 @@
           <span class="flex text-xs font-semibold"> Depuis le départ </span>
           <div class="flex flex-row gap-2">
             <ColorTag color="brown">
-              <span class="xsmall">+</span
-              ><span>{{ split.cumulElevation }}</span
-              ><span class="xsmall">m</span>
+              <span class="xsmall">+</span><span>{{ split.cumulElevation }}</span><span class="xsmall">m</span>
             </ColorTag>
             <ColorTag color="brown">
-              <span class="xsmall">-</span
-              ><span>{{ split.cumulNegativeElevation }}</span
-              ><span class="xsmall">m</span>
+              <span class="xsmall">-</span><span>{{ split.cumulNegativeElevation }}</span><span class="xsmall">m</span>
             </ColorTag>
           </div>
         </div>
@@ -110,17 +74,12 @@
           <div class="flex text-xs font-bold mb-1">Split</div>
           <div class="flex justify-center gap-2">
             <ColorTag color="primary">
-              {{ split.splitDistance }} <span class="xsmall">km</span></ColorTag
-            >
+              {{ split.splitDistance }} <span class="xsmall">km</span></ColorTag>
             <ColorTag color="amber">
-              <span class="xsmall">+</span
-              ><span>{{ split.splitElevation }}</span
-              ><span class="xsmall">m</span>
+              <span class="xsmall">+</span><span>{{ split.splitElevation }}</span><span class="xsmall">m</span>
             </ColorTag>
             <ColorTag color="amber">
-              <span class="xsmall">-</span
-              ><span>{{ split.splitNegativeElevation }}</span
-              ><span class="xsmall">m</span>
+              <span class="xsmall">-</span><span>{{ split.splitNegativeElevation }}</span><span class="xsmall">m</span>
             </ColorTag>
             <SlopeTag :slope="split.splitSlopePercent">
               {{ split.splitSlopePercent }} <span class="xsmall">%</span>
@@ -142,19 +101,13 @@
                   </ColorTag>
                 </template>
                 <template v-else>
-                  <InputPaceDuration
-                    :pace="split.splitPace"
-                    :distance="split.splitDistance"
-                    @update="updatePace"
-                  />
+                  <InputPaceDuration :pace="split.splitPace" :distance="split.splitDistance" @update="updatePace" />
                 </template>
               </div>
             </div>
-            <template
-              v-if="
-                (split.refuel && !edition) || (edition && newRowData.refuel)
-              "
-            >
+            <template v-if="
+              (split.refuel && !edition) || (edition && newRowData.refuel)
+            ">
               <Divider layout="vertical" />
               <div class="flex flex-col gap-2 items-center">
                 <span class="flex text-xs font-semibold text-gray-500">
@@ -166,10 +119,7 @@
                   </ColorTag>
                 </template>
                 <template v-else>
-                  <InputRefuelStopDuration
-                    :duration="split.stopDuration || 0"
-                    @update="updateStopDuration"
-                  />
+                  <InputRefuelStopDuration :duration="split.stopDuration || 0" @update="updateStopDuration" />
                 </template>
               </div>
             </template>
@@ -204,21 +154,14 @@
                 </span>
                 <div class="flex gap-2">
                   <template v-if="!edition">
-                    <ColorTag
-                      icon="pi pi-clock"
-                      :color="split.timeBarrierValid ? 'bright-green' : 'red'"
-                    >
+                    <ColorTag icon="pi pi-clock" :color="split.timeBarrierValid ? 'bright-green' : 'red'">
                       {{ dateToFormattedTime(split.timeBarrier) }}
                     </ColorTag>
                   </template>
                   <template v-else>
                     <div class="w-[90px]">
-                      <InputTime
-                        :time="split.timeBarrier"
-                        :reference="race.startTime"
-                        size="small"
-                        @update="updateTimeBarrier"
-                      />
+                      <InputTime :time="split.timeBarrier" :reference="race.startTime" size="small"
+                        @update="updateTimeBarrier" />
                     </div>
                   </template>
                 </div>
@@ -229,10 +172,7 @@
       </template>
     </Fieldset>
 
-    <div
-      class="flex justify-center mt-2"
-      v-if="editableMode && split.distance !== totalDistance"
-    >
+    <div class="flex justify-center mt-2" v-if="editableMode && split.distance !== totalDistance">
       <AddSeparatorMobile />
     </div>
   </div>
@@ -242,7 +182,7 @@
 import {
   dateToFormattedTime,
   minutesToFormattedDuration,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import { SplitItem } from '@/domain/types/SplitItem';
 import InputDistance from '@/ui/components/inputs/InputDistance.vue';
 import InputPaceDuration from '@/ui/components/inputs/InputPaceDuration.vue';

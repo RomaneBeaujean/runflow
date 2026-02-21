@@ -1,4 +1,4 @@
-import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
+import { roundOneNumber } from '@/domain/helpers/round-number';
 import { GpxParse, smoothPointsByDistance } from '@/domain/services/GpxParse';
 import { computeSlidingSlopeKm } from '@/domain/services/Slopes';
 import { GpxPoint } from '@/domain/types/GpxPoint';

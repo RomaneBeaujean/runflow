@@ -1,4 +1,4 @@
-import { durationFromPaceAndDistance } from '@/domain/helpers/Time.helper';
+import { durationFromPaceAndDistance } from '@/domain/helpers/time';
 import { GpxPoint } from '@/domain/types/GpxPoint';
 import { GpxSegment } from '@/domain/types/GpxSegment';
 import { Separator } from '@/domain/types/Separator';

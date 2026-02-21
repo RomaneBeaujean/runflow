@@ -1,11 +1,6 @@
 <template>
   <div>
-    <Button
-      label="Ajouter un plan de course"
-      icon="pi pi-plus"
-      rounded
-      @click="dialogOpened = true"
-    />
+    <Button label="Ajouter un plan de course" icon="pi pi-plus" rounded @click="dialogOpened = true" />
 
     <Dialog v-model:visible="dialogOpened" modal>
       <template #header>
@@ -20,13 +15,8 @@
               <div class="flex flex-col gap-4">
                 <GpxDropzone @select="addFile" @remove="removeFile" />
                 <div class="flex justify-center">
-                  <Button
-                    label="Suivant"
-                    icon="pi pi-arrow-right"
-                    iconPos="right"
-                    :disabled="!gpxFile"
-                    @click="activateCallback('2')"
-                  />
+                  <Button label="Suivant" icon="pi pi-arrow-right" iconPos="right" :disabled="!gpxFile"
+                    @click="activateCallback('2')" />
                 </div>
               </div>
             </StepPanel>
@@ -36,20 +26,12 @@
           <StepItem value="2">
             <Step>Informations sur la course</Step>
             <StepPanel v-slot="{ activateCallback }">
-              <div
-                class="flex flex-1 flex-col"
-                v-show="gpxFile && gpxFile.content !== null"
-              >
+              <div class="flex flex-1 flex-col" v-show="gpxFile && gpxFile.content !== null">
                 <div>
                   <label class="block mb-2 text-sm font-medium text-gray-700">
                     Nom du plan de course *
                   </label>
-                  <InputText
-                    v-model="raceName"
-                    type="text"
-                    placeholder="Nom"
-                    class="w-full"
-                  />
+                  <InputText v-model="raceName" type="text" placeholder="Nom" class="w-full" />
                 </div>
 
                 <div class="flex flex-1 gap-2 mt-2">
@@ -57,33 +39,20 @@
                     <label class="block mb-2 text-sm font-medium text-gray-700">
                       Date de la course
                     </label>
-                    <DatePicker
-                      v-model="raceDate"
-                      dateFormat="dd/mm/yy"
-                      showIcon
-                      placeholder="Date"
-                      :showTime="false"
-                    />
+                    <DatePicker v-model="raceDate" dateFormat="dd/mm/yy" showIcon placeholder="Date"
+                      :showTime="false" />
                   </div>
                   <div class="flex-1">
                     <label class="block mb-2 text-sm font-medium text-gray-700">
                       Heure de départ
                     </label>
-                    <InputTime
-                      :time="startTime"
-                      @update="({ time }) => (startTime = time)"
-                    />
+                    <InputTime :time="startTime" @update="({ time }) => (startTime = time)" />
                   </div>
                 </div>
               </div>
               <div class="mt-8 flex justify-center">
-                <Button
-                  label="Suivant"
-                  icon="pi pi-arrow-right"
-                  iconPos="right"
-                  :disabled="raceName?.length < 1"
-                  @click="activateCallback('3')"
-                />
+                <Button label="Suivant" icon="pi pi-arrow-right" iconPos="right" :disabled="raceName?.length < 1"
+                  @click="activateCallback('3')" />
               </div>
             </StepPanel>
           </StepItem>
@@ -92,11 +61,7 @@
             <Step>Objectifs et temps de course</Step>
             <StepPanel>
               <div v-if="parsedFile">
-                <PaceSimulator
-                  :parsedFile="parsedFile"
-                  v-model="splits"
-                  onlyAveragePace
-                />
+                <PaceSimulator :parsedFile="parsedFile" v-model="splits" onlyAveragePace />
               </div>
             </StepPanel>
           </StepItem>
@@ -104,18 +69,15 @@
       </div>
       <template #footer>
         <Button label="Fermer" text severity="secondary" @click="close" />
-        <Button
-          label="Créer le plan de course"
-          :disabled="gpxFile == null || raceName == '' || !section3Opened"
-          @click="createCourse"
-        />
+        <Button label="Créer le plan de course" :disabled="gpxFile == null || raceName == '' || !section3Opened"
+          @click="createCourse" />
       </template>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
+import { roundOneNumber } from '@/domain/helpers/round-number';
 import { GpxParse } from '@/domain/services/GpxParse';
 import { Separator } from '@/domain/types/Separator';
 import { Split } from '@/domain/types/Split';

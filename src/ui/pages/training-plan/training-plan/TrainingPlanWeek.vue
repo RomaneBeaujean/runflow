@@ -1,15 +1,20 @@
 <template>
   <div>
-    <div class="w-full flex mt-2 mb-2 items-center justify-between">
+    <div class="flex mt-2 mb-2 items-center justify-between">
       <div class="flex items-center font-semibold gap-3">
         <div class="mr-3 whitespace-nowrap">Semaine {{ trainingWeek.weekNumber }}</div>
-        <SelectWeekTheme :trainingWeek="trainingWeek" />
+        <SelectWeekTheme :trainingWeek="trainingWeek" v-if="editing" />
+        <ColorTag v-else :color="weekTheme.color">
+          {{ weekTheme.label }}
+        </ColorTag>
       </div>
-      <div>
-        <Button icon="pi pi-trash" size="small" text @click="deleteWeek(trainingWeek.weekNumber)" />
+      <div v-if="editing && trainingWeek.weekNumber > 1">
+        <Button icon="pi pi-trash" size="small" text @click="deleteWeek(trainingWeek.weekNumber)"
+          :disabled="trainingWeek.weekNumber === 1"
+          v-tooltip.bottom="trainingWeek.weekNumber === 1 ? '' : 'Supprimer la semaine'" />
       </div>
     </div>
-    <div class="table-holder w-full">
+    <div class="table-holder">
       <table>
         <tbody>
           <tr>
@@ -19,7 +24,7 @@
                 <TrainingPlanDay :trainingDay="td" />
               </td>
             </template>
-            <td>
+            <!-- <td>
               <div class="h-[4px] w-full absolute top-0 left-0 z-10" :style="{ backgroundColor: barColor }"></div>
               <div class="w-full h-full flex flex-col p-3 bg-neutral-100">
                 <div class="text-sm font-semibold full-w text-center mb-3 text-neutral-500">Totaux hebdomadaires</div>
@@ -35,7 +40,7 @@
                   </ColorTag>
                 </div>
               </div>
-            </td>
+            </td> -->
           </tr>
         </tbody>
       </table>
@@ -44,10 +49,9 @@
 </template>
 
 <script setup lang="ts">
-import { createSportTagColor } from '@/domain/factories/WorkoutFactory';
-import { minutesToFormattedDuration } from '@/domain/helpers/Time.helper';
 import { getTagColor } from '@/domain/services/TagColors';
 import { TrainingWeek } from '@/domain/types/TrainingPlan';
+import { WeekTheme } from '@/domain/types/WeekTheme';
 import SelectWeekTheme from '@/ui/components/select/SelectWeekTheme.vue';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
@@ -60,12 +64,17 @@ const props = defineProps<{
   trainingWeek: TrainingWeek;
 }>();
 
-const { getWeekStats, getWeekTheme } = useTrainingPlanHelper();
-const { deleteWeek } = useTrainingPlan();
+const { getWeekTheme } = useTrainingPlanHelper();
+const { deleteWeek, editing } = useTrainingPlan();
+
+const weekTheme = computed((): WeekTheme => {
+  return getWeekTheme(props.trainingWeek.theme);
+})
 
 const barColor = computed((): string => {
   if (!props.trainingWeek.theme) return;
   const weekTheme = getWeekTheme(props.trainingWeek.theme);
+  if (!weekTheme) return;
   const color = getTagColor(weekTheme.color, "strong").background;
   return color;
 })

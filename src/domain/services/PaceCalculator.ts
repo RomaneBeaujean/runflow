@@ -1,8 +1,4 @@
-import {
-  kmhToPace,
-  numberToPace,
-  paceToKmh,
-} from '@/domain/helpers/Time.helper';
+import { kmhToPace, numberToPace, paceToKmh } from '@/domain/helpers/time';
 import { chunkerizeSegments } from '@/domain/services/Segments';
 import { computeSegmentSlopeKm } from '@/domain/services/Slopes';
 import { GpxPoint } from '@/domain/types/GpxPoint';

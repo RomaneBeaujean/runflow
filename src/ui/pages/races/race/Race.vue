@@ -1,13 +1,9 @@
 <template>
-  <div
-    v-if="race"
-    id="race"
-    :class="[
-      'race flex p-5 flex-col relative',
-      stickyChart && 'sticky',
-      isMobile ? 'mobile' : 'desktop',
-    ]"
-  >
+  <div v-if="race" id="race" :class="[
+    'race flex p-5 flex-col relative',
+    stickyChart && 'sticky',
+    isMobile ? 'mobile' : 'desktop',
+  ]">
     <div class="w-full relative">
       <RaceHeader />
     </div>
@@ -36,7 +32,7 @@
         <div class="flex justify-between">
           <div>Tableau des splits</div>
           <div>
-            <SwitchToggle label="Mode édition" v-model="editableMode" />
+            <SwitchToggle label="Mode édition" value="editableMode" />
           </div>
         </div>
       </template>

@@ -19,7 +19,6 @@ import { getTagColor } from '@/domain/services/TagColors';
 import { TagColor } from '@/domain/types/TagColor';
 import { computed } from 'vue';
 
-
 const props = defineProps<{
   label?: string;
   color?: TagColor;
@@ -28,7 +27,6 @@ const props = defineProps<{
   size?: 'medium' | 'small' | 'xsmall';
   variant?: 'soft' | 'strong';
 }>();
-
 
 const colorKey = computed(() => props.color ?? 'neutral');
 const variantKey = computed(() => props.variant ?? 'soft');

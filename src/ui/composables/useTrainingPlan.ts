@@ -9,9 +9,9 @@ import {
   TrainingDay,
   TrainingPlan,
   TrainingWeek,
-  Workout,
 } from '@/domain/types/TrainingPlan';
 import { WeekTheme } from '@/domain/types/WeekTheme';
+import { Workout } from '@/domain/types/Workout';
 import { computed, ref } from 'vue';
 import { useTrainingPlanWatchers } from './useTrainingPlanWatchers';
 
@@ -21,8 +21,30 @@ const weekThemes = ref<WeekTheme[]>([]);
 const sports = ref<Sport[]>([]);
 const workoutModels = ref<Workout[]>([]);
 const name = ref<string>('');
+const description = ref<string>('');
+const editing = ref<boolean>(true);
 
 export function useTrainingPlan() {
+  const init = (tp: TrainingPlan): void => {
+    try {
+      const trainingPlan = createTrainingPlan(tp);
+      console.log('🎉 INIT TRAINING PLAN', trainingPlan);
+
+      id.value = trainingPlan.id;
+      name.value = trainingPlan.name;
+      description.value = trainingPlan.description;
+      weeks.value = trainingPlan.weeks;
+      weekThemes.value = trainingPlan.weekThemes;
+      sports.value = trainingPlan.sports;
+      workoutModels.value = trainingPlan.workoutModels;
+
+      useTrainingPlanWatchers();
+    } catch (error) {
+      console.error('Failed to initialize training plan:', error);
+      throw error;
+    }
+  };
+
   const totalWeeks = computed(() => weeks.value.length);
   const totalWorkouts = computed(() =>
     weeks.value.reduce(
@@ -73,27 +95,12 @@ export function useTrainingPlan() {
     }));
   };
 
-  const init = (tp: TrainingPlan): void => {
-    try {
-      const trainingPlan = createTrainingPlan(tp);
-      id.value = trainingPlan.id;
-      name.value = trainingPlan.name;
-      weeks.value = trainingPlan.weeks;
-      weekThemes.value = trainingPlan.weekThemes;
-      sports.value = trainingPlan.sports;
-      workoutModels.value = trainingPlan.workoutModels;
-
-      useTrainingPlanWatchers();
-    } catch (error) {
-      console.error('Failed to initialize training plan:', error);
-      throw error;
-    }
+  const updateName = (newName: string): void => {
+    name.value = newName;
   };
 
-  const updateName = (
-    newName: string,
-  ): void => {
-    name.value = newName;
+  const updateDescription = (newValue: string): void => {
+    description.value = newValue;
   };
 
   const addNewWeek = (): void => {
@@ -152,16 +159,17 @@ export function useTrainingPlan() {
     workoutModels.value.push(wo);
   };
 
-  const addWeekTheme = (wt: Partial<WeekTheme>): void => {
-    const newWeekTheme = createWeekTheme(wt);
-    weekThemes.value.push(newWeekTheme);
-  };
-
+  /**
+   * Sport
+   */
   const addSport = (newItem: Partial<Sport>): void => {
     const newSport = createSport(newItem);
     sports.value.push(newSport);
   };
 
+  /**
+   * Week
+   */
   const deleteWeek = (weekNumber: number): void => {
     weeks.value = weeks.value
       .filter((week) => week.weekNumber !== weekNumber)
@@ -178,7 +186,19 @@ export function useTrainingPlan() {
       });
   };
 
-  const updateThemeOfWeek = (weekNumber: number, weekTheme: WeekTheme): void => {
+  /**
+   * Week Theme
+   */
+  const addWeekTheme = (wt: Partial<WeekTheme>): WeekTheme => {
+    const newWeekTheme = createWeekTheme(wt);
+    weekThemes.value.push(newWeekTheme);
+    return newWeekTheme;
+  };
+
+  const updateThemeOfWeek = (
+    weekNumber: number,
+    weekTheme: WeekTheme
+  ): void => {
     updateWeek(weekNumber, (week) => ({
       ...week,
       theme: weekTheme?.id || null,
@@ -187,29 +207,28 @@ export function useTrainingPlan() {
 
   const updateWeekTheme = (updated: WeekTheme): void => {
     weekThemes.value = weekThemes.value.map((el) => {
-      if(el.id === updated.id) {
-        return updated
+      if (el.id === updated.id) {
+        return updated;
       }
       return el;
     });
-  }
+  };
 
   const deleteWeekTheme = (deleted: WeekTheme): void => {
-    if(!deleted) return;
-    
+    if (!deleted) return;
+
     weekThemes.value = weekThemes.value.filter((el) => el.id !== deleted.id);
-    
-    weeks.value = weeks.value
-      .map((week) => {
-        if(week.theme == deleted.id) {
-          return {
-            ...week,
-            theme: null
-          }
-        }
-       return week;
-      });
-  }
+
+    weeks.value = weeks.value.map((week) => {
+      if (week.theme == deleted.id) {
+        return {
+          ...week,
+          theme: null,
+        };
+      }
+      return week;
+    });
+  };
 
   return {
     init,
@@ -227,11 +246,14 @@ export function useTrainingPlan() {
     removeWorkout,
     updatePlannedWorkout,
     updateName,
+    updateDescription,
     removeWorkoutModel,
     weeks,
     id,
+    description,
     name,
     weekThemes,
+    editing,
     workoutModels,
     sports,
     totalWeeks,

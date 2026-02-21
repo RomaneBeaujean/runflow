@@ -9,17 +9,9 @@
     </span>
     <template v-if="isNotFirstLine && edition && isNotFirstLine">
       <div class="flex flex-wrap gap-2 items-center justify-center">
-        <ToggleSwitch
-          :id="'refuel' + split.id"
-          name="refuel"
-          v-model="newRowData.refuel"
-        />
-        <label
-          :for="'refuel' + split.id"
-          class="text-xs cursor-pointer"
-          @click="newRowData.refuel = !newRowData.refuel"
-          >Ravitaillement</label
-        >
+        <ToggleSwitch :id="'refuel' + split.id" name="refuel" v-model="newRowData.refuel" />
+        <label :for="'refuel' + split.id" class="text-xs cursor-pointer"
+          @click="newRowData.refuel = !newRowData.refuel">Ravitaillement</label>
       </div>
     </template>
   </div>
@@ -32,10 +24,7 @@
     </template>
   </div>
   <div class="cell">
-    <div
-      v-if="isNotFirstLine"
-      class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
-    >
+    <div v-if="isNotFirstLine" class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center">
       <ColorTag class="mr-2">
         <span class="xsmall">+</span>{{ split.cumulElevation }}
         <span class="xsmall">m</span>
@@ -54,10 +43,7 @@
     </div>
   </div>
   <div class="cell">
-    <div
-      v-if="isNotFirstLine"
-      class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
-    >
+    <div v-if="isNotFirstLine" class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center">
       <ColorTag class="mr-2" color="amber">
         <span class="xsmall">+</span> {{ split.splitElevation }}
         <span class="xsmall">m</span>
@@ -76,10 +62,8 @@
     </div>
   </div>
   <div class="cell">
-    <div
-      v-if="isNotFirstLine && !edition"
-      class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
-    >
+    <div v-if="isNotFirstLine && !edition"
+      class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center">
       <ColorTag icon="pi pi-bolt" color="deep-purple" class="mr-2">
         {{ split.splitPace }}
         <span class="xsmall">min/km</span>
@@ -88,15 +72,8 @@
         {{ minutesToFormattedDuration(split.splitDuration) }}
       </ColorTag>
     </div>
-    <div
-      v-if="isNotFirstLine && edition"
-      class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center"
-    >
-      <InputPaceDuration
-        :pace="split.splitPace"
-        :distance="split.splitDistance"
-        @update="updatePace"
-      />
+    <div v-if="isNotFirstLine && edition" class="flex flex-wrap flex-col md:flex-row gap-1 justify-center items-center">
+      <InputPaceDuration :pace="split.splitPace" :distance="split.splitDistance" @update="updatePace" />
     </div>
   </div>
   <!-- Temps d'arrêt -->
@@ -107,10 +84,7 @@
       </ColorTag>
     </template>
     <template v-if="isNotFirstLine && edition && newRowData.refuel">
-      <InputRefuelStopDuration
-        :duration="newRowData.stopDuration"
-        @update="updateStopDuration"
-      />
+      <InputRefuelStopDuration :duration="newRowData.stopDuration" @update="updateStopDuration" />
     </template>
   </div>
   <!-- Temps écoulé -->
@@ -127,79 +101,40 @@
   <div class="cell">
     <div class="w-[70px] inline-block">
       <template v-if="isNotFirstLine || (!isNotFirstLine && !edition)">
-        <ColorTag
-          icon="pi pi-clock"
-          color="primary"
-          class="mb-2"
-          v-if="split.time"
-        >
+        <ColorTag icon="pi pi-clock" color="primary" class="mb-2" v-if="split.time">
           {{ dateToFormattedTime(split.time) }}
         </ColorTag>
       </template>
       <template v-if="edition && !isNotFirstLine">
-        <InputTime
-          :time="split.time"
-          :reference="split.time"
-          size="small"
-          @update="updateStartTime"
-        />
+        <InputTime :time="split.time" :reference="split.time" size="small" @update="updateStartTime" />
       </template>
     </div>
   </div>
   <div class="cell">
     <div v-if="isNotFirstLine" class="w-[70px] inline-block">
       <template v-if="!isNotFirstLine || (isNotFirstLine && !edition)">
-        <ColorTag
-          v-if="split.timeBarrier"
-          icon="pi pi-clock"
-          :color="split.timeBarrierValid ? 'bright-green' : 'red'"
-          class="mb-2"
-        >
+        <ColorTag v-if="split.timeBarrier" icon="pi pi-clock" :color="split.timeBarrierValid ? 'bright-green' : 'red'"
+          class="mb-2">
           {{ dateToFormattedTime(split.timeBarrier) }}
         </ColorTag>
-        <ColorTag
-          v-if="split.timeBarrier"
-          icon="pi pi-stopwatch"
-          :color="split.timeBarrierValid ? 'bright-green' : 'red'"
-        >
+        <ColorTag v-if="split.timeBarrier" icon="pi pi-stopwatch"
+          :color="split.timeBarrierValid ? 'bright-green' : 'red'">
           {{ minutesToFormattedDuration(split.timeBarrierDuration) }}
         </ColorTag>
       </template>
       <template v-if="isNotFirstLine && edition">
-        <InputTime
-          :time="split.timeBarrier"
-          :reference="race.startTime"
-          size="small"
-          @update="updateTimeBarrier"
-        />
+        <InputTime :time="split.timeBarrier" :reference="race.startTime" size="small" @update="updateTimeBarrier" />
       </template>
     </div>
   </div>
   <div class="cell border-l-1 border-gray-200" v-if="editableMode">
     <div v-if="!edition" class="flex flex-nowrap">
-      <Button
-        icon="pi pi-pencil"
-        size="small"
-        text
-        class="mr-2"
-        @click="editRow"
-      />
-      <Button
-        icon="pi pi-trash"
-        size="small"
-        text
-        :disabled="split.distance === 0 || split.distance === totalDistance"
-        @click="deleteRow"
-      />
+      <Button icon="pi pi-pencil" size="small" text class="mr-2" @click="editRow" />
+      <Button icon="pi pi-trash" size="small" text :disabled="split.distance === 0 || split.distance === totalDistance"
+        @click="deleteRow" />
     </div>
     <template v-else>
-      <Button
-        icon="pi pi-check"
-        size="small"
-        text
-        class="mr-2"
-        @click="saveRow"
-      />
+      <Button icon="pi pi-check" size="small" text class="mr-2" @click="saveRow" />
       <Button icon="pi pi-times" size="small" text @click="uneditRow" />
     </template>
   </div>
@@ -209,7 +144,7 @@
 import {
   dateToFormattedTime,
   minutesToFormattedDuration,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import { SplitItem } from '@/domain/types/SplitItem';
 import InputDistance from '@/ui/components/inputs/InputDistance.vue';
 import InputPaceDuration from '@/ui/components/inputs/InputPaceDuration.vue';

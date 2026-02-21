@@ -1,7 +1,7 @@
 <template>
   <div class="w-[300px]">
     <SelectTag v-model:selected="selectedTheme" :items="options" placeholder="Thème de la semaine" showClear
-      @update:item="updateWeekTheme" @delete:item="handleDeleteWeekTheme" />
+      @update:item="handleUpdateWeekTheme" @delete:item="handleDeleteWeekTheme" />
   </div>
 </template>
 <script setup lang="ts">
@@ -37,6 +37,13 @@ const options = computed((): Item[] => {
   });
 });
 
+const handleUpdateWeekTheme = (updated: WeekTheme) => {
+  updateWeekTheme(updated);
+  if (selectedTheme.value.id == updated.id) {
+    selectedTheme.value = getItemFromWeekTheme(getWeekTheme(updated.id))
+  }
+}
+
 const handleDeleteWeekTheme = (deleted: WeekTheme) => {
   if (selectedTheme.value?.id == deleted.id) {
     selectedTheme.value = null;
@@ -47,8 +54,8 @@ const handleDeleteWeekTheme = (deleted: WeekTheme) => {
 watch(selectedTheme, () => {
   const selectedWeekTheme = getWeekThemeFromItem(selectedTheme.value);
   if (selectedWeekTheme?.id === "new") {
-    addWeekTheme(selectedWeekTheme);
-    updateThemeOfWeek(props.trainingWeek.weekNumber, selectedWeekTheme);
+    const newWeekTheme = addWeekTheme(selectedWeekTheme);
+    updateThemeOfWeek(props.trainingWeek.weekNumber, newWeekTheme);
   } else {
     updateThemeOfWeek(props.trainingWeek.weekNumber, selectedWeekTheme);
   }

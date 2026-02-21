@@ -7,27 +7,17 @@
         </div>
         <div class="flex flex-col gap-2">
           <div class="flex justify-center gap-2 min-w-0">
-            <div
-              v-if="!editing"
-              class="flex justify-center items-center min-w-0"
-            >
+            <div v-if="!editing" class="flex justify-center items-center min-w-0">
               <span class="text-4xl p-3 truncate block max-w-full title-font">
                 {{ race.name }}
               </span>
             </div>
             <div v-else>
-              <InputText
-                v-model="editableName"
-                class="w-full sm:w-auto"
-                placeholder="Nom du plan"
-              />
+              <InputText v-model="editableName" class="w-full sm:w-auto" placeholder="Nom du plan" />
             </div>
           </div>
           <div class="flex flex-col gap-2 items-center">
-            <div
-              class="text-xs md:text-sm text-neutral-600 pb-3"
-              v-if="(race.date || race.startTime) && !editing"
-            >
+            <div class="text-xs md:text-sm text-neutral-600 pb-3" v-if="(race.date || race.startTime) && !editing">
               <span v-if="race.date">
                 Le {{ dateToFormatted(race.date) }}
               </span>
@@ -36,26 +26,13 @@
               </span>
             </div>
             <div v-if="editing" class="flex flex-wrap gap-2">
-              <DatePicker
-                v-model="editableDate"
-                locale="fr"
-                dateFormat="dd/mm/yy"
-                showIcon
-                placeholder="Date"
-              />
-              <InputTime
-                :time="editableTime"
-                @update="({ time }) => (editableTime = time)"
-              />
+              <DatePicker v-model="editableDate" locale="fr" dateFormat="dd/mm/yy" showIcon placeholder="Date" />
+              <InputTime :time="editableTime" @update="({ time }) => (editableTime = time)" />
             </div>
 
             <div class="flex flex-wrap gap-2 justify-center">
-              <ColorTag color="primary"
-                >{{ totalDistance }} <small>km</small></ColorTag
-              >
-              <ColorTag color="amber"
-                >{{ race.totalElevation }}m <small>d+</small></ColorTag
-              >
+              <ColorTag color="primary">{{ totalDistance }} <small>km</small></ColorTag>
+              <ColorTag color="amber">{{ race.totalElevation }}m <small>d+</small></ColorTag>
               <ColorTag color="green" icon="pi pi-stopwatch">
                 Durée prévue: {{ totalDuration }}
               </ColorTag>
@@ -84,7 +61,7 @@ import {
   dateToFormatted,
   dateToFormattedTime,
   minutesToFormattedDuration,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import { Race } from '@/domain/types/Race';
 import InputTime from '@/ui/components/inputs/InputTime.vue';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';

@@ -1,4 +1,4 @@
-import { TagColor } from "../types/TagColor";
+import { TagColor } from '../types/TagColor';
 
 interface TagPalette {
   background: string;
@@ -178,11 +178,15 @@ const palette: Record<TagColor, Record<'soft' | 'strong', TagPalette>> = {
   },
 };
 
-export function getTagColor(color: TagColor, variant = "soft"): TagPalette {
-  if(!palette[color]) return palette['primary'][variant]
-  return palette[color][variant]
+export function getTagColor(color: TagColor, variant = 'soft'): TagPalette {
+  if (!palette[color]) return palette['primary'][variant];
+  return palette[color][variant];
 }
 
 export function getAvailableTagColors(): TagColor[] {
   return Object.keys(palette) as TagColor[];
+}
+
+export function isTagColor(value: string): boolean {
+  return getAvailableTagColors().includes(value as TagColor);
 }

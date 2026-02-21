@@ -1,4 +1,4 @@
-import { dateToMinutes, parseDate } from '@/domain/helpers/Time.helper';
+import { dateToMinutes, parseDate } from '@/domain/helpers/time';
 import { Separator } from '@/domain/types/Separator';
 import { SplitItem } from '@/domain/types/SplitItem';
 import { useRace } from '@/ui/composables/useRace';

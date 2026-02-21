@@ -1,4 +1,4 @@
-import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
+import { roundOneNumber } from '@/domain/helpers/round-number';
 import {
   dateToFormattedTime,
   durationFromPaceAndDistance,
@@ -6,7 +6,7 @@ import {
   numberToPace,
   paceToNumber,
   parseDate,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import { getAveragePace } from '@/domain/services/GpxMetrics';
 import { GpxPoint } from '@/domain/types/GpxPoint';
 import { Separator } from '@/domain/types/Separator';
@@ -14,8 +14,7 @@ import { Split } from '@/domain/types/Split';
 import { useRace } from '@/ui/composables/useRace';
 import { computed } from 'vue';
 
-const { points, separators, splits, race, slidingSlopesPoints } =
-  useRace();
+const { points, separators, splits, race, slidingSlopesPoints } = useRace();
 
 export function useRaceMetrics() {
   function getCumulElevationToDistance(distance: number) {

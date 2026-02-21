@@ -12,8 +12,8 @@
           </div>
         </div>
 
-        <!-- CONTENT (scroll) -->
-        <div class="drawer-body">
+        <!-- CONTENT -->
+        <div class="drawer-body" :style="drawerBodyStyle">
           <slot />
         </div>
 
@@ -42,6 +42,7 @@ const props = withDefaults(
     overlay?: boolean;
     position?: string;
     showCloseButton?: boolean;
+    width?: string;
   }>(),
   {
     id: null,
@@ -49,6 +50,7 @@ const props = withDefaults(
     overlay: false,
     position: 'right',
     showCloseButton: false,
+    width: '500px',
   }
 );
 
@@ -58,9 +60,15 @@ const drawerClasses = computed(() => {
     props.opened ? 'opened' : 'closed',
     props.position,
     props.overlay ? 'overlay' : '',
-    !props.overlay && props.position === 'right' ? 'border-l border-l-gray-200' : ''
+    !props.overlay && props.position === 'right' ? 'border-l border-l-gray-200' : '',
   ].join(' ');
 });
+
+const drawerBodyStyle = computed(() => {
+  return {
+    width: props.width
+  }
+})
 
 const closeDrawer = () => {
   emit('update:opened', false);

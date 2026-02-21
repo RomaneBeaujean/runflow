@@ -1,7 +1,7 @@
 import { GpxParse, smoothPointsByDistance } from '@/domain/services/GpxParse';
 import { GpxPoint } from '@/domain/types/GpxPoint';
 import { SlidingSlopePoint, SlopeType } from '@/domain/types/Slope';
-import { roundOneNumber } from '../helpers/RoundNumbers.helper';
+import { roundOneNumber } from '../helpers/round-number';
 import { computeSlidingSlopeKm } from './Slopes';
 
 type TransitionType = 'summit' | 'valley';

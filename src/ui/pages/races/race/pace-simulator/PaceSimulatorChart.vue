@@ -1,14 +1,9 @@
 <template>
-  <VChart
-    autoresize
-    ref="automaticPaceChartRef"
-    class="h-full"
-    :option="chartOptions"
-  />
+  <VChart autoresize ref="automaticPaceChartRef" class="h-full" :option="chartOptions" />
 </template>
 
 <script setup lang="ts">
-import { numberToPace, paceToNumber } from '@/domain/helpers/Time.helper';
+import { numberToPace, paceToNumber } from '@/domain/helpers/time';
 import { getAveragePace } from '@/domain/services/GpxMetrics';
 import {
   getMarkLineColorStops,

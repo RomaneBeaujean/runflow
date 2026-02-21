@@ -7,14 +7,30 @@
       <template #header>
         <span class="font-bold">Ajouter un plan d'entrainement</span>
       </template>
-      <div class="flex flex-col gap-2">
-        <FloatLabel variant="in">
-          <InputText id="name" v-model="trainingPlanName" :invalid="isNameExist" />
-          <label for="name">Nom du plan d'entrainement</label>
-        </FloatLabel>
-        <Message v-if="isNameExist" severity="error" variant="simple">
-          Ce nom de plan d'entrainement existe déjà. Veuillez en choisir un autre.
-        </Message>
+      <div>
+        <div class="flex flex-col gap-2">
+          <div class="flex-1 flex flex-col gap-1">
+            <label class="font-semibold">Nom du plan d'entrainement</label>
+            <InputText v-model="trainingPlanName" :invalid="isNameExist" />
+          </div>
+          <Message v-if="isNameExist" severity="error" variant="simple">
+            Ce nom de plan d'entrainement existe déjà. Veuillez en choisir un autre.
+          </Message>
+        </div>
+        <Divider />
+
+        <div class="flex gap-2">
+          <div class="flex-1 flex flex-col gap-1">
+            <label class="font-semibold">Durée (semaines)</label>
+            <InputNumber id="weeks" v-model="numberOfWeeks" :min="1" showButtons />
+          </div>
+          <div class="flex-1 flex flex-col gap-1">
+            <label class="font-semibold">Description <span class="font-normal text-gray-500">(facultatif)</span></label>
+            <Textarea v-model="description" />
+          </div>
+
+        </div>
+
       </div>
       <template #footer>
         <Button label="Fermer" text severity="secondary" @click="close" />
@@ -26,11 +42,13 @@
 
 <script setup lang="ts">
 import { useTrainingPlans } from '@/ui/composables/useTrainingPlans';
-import { Button, Dialog, FloatLabel, InputText, Message } from 'primevue';
+import { Button, Dialog, Divider, InputNumber, InputText, Message, Textarea } from 'primevue';
 import { computed, ref } from 'vue';
 
 const dialogOpened = ref<boolean>(false);
 const trainingPlanName = ref<string | null>(null);
+const description = ref(null);
+const numberOfWeeks = ref<number>(12);
 const startDate = ref<Date | null>(null);
 const { isTrainingPlanNameExist, navigateToTrainingPlan, createTrainingPlan } = useTrainingPlans();
 
@@ -49,7 +67,7 @@ const close = () => {
 }
 
 const handleCreateTrainingPlan = async () => {
-  const id = await createTrainingPlan(trainingPlanName.value);
+  const id = await createTrainingPlan({ name: trainingPlanName.value, description: description.value }, numberOfWeeks.value);
   navigateToTrainingPlan(id);
 }
 </script>

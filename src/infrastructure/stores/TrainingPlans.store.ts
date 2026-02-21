@@ -1,7 +1,6 @@
 import { createTrainingPlan } from '@/domain/factories/TrainingPlanFactory';
 import { TrainingPlan } from '@/domain/types/TrainingPlan';
 import { db } from '@/infrastructure/dexie/DexieDatabase';
-import { nanoid } from 'nanoid';
 import { reactive, toRaw } from 'vue';
 
 export class TrainingPlansStore {
@@ -28,7 +27,6 @@ export class TrainingPlansStore {
 
     const newOne = createTrainingPlan({
       ...tp,
-      id: nanoid(),
       createdAt: new Date().toISOString(),
     });
 
@@ -65,7 +63,7 @@ export class TrainingPlansStore {
 
   clearAll = async () => {
     await db.training_plans.clear();
-     this.state = [];
+    this.state = [];
   };
 
   importTrainingPlan = async (file: File) => {
@@ -78,6 +76,6 @@ export class TrainingPlansStore {
 
     await db.training_plans.put(jsonFile);
     await this.init();
-    alert('Plan d\'entrainement importé avec succès !');
+    alert("Plan d'entrainement importé avec succès !");
   };
 }

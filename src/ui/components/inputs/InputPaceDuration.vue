@@ -1,20 +1,8 @@
 <template>
-  <InputMask
-    v-model="currentPace"
-    mask="99:99 (min/km)"
-    placeholder="Allure (min/km)"
-    class="input-pace mr-2"
-    :size="props.size || 'small'"
-    style="width: 125px"
-  />
-  <InputMask
-    v-model="currentDuration"
-    mask="99h99"
-    placeholder="__h__"
-    class="input-duration"
-    :size="props.size || 'small'"
-    style="width: 75px"
-  />
+  <InputMask v-model="currentPace" mask="99:99 (min/km)" placeholder="Allure (min/km)" class="input-pace mr-2"
+    :size="props.size || 'small'" style="width: 125px" />
+  <InputMask v-model="currentDuration" mask="99h99" placeholder="__h__" class="input-duration"
+    :size="props.size || 'small'" style="width: 75px" />
 </template>
 
 <script setup lang="ts">
@@ -23,7 +11,7 @@ import {
   formattedDurationToMinutes,
   minutesToFormattedDuration,
   paceFromMinutesAndDistance,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import { InputMask } from 'primevue';
 import { ref, watch } from 'vue';
 

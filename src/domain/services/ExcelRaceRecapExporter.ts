@@ -1,4 +1,4 @@
-import { dateToFormattedTime } from '@/domain/helpers/Time.helper';
+import { dateToFormattedTime } from '@/domain/helpers/time';
 import useRaceSplits from '@/ui/composables/useRaceSplits';
 import { RecapParams } from '@/ui/pages/races/race/recap/RaceRecapTable.vue';
 import * as XLSX from 'xlsx';

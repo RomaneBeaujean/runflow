@@ -10,17 +10,10 @@ import type { MenuItem } from 'primevue/menuitem';
 import { ref } from 'vue';
 
 const stores = useStores();
-const props = defineProps<{ trainingPlanId: string; edit: () => void }>();
+const props = defineProps<{ trainingPlanId: string }>();
 const menu = ref(null);
 
 const items: MenuItem[] = [
-  {
-    label: 'Modifier le nom du plan',
-    icon: 'pi pi-pencil',
-    command: () => {
-      props.edit();
-    },
-  },
   {
     label: 'Exporter le plan de course',
     icon: 'pi pi-file-export',

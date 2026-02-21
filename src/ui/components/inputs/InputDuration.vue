@@ -7,7 +7,7 @@
 import {
   formattedDurationToMinutes,
   minutesToFormattedDuration,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import { InputMask } from 'primevue';
 import { ref, watch } from 'vue';
 

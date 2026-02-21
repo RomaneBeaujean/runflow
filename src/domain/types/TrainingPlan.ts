@@ -1,9 +1,11 @@
 import { Sport } from './Sport';
 import { WeekTheme } from './WeekTheme';
+import { Workout } from './Workout';
 
 export interface TrainingPlan {
   id: string | null;
   name: string | null;
+  description: string;
   createdAt: string | null;
   startDate: Date | null;
   weeks: TrainingWeek[];
@@ -22,13 +24,4 @@ export interface TrainingDay {
   dayNumber: number;
   weekNumber: number;
   workouts: Workout[];
-}
-
-export interface Workout {
-  id: string | null;
-  title: string;
-  sport: Sport | null;
-  description: string;
-  distance: number;
-  duration: number;
 }

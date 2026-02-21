@@ -1,11 +1,11 @@
-import { TrainingDay, Workout } from '@/domain/types/TrainingPlan';
+import { TrainingDay } from '@/domain/types/TrainingPlan';
+import { Workout } from '@/domain/types/Workout';
 import { ref } from 'vue';
 
 const editableMode = ref<boolean>(true);
 const showAddWorkout = ref<boolean>(false);
 const showAddWorkoutDay = ref<TrainingDay>(null);
 const showWorkoutModels = ref<boolean>(false);
-const isDragging = ref(false);
 const showWorkoutDetails = ref(false);
 const showWorkoutDetailsWorkout = ref<Workout>(null);
 const showWorkoutDetailsDay = ref<TrainingDay>(null);
@@ -33,8 +33,7 @@ export function useTrainingPlanParams() {
     handleCloseAddWorkout();
     handleCloseWorkoutDetails();
     showWorkoutModels.value = true;
-  }
-  
+  };
 
   const handleShowAddWorkout = (trainingDay: TrainingDay) => {
     handleCloseWorkoutDetails();
@@ -42,36 +41,38 @@ export function useTrainingPlanParams() {
 
     showAddWorkout.value = true;
     showAddWorkoutDay.value = trainingDay;
-  }
+  };
 
-  const handleShowWorkoutDetails = (trainingDay: TrainingDay, workout: Workout) => {
+  const handleShowWorkoutDetails = (
+    trainingDay: TrainingDay,
+    workout: Workout
+  ) => {
     handleCloseAddWorkout();
     handleCloseWorkoutModels();
     showWorkoutDetails.value = true;
     showWorkoutDetailsWorkout.value = workout;
     showWorkoutDetailsDay.value = trainingDay;
-  }
+  };
 
   const handleCloseWorkoutModels = () => {
     showWorkoutModels.value = false;
-  }
+  };
 
   const handleCloseAddWorkout = () => {
     showAddWorkout.value = false;
     showAddWorkoutDay.value = null;
-  }
+  };
 
-   const handleCloseWorkoutDetails = () => {
+  const handleCloseWorkoutDetails = () => {
     showWorkoutDetails.value = false;
     showWorkoutDetailsWorkout.value = null;
     showWorkoutDetailsDay.value = null;
-  }
+  };
 
   return {
     showAddWorkout,
     editableMode,
     showAddWorkoutDay,
-    isDragging,
     daysOfWeek,
     showWorkoutModels,
     showWorkoutDetails,
@@ -84,6 +85,6 @@ export function useTrainingPlanParams() {
     handleShowAddWorkout,
     handleShowWorkoutDetails,
     handleCloseAddWorkout,
-    handleShowWorkoutModels
+    handleShowWorkoutModels,
   };
 }

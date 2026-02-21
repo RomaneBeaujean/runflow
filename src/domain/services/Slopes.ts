@@ -1,4 +1,4 @@
-import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
+import { roundOneNumber } from '@/domain/helpers/round-number';
 import { getDistance } from '@/domain/services/GpxMetrics';
 import { GpxPoint } from '@/domain/types/GpxPoint';
 import { GpxSegment } from '@/domain/types/GpxSegment';

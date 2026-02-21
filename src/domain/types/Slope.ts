@@ -1,3 +1,5 @@
+import { GpxPoint } from './GpxPoint';
+
 export interface SlopeTransition {
   transitionType: 'summit' | 'valley';
   distance: number;

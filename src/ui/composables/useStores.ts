@@ -1,4 +1,4 @@
-import { useInjection } from '@/domain/helpers/UseInjection.helper';
+import { useInjection } from '@/domain/helpers/use-injection';
 import { AppStores } from '@/infrastructure/stores/AppLoader';
 
 export function useStores() {

@@ -6,10 +6,7 @@
     <div class="flex flex-col gap-2">
       <Panel toggleable v-model:collapsed="paramsCollapsed">
         <template #header>
-          <div
-            class="flex flex-row flex-1 w-full h-full cursor-pointer"
-            @click="paramsCollapsed = !paramsCollapsed"
-          >
+          <div class="flex flex-row flex-1 w-full h-full cursor-pointer" @click="paramsCollapsed = !paramsCollapsed">
             <div class="flex items-center gap-2 cursor-pointer">
               <i class="pi pi-chart-bar"></i>
               <span class="font-bold">Paramètres à afficher</span>
@@ -18,59 +15,29 @@
         </template>
         <div class="flex">
           <div class="flex-1">
-            <SwitchToggle
-              :display="isMobile ? 'col' : 'row'"
-              label="Heure"
-              v-model="params.time"
-            />
-            <SwitchToggle
-              :display="isMobile ? 'col' : 'row'"
-              label="Temps écoulé"
-              v-model="params.totalDuration"
-            />
-            <SwitchToggle
-              :display="isMobile ? 'col' : 'row'"
-              label="Barrière horraire"
-              v-model="params.timeBarrier"
-            />
+            <SwitchToggle :display="isMobile ? 'col' : 'row'" label="Heure" v-model:value="params.time" />
+            <SwitchToggle :display="isMobile ? 'col' : 'row'" label="Temps écoulé"
+              v-model:value="params.totalDuration" />
+            <SwitchToggle :display="isMobile ? 'col' : 'row'" label="Barrière horraire"
+              v-model:value="params.timeBarrier" />
           </div>
 
           <Divider layout="vertical" />
 
           <div class="flex-1">
-            <SwitchToggle
-              :display="isMobile ? 'col' : 'row'"
-              label="Distance split"
-              v-model="params.splitDistance"
-            />
-            <SwitchToggle
-              :display="isMobile ? 'col' : 'row'"
-              label="Allure split"
-              v-model="params.splitPace"
-            />
-            <SwitchToggle
-              :display="isMobile ? 'col' : 'row'"
-              label="Durée split"
-              v-model="params.splitDuration"
-            />
-            <SwitchToggle
-              :display="isMobile ? 'col' : 'row'"
-              label="Dénivelé split"
-              v-model="params.splitElevation"
-            />
-            <SwitchToggle
-              :display="isMobile ? 'col' : 'row'"
-              label="Pente split"
-              v-model="params.splitSlope"
-            />
+            <SwitchToggle :display="isMobile ? 'col' : 'row'" label="Distance split"
+              v-model:value="params.splitDistance" />
+            <SwitchToggle :display="isMobile ? 'col' : 'row'" label="Allure split" v-model:value="params.splitPace" />
+            <SwitchToggle :display="isMobile ? 'col' : 'row'" label="Durée split"
+              v-model:value="params.splitDuration" />
+            <SwitchToggle :display="isMobile ? 'col' : 'row'" label="Dénivelé split"
+              v-model:value="params.splitElevation" />
+            <SwitchToggle :display="isMobile ? 'col' : 'row'" label="Pente split" v-model:value="params.splitSlope" />
           </div>
         </div>
       </Panel>
 
-      <div
-        id="preview"
-        class="w-full h-[500px] p-3 border-1 border-gray-400 bg-gray-200 rounded overflow-auto"
-      >
+      <div id="preview" class="w-full h-[500px] p-3 border-1 border-gray-400 bg-gray-200 rounded overflow-auto">
         <div style="pointer-events: none">
           <RaceRecapChart :params="params" />
         </div>
@@ -79,23 +46,11 @@
 
     <template #footer>
       <div>
-        <Button
-          label="Annuler"
-          icon="pi pi-times"
-          variant="outlined"
-          size="small"
-          severity="secondary"
-          @click="closeModal"
-        />
+        <Button label="Annuler" icon="pi pi-times" variant="outlined" size="small" severity="secondary"
+          @click="closeModal" />
       </div>
       <div>
-        <Button
-          size="small"
-          icon="pi pi-download"
-          variant="outlined"
-          label="Télécharger"
-          @click="downloadFile"
-        />
+        <Button size="small" icon="pi pi-download" variant="outlined" label="Télécharger" @click="downloadFile" />
       </div>
     </template>
   </Dialog>
@@ -162,7 +117,8 @@ const downloadFile = async () => {
 
 @media (max-width: 768px) {
   .p-dialog {
-    width: calc(100vw - 32px) !important; /* 8px de chaque côté */
+    width: calc(100vw - 32px) !important;
+    /* 8px de chaque côté */
     height: calc(100vh - 32px) !important;
   }
 }

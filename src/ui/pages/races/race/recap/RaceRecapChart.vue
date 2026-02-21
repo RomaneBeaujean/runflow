@@ -1,20 +1,14 @@
 <template>
-  <VChart
-    id="chartRecap"
-    ref="recapChartRef"
-    :option="chartOptions"
-    autoresize
-    :style="computedStyle"
-  />
+  <VChart id="chartRecap" ref="recapChartRef" :option="chartOptions" autoresize :style="computedStyle" />
 </template>
 
 <script setup lang="ts">
-import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
+import { roundOneNumber } from '@/domain/helpers/round-number';
 import {
   dateToFormattedTime,
   minutesToFormattedDuration,
   parseDate,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import { getSlopeColors } from '@/domain/services/Slopes';
 import { Separator } from '@/domain/types/Separator';
 import { Split } from '@/domain/types/Split';
@@ -408,7 +402,8 @@ watch([chartSeparators, props.params, splits], () => {
   border-collapse: collapse;
   table-layout: auto;
   border-collapse: collapse;
-  width: max-content; /* optionnel, et très utile */
+  width: max-content;
+  /* optionnel, et très utile */
 }
 
 .header {

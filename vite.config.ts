@@ -16,6 +16,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@domain': fileURLToPath(new URL('./src/domain', import.meta.url)),
+      '@ui': fileURLToPath(new URL('./src/ui', import.meta.url)),
+      '@components': fileURLToPath(
+        new URL('./src/ui/components', import.meta.url)
+      ),
+      '@pages': fileURLToPath(new URL('./src/ui/pages', import.meta.url)),
+      '@composables': fileURLToPath(
+        new URL('./src/ui/composables', import.meta.url)
+      ),
     },
   },
   css: {

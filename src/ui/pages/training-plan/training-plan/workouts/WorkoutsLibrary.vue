@@ -1,29 +1,29 @@
 <template>
-  <Drawer v-model:opened="showWorkoutModels" position="right">
+  <Drawer v-model:opened="showWorkoutModels" position="right" width="564px">
 
     <template #header v-if="showWorkoutModels">
       <div class="flex justify-between items-center">
         <div class="flex-1 font-bold text-xl">Bibliothèque de séances</div>
         <div class="flex-0">
-          <Button text icon="pi pi-plus" size="small" @click="handleShowAddWorkout" />
+          <Button text icon="pi pi-plus" size="small" @click="handleShowAddWorkout" v-if="!showAddModel" />
         </div>
       </div>
     </template>
 
     <!-- Body  -->
-    <div class="flex-1 flex flex-col gap-2 w-[400px]" v-if="showWorkoutModels">
+    <div class="flex-1 flex flex-col gap-2" v-if="showWorkoutModels">
       <div v-if="!showEditModel && !showAddModel">
-        <div class="flex gap-2 mb-4">
+        <!-- <div class="flex gap-2 items-center mb-4">
+          <div>
+            <SelectSport v-model:selected="searchSportValue" showClear />
+          </div>
           <div class="flex-1">
             <FloatLabel variant="in">
               <InputText id="title" v-model="searchModelValue" class="w-full" />
               <label for="title">Rechercher un modèle</label>
             </FloatLabel>
           </div>
-          <div class="flex-1">
-            <SelectSport v-model:selectedSport="searchSportValue" showClear />
-          </div>
-        </div>
+        </div> -->
         <WorkoutsList @showEditModel="handleShowEditModel" v-model:workoutModels="displayedModels" />
       </div>
       <div v-if="showEditModel">
@@ -50,10 +50,9 @@
       <div class="flex justify-end gap-2">
         <Button label="Fermer" variant="outlined" @click="handleClose" v-if="!showEditModel" />
         <Button label="Annuler" variant="outlined" v-if="showEditModel" @click="handleCloseEdition" />
-        <Button label="Enregistrer le modèle" icon="pi pi-save" v-if="showAddModel" :disabled="isSaveButtonDisabled"
-          @click="handleAddModel" />
-        <Button label="Enregistrer les modifications" icon="pi pi-save" v-if="showEditModel"
-          :disabled="isSaveButtonDisabled" @click="handleSaveModel" />
+        <Button label="Enregistrer le modèle" icon="pi pi-save" v-if="showAddModel" @click="handleAddModel" />
+        <Button label="Enregistrer les modifications" icon="pi pi-save" v-if="showEditModel" :disabled="isDisabled"
+          @click="handleSaveModel" />
       </div>
     </template>
   </Drawer>
@@ -65,20 +64,17 @@ import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
 import { useTrainingPlanParams } from '@/ui/composables/useTrainingPlanParams';
 import {
   Button,
-  FloatLabel,
-  InputText,
   Message
 } from 'primevue';
 import { computed, ref } from 'vue';
 
 import { createWorkout } from '@/domain/factories/WorkoutFactory';
-import { Workout } from '@/domain/types/TrainingPlan';
-import SelectSport from '@/ui/components/select/SelectSport.vue';
-import WorkoutForm from '@/ui/components/workout/WorkoutForm.vue';
+import { Workout } from '@/domain/types/Workout';
 import { useTrainingPlanHelper } from '@/ui/composables/useTrainingPlanHelper';
 import WorkoutsList from './WorkoutsList.vue';
+import WorkoutForm from './workout/workout-form/WorkoutForm.vue';
 const { showWorkoutModels, handleCloseWorkoutModels } = useTrainingPlanParams();
-const { isSameWorkout } = useTrainingPlanHelper();
+const { isTitleExist, isFormValid } = useTrainingPlanHelper();
 const { workoutModels, updateWorkoutModel, addWorkoutModel } = useTrainingPlan();
 
 const searchModelValue = ref(null);
@@ -90,32 +86,23 @@ const editedWorkout = ref(null);
 
 const displayedModels = computed(() => {
   return [...workoutModels.value].filter((m) => {
-    const sportOk = searchSportValue.value ? m.sport.label == searchSportValue.value.label : true;
+    const sportOk = searchSportValue.value ? m.sportId == searchSportValue.value : true;
     const titleOk = searchModelValue.value ? m.title.match(searchModelValue.value) : true;
     return sportOk && titleOk;
   })
 });
 
-const isSaveButtonDisabled = computed(() => {
-  if (isTitleExist.value) return true;
-  const isSame = isSameWorkout(initialWorkout.value, editedWorkout.value);
-  return isSame || !editedWorkout.value.title || !editedWorkout.value.sport;
-});
-
-const isTitleExist = computed(() => {
-  if (!editedWorkout.value) return false;
-  const otherTitles = workoutModels.value.filter((el) => el.id !== editedWorkout.value.id).map((el) => el.title);
-  const exist = otherTitles.includes(editedWorkout.value.title);
-  return exist
-})
-
 const titleMessage = computed(() => {
-  if (isTitleExist.value) return {
+  if (isTitleExist(editedWorkout.value)) return {
     severity: 'error',
     message: 'Ce titre de séance est déjà utilisé pour ce sport'
   }
   return null;
 });
+
+const isDisabled = computed(() => {
+  return !isFormValid(editedWorkout.value, initialWorkout.value);
+})
 
 const handleClose = () => {
   handleCloseWorkoutModels()

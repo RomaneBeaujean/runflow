@@ -1,6 +1,6 @@
 <!-- AddWorkout.vue -->
 <template>
-  <Drawer v-model:opened="showAddWorkout" position="right" showCloseButton id="addWorkout">
+  <Drawer v-model:opened="showAddWorkout" position="right" overlay showCloseButton id="addWorkout" width="564px">
     <template #header v-if="showAddWorkout">
       <div class="font-bold text-xl">Ajouter une séance</div>
       <div class="font-regular text-md mt-2 flex gap-2">
@@ -11,26 +11,64 @@
 
     </template>
 
-    <div class="flex flex-col w-[450px]" v-if="showAddWorkout">
-      <SelectWorkoutTemplate v-model:selectedModelId="workoutModelId" />
-      <Divider />
+    <div class="flex flex-col h-full" v-if="showAddWorkout">
+
+      <!-- <div class="flex flex-col h-full items-center justify-center gap-2">
+        <div
+          class="w-[200px] h-[100px] p-2 border-1 border-gray-200 flex items-center justify-center rounded-lg shadow-lg cursor-pointer gap-3 hover:shadow-2xl hover:bg-gray-50">
+          <div alass=" h-full flex items-center justify-center flex-0">
+            <Icon size="large" icon="pi pi-plus" class="" />
+          </div>
+          <div>
+            <div class="font-bold text-sm">
+              Nouvelle séance
+            </div>
+            <div class="text-gray-600 text-sm">Créer une nouvelle séance</div>
+          </div>
+        </div>
+        <div>
+          ou
+        </div>
+        <div
+          class="w-[200px] h-[100px] p-2 border-1 border-gray-200 flex items-center justify-center rounded-lg shadow-lg cursor-pointer gap-3 hover:shadow-2xl hover:bg-gray-50">
+          <div alass="h-full flex items-center justify-center flex-0">
+            <Icon size="large" icon="pi pi-book" class="" />
+          </div>
+          <div>
+            <div class="font-bold text-sm">
+              Depuis la bibliothèque
+            </div>
+            <div class="text-gray-600 text-sm">Copier ou planifier une séance existante </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- <div>
+        <div class="font-semibold">
+          Depuis la bibliothèque
+        </div>
+        <SelectWorkoutTemplate v-model:selectedModelId="workoutModelId" />
+      </div>
+      <Divider /> -->
       <WorkoutForm v-model:workout="workout" :titleMessage="titleMessage" />
     </div>
 
     <template #footer>
-      <div class="flex gap-2 mb-3">
-        <Checkbox v-model="saveModelOnLibrary" inputId="saveModel" binary :disabled="isSaveModelDisabled"
-          class="mt-[1px]" />
-        <label for="saveModel" class="font-semibold">
-          Ajouter cette séance à la bibliothèque de modèles
-          <Message v-show="isSaveModelDisabled" variant="simple" size="small">
-            Ce modèle de séance est déjà enregistré
-          </Message>
-        </label>
-      </div>
-      <div class="flex justify-end gap-2">
-        <Button label="Annuler" variant="outlined" @click="handleCloseAddWorkout" />
-        <Button :label="validateButtonLabel" @click="handleAddWorkout" :disabled="validateButtonDisabled" />
+      <div class="flex flex-col gap-3">
+        <div class="flex gap-2 items-center" v-if="!isSubmitButtonDisabled">
+          <Checkbox v-model="saveModelOnLibrary" inputId="saveModel" binary :disabled="isSaveModelDisabled" />
+          <label for="saveModel" class="font-semibold cursor-pointer">
+            Ajouter cette séance à la bibliothèque de modèles
+            <Message v-show="isSaveModelDisabled" variant="simple" size="small">
+              Ce modèle de séance est déjà enregistré
+            </Message>
+          </label>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <Button label="Annuler" variant="outlined" @click="handleCloseAddWorkout" />
+          <Button :label="validateButtonLabel" @click="handleAddWorkout" :disabled="isSubmitButtonDisabled" />
+        </div>
       </div>
     </template>
   </Drawer>
@@ -38,43 +76,33 @@
 
 <script setup lang="ts">
 import { createWorkout } from '@/domain/factories/WorkoutFactory';
-import { Workout } from '@/domain/types/TrainingPlan';
+import { Workout } from '@/domain/types/Workout';
 import Drawer from '@/ui/components/drawer/Drawer.vue';
-import SelectWorkoutTemplate from '@/ui/components/select/SelectWorkoutTemplate.vue';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
-import WorkoutForm from '@/ui/components/workout/WorkoutForm.vue';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
+import { useTrainingPlanHelper } from '@/ui/composables/useTrainingPlanHelper';
 import { useTrainingPlanParams } from '@/ui/composables/useTrainingPlanParams';
+import WorkoutForm from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-form/WorkoutForm.vue';
 import {
   Button,
   Checkbox,
-  Divider,
   Message
 } from 'primevue';
 import { computed, ref, watch } from 'vue';
 
 const { showAddWorkout, showAddWorkoutDay, getRealDayNumber, getWeekDayLabel, handleCloseAddWorkout } =
   useTrainingPlanParams();
-
 const { planifyWorkout, addWorkoutModel, workoutModels } = useTrainingPlan();
+const { isFormValid, isTitleExist } = useTrainingPlanHelper();
 
 const workoutModelId = ref<string>(null);
-const workout = ref<Workout>({
-  id: null,
-  title: null,
-  description: null,
-  sport: null,
-  duration: null,
-  distance: null,
-});
+const workout = ref<Workout>(createWorkout({ sportId: 'course-a-pied' }));
 const saveModelOnLibrary = ref<boolean>(true);
+
 /**
  * Computed
  */
-const isTitleExist = computed(() => {
-  if (!workout.value) return false;
-  return workoutModels.value.some((model) => model.title === workout.value.title && model.sport.label === workout.value.sport?.label);
-})
+
 
 const isSaveModelDisabled = computed(() => {
   return workoutFromModelId.value !== null;
@@ -85,33 +113,29 @@ const workoutFromModelId = computed(() => {
 })
 
 const titleMessage = computed(() => {
-  if (!workoutModelId.value && isTitleExist.value) return {
+  if (!workoutModelId.value && isTitleExist(workout.value)) return {
     severity: 'error',
     message: 'Ce titre de séance est déjà utilisé pour ce sport'
   }
   return null;
 });
 
-const validateButtonDisabled = computed(() => {
-  const titleExist = !workoutModelId.value && isTitleExist.value;
-  return !workout.value.title || !workout.value.sport || titleExist;
+const isSubmitButtonDisabled = computed(() => {
+  return !isFormValid(workout.value, workoutFromModelId.value)
 });
 
 const validateButtonLabel = computed(() => {
   if (workoutModelId.value) return 'Planifier la séance'
-  if (workout.value.title && workout.value.sport && saveModelOnLibrary.value) return 'Planifier la séance & enregistrer le modèle'
+  if (workout.value.title && workout.value.sportId && saveModelOnLibrary.value) return 'Planifier la séance & enregistrer le modèle'
   return 'Planifier la séance'
 });
+
 /**
  * Functions
  */
 
-const initForm = (data: Workout | null) => {
-  workout.value.title = data?.title || null;
-  workout.value.description = data?.description || null;
-  workout.value.sport = data?.sport || null;
-  workout.value.distance = data?.distance || null;
-  workout.value.duration = data?.duration || null;
+const initForm = (data: Partial<Workout> | null) => {
+  workout.value = createWorkout(data);
   saveModelOnLibrary.value = true;
 }
 
@@ -120,6 +144,7 @@ const handleAddWorkout = () => {
     id: workoutModelId.value,
     ...workout.value
   });
+
   if (saveModelOnLibrary.value) addWorkoutModel(newWorkout);
   planifyWorkout(newWorkout, showAddWorkoutDay.value);
   handleCloseAddWorkout();
@@ -130,11 +155,12 @@ const handleAddWorkout = () => {
  */
 
 watch(showAddWorkout, () => {
-  initForm(null);
+  initForm({ sportId: 'course-a-pied' });
 });
 
 watch(workoutModelId, () => {
   const workout: Workout | null = workoutFromModelId.value;
+
   if (workout) initForm(workout);
 })
 
@@ -146,14 +172,7 @@ watch(
     const model = workoutFromModelId.value;
     if (!model) return;
 
-
-    const isSame =
-      newWorkout.title === model.title &&
-      newWorkout.description === model.description &&
-      newWorkout.distance === model.distance &&
-      newWorkout.duration === model.duration &&
-      newWorkout.sport?.label === model.sport?.label;
-
+    const isSame = createWorkout(newWorkout) == createWorkout(model)
     if (!isSame) {
       workoutModelId.value = null;
     }

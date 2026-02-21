@@ -3,7 +3,8 @@ import { useStores } from './useStores';
 import { useTrainingPlan } from './useTrainingPlan';
 
 export function useTrainingPlanWatchers() {
-  const { id, weeks, name, weekThemes, sports, workoutModels } = useTrainingPlan();
+  const { id, weeks, name, weekThemes, sports, workoutModels, description } =
+    useTrainingPlan();
   const stores = useStores();
 
   watch(
@@ -13,10 +14,11 @@ export function useTrainingPlanWatchers() {
         weeks: weeks.value,
         name: name.value,
         weekThemes: weekThemes.value,
+        description: description.value,
         sports: sports.value,
-        workoutModels: workoutModels.value
+        workoutModels: workoutModels.value,
       });
-      console.log('✅ saved on db')
+      console.log('✅ saved on db');
     },
     { deep: true, flush: 'post' }
   );

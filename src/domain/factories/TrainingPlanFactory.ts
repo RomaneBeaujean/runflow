@@ -2,11 +2,7 @@ import { nanoid } from 'nanoid';
 import { DEFAULT_SPORTS } from '../constants/sports';
 import { DEFAULT_WEEK_THEMES } from '../constants/weekThemes';
 import { Sport } from '../types/Sport';
-import {
-  TrainingDay,
-  TrainingPlan,
-  TrainingWeek,
-} from '../types/TrainingPlan';
+import { TrainingDay, TrainingPlan, TrainingWeek } from '../types/TrainingPlan';
 import { WeekTheme } from '../types/WeekTheme';
 import { createWorkout } from './WorkoutFactory';
 
@@ -14,14 +10,23 @@ export function createTrainingPlan(data?: Partial<TrainingPlan>): TrainingPlan {
   const plan: TrainingPlan = {
     id: data?.id ?? nanoid(),
     name: data?.name ?? null,
+    description: data?.description ?? null,
     createdAt: data?.createdAt ?? new Date().toISOString(),
     startDate: data?.startDate ?? null,
     weeks: data?.weeks ?? [createTrainingWeek({ weekNumber: 1 })],
-    weekThemes: data.weekThemes || [...DEFAULT_WEEK_THEMES],
-    sports: data?.sports || [...DEFAULT_SPORTS],
+    weekThemes: createWeekThemes(data?.weekThemes || DEFAULT_WEEK_THEMES),
+    sports: createSports(DEFAULT_SPORTS),
     workoutModels: data?.workoutModels?.map((el) => createWorkout(el)) || [],
   };
   return plan;
+}
+
+export function createTrainingPlanWeeks(numberOfWeeks: number): TrainingWeek[] {
+  const weeks = [];
+  for (let i = 1; i <= numberOfWeeks; i++) {
+    weeks.push(createTrainingWeek({ weekNumber: i }));
+  }
+  return weeks;
 }
 
 export function createTrainingWeek(data?: Partial<TrainingWeek>): TrainingWeek {
@@ -56,8 +61,8 @@ export function createTrainingDay(data?: Partial<TrainingDay>): TrainingDay {
 export function createWeekThemes(data?: WeekTheme[]): WeekTheme[] {
   const combined = [...data];
   const seen = new Map<string | null, WeekTheme>();
-  
-  combined.forEach(weekTheme => {
+
+  combined.forEach((weekTheme) => {
     const key = weekTheme.label;
     if (!seen.has(key)) {
       seen.set(key, weekTheme);
@@ -70,21 +75,21 @@ export function createWeekThemes(data?: WeekTheme[]): WeekTheme[] {
 export function createSports(data?: Sport[]): Sport[] {
   const combined = [...(data || [])];
   const seen = new Map<string | null, Sport>();
-  
-  combined.forEach(sport => {
-    const key = sport.id ?? sport.label; // Utiliser id ou label comme clé unique
+
+  combined.forEach((sport) => {
+    const key = sport.id ?? sport.label;
     if (!seen.has(key)) {
       seen.set(key, sport);
     }
   });
-  
+
   return Array.from(seen.values());
 }
 export function createWeekTheme(data?: Partial<WeekTheme>): WeekTheme {
   return {
     id: nanoid(),
     label: data.label ?? '',
-    color: data.color ?? null,
+    color: data.color ?? 'primary',
   };
 }
 
@@ -93,6 +98,7 @@ export function createSport(data?: Partial<Sport>): Sport {
     id: data.id ?? nanoid(),
     label: data.label ?? '',
     color: data.color ?? null,
+    background: data.background ?? null,
     icon: data.icon ?? '',
   };
 }

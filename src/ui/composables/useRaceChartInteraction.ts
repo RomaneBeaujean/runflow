@@ -1,5 +1,5 @@
-import { roundOneNumber } from '@/domain/helpers/RoundNumbers.helper';
-import { numberToPace } from '@/domain/helpers/Time.helper';
+import { roundOneNumber } from '@/domain/helpers/round-number';
+import { numberToPace } from '@/domain/helpers/time';
 import { GpxPoint } from '@/domain/types/GpxPoint';
 import { Position } from '@/domain/types/Position';
 import { Separator } from '@/domain/types/Separator';

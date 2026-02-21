@@ -58,9 +58,7 @@
           <!-- Longeur split -->
           <div class="cell">
             <div class="inside-cell">
-              <span v-if="idx !== 0"
-                >{{ split.splitDistance }} <span class="xsmall">km</span></span
-              >
+              <span v-if="idx !== 0">{{ split.splitDistance }} <span class="xsmall">km</span></span>
             </div>
           </div>
           <!-- Dénivelé split positif -->
@@ -155,7 +153,7 @@
 import {
   dateToFormattedTime,
   minutesToFormattedDuration,
-} from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/time';
 import useRaceSplits from '@/ui/composables/useRaceSplits';
 
 export interface RecapParams {

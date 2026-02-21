@@ -10,7 +10,7 @@
 
       <Button label="Importer un plan d'entrainement" rounded icon="pi pi-download" text @click="importFile" />
     </div>
-    <TrainingsList />
+    <TrainingPlanList />
   </div>
 </template>
 
@@ -18,7 +18,7 @@
 import { useStores } from '@/ui/composables/useStores';
 import { Button } from 'primevue';
 import AddNewTrainingPlan from './AddNewTrainingPlan.vue';
-import TrainingsList from './trainings-list/TrainingsList.vue';
+import TrainingPlanList from './TrainingPlanList.vue';
 
 const stores = useStores();
 

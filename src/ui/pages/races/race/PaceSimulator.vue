@@ -9,13 +9,7 @@
               (environ -3%) ?
             </div>
             <div class="w-full">
-              <PaceSlider
-                :min="2"
-                :max="18"
-                :step="1 / 60"
-                :hideGraduation="isMobile"
-                v-model="maxPace"
-              />
+              <PaceSlider :min="2" :max="18" :step="1 / 60" :hideGraduation="isMobile" v-model="maxPace" />
             </div>
           </div>
         </div>
@@ -27,13 +21,8 @@
               %) ?
             </div>
             <div class="w-full">
-              <PaceSlider
-                :min="Math.floor(maxPace)"
-                :max="30"
-                :step="1 / 60"
-                v-model="minUpPace"
-                :hideGraduation="isMobile"
-              />
+              <PaceSlider :min="Math.floor(maxPace)" :max="30" :step="1 / 60" v-model="minUpPace"
+                :hideGraduation="isMobile" />
             </div>
           </div>
           <div class="flex flex-col gap-2 md:w-[50%]">
@@ -43,13 +32,8 @@
               %) ?
             </div>
             <div class="w-full">
-              <PaceSlider
-                :min="Math.floor(maxPace)"
-                :max="30"
-                :step="1 / 60"
-                v-model="minDownPace"
-                :hideGraduation="isMobile"
-              />
+              <PaceSlider :min="Math.floor(maxPace)" :max="30" :step="1 / 60" v-model="minDownPace"
+                :hideGraduation="isMobile" />
             </div>
           </div>
         </div>
@@ -63,12 +47,7 @@
         </div>
         <div class="md:w-[50%]">
           <div class="text-center font-bold p-2">Aptitude en descente</div>
-          <DifficultiesSlider
-            v-model="pDown"
-            :min="0.1"
-            :max="4"
-            :step="0.05"
-          />
+          <DifficultiesSlider v-model="pDown" :min="0.1" :max="4" :step="0.05" />
         </div>
       </div>
     </Fieldset>
@@ -77,30 +56,16 @@
         <div class="flex flex-col md:flex-row gap-3">
           <div class="md:w-[50%]">
             <div class="text-center font-bold p-2">Allure moyenne</div>
-            <PaceSlider
-              v-model="averagePace"
-              :min="Math.floor(maxPace)"
-              :max="Math.floor(minUpPace)"
-              :step="1 / 60"
-              :hideGraduation="isMobile"
-            />
+            <PaceSlider v-model="averagePace" :min="Math.floor(maxPace)" :max="Math.floor(minUpPace)" :step="1 / 60"
+              :hideGraduation="isMobile" />
           </div>
           <div class="md:w-[50%]">
             <div class="text-center font-bold p-2">Durée totale</div>
-            <DurationSlider
-              v-model="totalDuration"
-              :step="1"
-              :min="minDuration"
-              :max="maxDuration"
-            />
+            <DurationSlider v-model="totalDuration" :step="1" :min="minDuration" :max="maxDuration" />
           </div>
         </div>
         <div class="h-[250px] md:h-[400px]">
-          <PaceSimulatorChart
-            :splits="splits"
-            :points="points"
-            :slidingSlopesPoints="slidingSlopesPoints"
-          />
+          <PaceSimulatorChart :splits="splits" :points="points" :slidingSlopesPoints="slidingSlopesPoints" />
         </div>
       </div>
     </Fieldset>
@@ -110,30 +75,16 @@
       <div class="flex flex-col md:flex-row gap-3">
         <div class="md:w-[50%]">
           <div class="text-center font-bold p-2">Allure moyenne</div>
-          <PaceSlider
-            v-model="averagePace"
-            :min="Math.floor(maxPace)"
-            :max="Math.floor(minUpPace)"
-            :step="1 / 60"
-            :hideGraduation="isMobile"
-          />
+          <PaceSlider v-model="averagePace" :min="Math.floor(maxPace)" :max="Math.floor(minUpPace)" :step="1 / 60"
+            :hideGraduation="isMobile" />
         </div>
         <div class="md:w-[50%]">
           <div class="text-center font-bold p-2">Durée totale</div>
-          <DurationSlider
-            v-model="totalDuration"
-            :step="1"
-            :min="minDuration"
-            :max="maxDuration"
-          />
+          <DurationSlider v-model="totalDuration" :step="1" :min="minDuration" :max="maxDuration" />
         </div>
       </div>
       <div class="h-[250px] md:h-[400px]">
-        <PaceSimulatorChart
-          :splits="splits"
-          :points="points"
-          :slidingSlopesPoints="slidingSlopesPoints"
-        />
+        <PaceSimulatorChart :splits="splits" :points="points" :slidingSlopesPoints="slidingSlopesPoints" />
       </div>
     </div>
   </template>
@@ -143,8 +94,8 @@
 import {
   roundOneNumber,
   roundThreeNumber,
-} from '@/domain/helpers/RoundNumbers.helper';
-import { paceToNumber } from '@/domain/helpers/Time.helper';
+} from '@/domain/helpers/round-number';
+import { paceToNumber } from '@/domain/helpers/time';
 import { GpxParse } from '@/domain/lib/gpx/GpxParse';
 import { ClimbDetector } from '@/domain/services/ClimbDetector';
 import { PaceCalculator } from '@/domain/services/PaceCalculator';

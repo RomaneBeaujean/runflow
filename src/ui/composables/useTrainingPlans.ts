@@ -1,9 +1,11 @@
-import { DEFAULT_SPORTS } from "@/domain/constants/sports";
-import { DEFAULT_WEEK_THEMES } from "@/domain/constants/weekThemes";
-import { computed } from "vue";
-import { useRouter } from "vue-router";
-import { useStores } from "./useStores";
-
+import {
+  createTrainingPlanWeeks,
+  createTrainingPlan as factory,
+} from '@/domain/factories/TrainingPlanFactory';
+import { TrainingPlan } from '@/domain/types/TrainingPlan';
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStores } from './useStores';
 
 export function useTrainingPlans() {
   const stores = useStores();
@@ -12,32 +14,32 @@ export function useTrainingPlans() {
   const allTrainingPlans = computed(() => {
     return stores.training_plans_store.training_plans;
   });
-  
-  const isTrainingPlanNameExist = (value: string) => {
-    const allNames = allTrainingPlans.value.map((tp) => tp.name);
+
+  const isTrainingPlanNameExist = (initial: string, value: string) => {
+    const allNames = allTrainingPlans.value
+      .map((tp) => tp.name)
+      .filter((n) => n !== initial);
     return allNames.includes(value);
-  }
+  };
 
-  const createTrainingPlan = async (name: string): Promise<string> => {
-    if (!name) return;
-
-    const id = await stores.training_plans_store.create({
-      name: name,
-      weekThemes: [...DEFAULT_WEEK_THEMES],
-      sports: [...DEFAULT_SPORTS],
-    });
-
+  const createTrainingPlan = async (
+    trainingPlan: Partial<TrainingPlan>,
+    numberOfWeeks: number
+  ): Promise<string> => {
+    const weeks = createTrainingPlanWeeks(numberOfWeeks);
+    const newTrainingPlan = factory({ ...trainingPlan, weeks });
+    const id = await stores.training_plans_store.create(newTrainingPlan);
     return id;
-  }
+  };
 
   function navigateToTrainingPlan(id: string) {
-  router.push(`/trainings/${id}`);
-}
+    router.push(`/trainings/${id}`);
+  }
 
   return {
     allTrainingPlans,
     isTrainingPlanNameExist,
     createTrainingPlan,
-    navigateToTrainingPlan
-  }
+    navigateToTrainingPlan,
+  };
 }

@@ -2,48 +2,34 @@
   <div class="pl-[20px] pr-[20px] select-none">
     <div class="w-full relative pt-10 pb-5">
       <!-- Bullette de valeur -->
-      <div
-        class="absolute top-0 transform -translate-x-1/2 bg-primary-400 text-white px-2 py-1 rounded"
-        :style="{ left: thumbPosition + '%' }"
-      >
+      <div class="absolute top-0 transform -translate-x-1/2 bg-primary-400 text-white px-2 py-1 rounded"
+        :style="{ left: thumbPosition + '%' }">
         <span class="flex flex-nowrap whitespace-nowrap items-center">
           <b>{{ formattedValue }}</b>
         </span>
       </div>
 
       <!-- Barre + curseur -->
-      <div
-        class="relative h-2 cursor-pointer"
-        ref="sliderRef"
-        @mousedown="startDrag"
-        @touchstart="startDrag"
-        @click="onClick"
-      >
+      <div class="relative h-2 cursor-pointer" ref="sliderRef" @mousedown="startDrag" @touchstart="startDrag"
+        @click="onClick">
         <!-- Track -->
-        <div
-          class="absolute w-full h-1 bg-gray-300 top-1/2 transform -translate-y-1/2 rounded"
-        ></div>
+        <div class="absolute w-full h-1 bg-gray-300 top-1/2 transform -translate-y-1/2 rounded"></div>
 
         <!-- Barre remplie (progress) -->
-        <div
-          class="absolute h-1 bg-primary-400 top-1/2 transform -translate-y-1/2 rounded"
-          :style="{ width: thumbPosition + '%' }"
-        ></div>
+        <div class="absolute h-1 bg-primary-400 top-1/2 transform -translate-y-1/2 rounded"
+          :style="{ width: thumbPosition + '%' }"></div>
 
         <!-- Curseur -->
         <div
           class="absolute top-1/2 w-3.5 h-3.5 bg-white border-2 border-primary-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
-          :style="{ left: thumbPosition + '%' }"
-          @mousedown.stop="startDrag"
-          @touchstart.stop="startDrag"
-        ></div>
+          :style="{ left: thumbPosition + '%' }" @mousedown.stop="startDrag" @touchstart.stop="startDrag"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { minutesToFormattedDuration } from '@/domain/helpers/Time.helper';
+import { minutesToFormattedDuration } from '@/domain/helpers/time';
 import { computed, ref, watch } from 'vue';
 
 const emit = defineEmits<{

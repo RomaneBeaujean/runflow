@@ -1,3 +1,5 @@
+import { Split } from './Split';
+
 export interface SplitItem {
   id: string;
   refuel: boolean;

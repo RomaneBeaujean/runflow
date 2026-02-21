@@ -2,7 +2,7 @@
   <template v-if="stores.races_store.races.length > 0">
     <div class="grid gap-5 p-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <div v-for="tp in stores.training_plans_store.training_plans" :key="tp.id" class="flex flex-col">
-        <TrainingCard :trainingPlan="tp" />
+        <TrainingPlanListCard :trainingPlan="tp" />
       </div>
     </div>
   </template>
@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { useStores } from '@/ui/composables/useStores';
-import TrainingCard from './TrainingCard.vue';
+import TrainingPlanListCard from '@/ui/pages/training-plan/TrainingPlanListCard.vue';
 
 const stores = useStores();
 </script>
