@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { WorkoutWorkStep } from '@/domain/types/Workout';
+import type { RunWorkoutWorkStep } from '@/domain/types/workout/Workout';
 import CardColor from '@/ui/components/card/CardColor.vue';
 import Icon from '@/ui/components/Icon.vue';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
@@ -69,6 +69,6 @@ import MetricTargetTag from '@/ui/components/tags/MetricTargetTag.vue';
 import { Divider } from 'primevue';
 
 const props = defineProps<{
-  step: WorkoutWorkStep
+  step: RunWorkoutWorkStep
 }>();
 </script>

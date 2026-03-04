@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { ZONES_FC } from '@/domain/constants/zones';
-import { PhaseTarget } from '@/domain/types/Workout';
+import type { PhaseTarget } from '@/domain/types/workout/Workout';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
 import { computed } from 'vue';
 

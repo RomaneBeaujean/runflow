@@ -1,4 +1,3 @@
-<!-- WorkoutForm.vue -->
 <template>
   <div class="flex flex-col gap-3" v-if="workout">
 
@@ -22,32 +21,30 @@
     </div>
 
     <div v-show="workout.sportId">
-      <Divider />
 
       <template v-if="workout.sportId === 'course-a-pied'">
-        <div :class="['p-2 mt-[-8px] rounded-md', basicSelected && 'bg-gray-100']">
-          <div class="flex justify-center mb-2">
-            <SwitchToggle label="Ajout simplifié" v-model:value="basicSelected"></SwitchToggle>
-          </div>
-
-          <WorkoutFormSteps v-if="!basicSelected" v-model:workout="stepsStructure" />
-          <WorkoutFormBasic v-if="basicSelected" v-model:workout="basicStructure" />
-        </div>
+        <Divider />
+        <WorkoutRunForm v-model:workout="internalWorkout" />
       </template>
-      <template v-else>
-        <WorkoutFormBasic v-model:workout="basicStructure" />
+      <template v-else-if="workout.sportId === 'velo'">
+        <Divider />
+        <WorkoutBikeForm v-model:workout="internalWorkout" />
+      </template>
+      <template v-else-if="workout.sportId === 'natation'">
+      </template>
+      <template v-else-if="workout.sportId === 'musculation'">
+      </template>
+      <template v-else-if="workout.sportId === 'randonnee'">
       </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { createWorkoutStructure } from '@/domain/factories/WorkoutFactory';
-import { Workout, WorkoutBasic, WorkoutWithSteps } from '@/domain/types/Workout';
-import SwitchToggle from '@/ui/components/inputs/SwitchToggle.vue';
+import type { Workout } from '@/domain/types/workout/Workout';
 import SelectSport from '@/ui/components/select/SelectSport.vue';
-import WorkoutFormBasic from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-form/WorkoutFormBasic.vue';
-import WorkoutFormSteps from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-form/WorkoutFormSteps.vue';
+import WorkoutRunForm from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-form/run/WorkoutRunForm.vue';
+import WorkoutBikeForm from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-form/WorkoutBikeForm.vue';
 import { Divider, InputText, Message } from 'primevue';
 import { ref, watch } from 'vue';
 
@@ -61,46 +58,15 @@ const props = defineProps<{
   titleMessage?: TitleMessage;
 }>();
 
-const getBasicStructure = (workout: Workout): WorkoutBasic => {
-  if (workout.structure.type === 'basic') return createWorkoutStructure(workout.structure) as WorkoutBasic;
-  else return createWorkoutStructure({ type: "basic" }) as WorkoutBasic;
-}
-
-const getStepsStructure = (workout: Workout): WorkoutWithSteps => {
-  if (workout.structure.type === 'steps') return createWorkoutStructure(workout.structure) as WorkoutWithSteps;
-  else return createWorkoutStructure({ type: 'steps' }) as WorkoutWithSteps;
-}
+const internalWorkout = ref(props.workout);
 
 const emit = defineEmits(["update:workout"]);
 
-const basicSelected = ref<boolean>(props.workout.structure.type === 'basic' ? true : false)
-const basicStructure = ref<WorkoutBasic>(getBasicStructure(props.workout));
-const stepsStructure = ref<WorkoutWithSteps>(getStepsStructure(props.workout));
-const internalWorkout = ref(props.workout);
-
-watch(basicSelected, () => {
-  if (basicSelected.value) {
-    internalWorkout.value.structure = createWorkoutStructure(basicStructure.value);
-  } else {
-    internalWorkout.value.structure = createWorkoutStructure(stepsStructure.value);
-  }
-});
-
-watch(basicStructure, () => {
-  internalWorkout.value.structure = basicStructure.value;
-}, { deep: true })
-
-watch(stepsStructure, () => {
-  internalWorkout.value.structure = stepsStructure.value;
-}, { deep: true })
-
-watch(() => props.workout.sportId, () => {
-  if (props.workout.sportId !== 'course-a-pied') {
-    internalWorkout.value.structure = basicStructure.value;
-  }
-})
-
-watch(internalWorkout, () => {
-  emit("update:workout", internalWorkout.value);
-}, { deep: true })
+watch(
+  internalWorkout,
+  () => {
+    emit('update:workout', internalWorkout.value);
+  },
+  { deep: true }
+);
 </script>

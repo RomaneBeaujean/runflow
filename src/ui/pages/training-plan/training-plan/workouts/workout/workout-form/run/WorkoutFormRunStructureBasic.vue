@@ -16,20 +16,26 @@
 </template>
 
 <script setup lang="ts">
-import { WorkoutBasic } from '@/domain/types/Workout';
+import { RunWorkoutStructureBasic } from '@/domain/types/workout/RunWorkoutStructure';
 import InputDuration from '@/ui/components/inputs/InputDuration.vue';
 import { FloatLabel, InputNumber, Textarea } from 'primevue';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
-  workout: WorkoutBasic
+  workout: RunWorkoutStructureBasic;
 }>();
 
-const emit = defineEmits(["update:workout"]);
+const emit = defineEmits<{
+  'update:workout': [workout: RunWorkoutStructureBasic];
+}>();
 
 const internalWorkout = ref(props.workout);
 
-watch(internalWorkout, () => {
-  emit("update:workout", internalWorkout.value);
-}, { deep: true })
+watch(
+  internalWorkout,
+  () => {
+    emit('update:workout', internalWorkout.value);
+  },
+  { deep: true }
+);
 </script>

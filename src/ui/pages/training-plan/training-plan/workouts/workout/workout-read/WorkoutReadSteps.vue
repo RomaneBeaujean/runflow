@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { WorkoutWithSteps } from '@/domain/types/Workout';
+import type { WorkoutWithSteps } from '@/domain/types/workout/Workout';
 import WorkoutReadStepRecovery from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-read/WorkoutReadStepRecovery.vue';
 import WorkoutReadStepWarmup from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-read/WorkoutReadStepWarmup.vue';
 import WorkoutReadStepWork from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-read/WorkoutReadStepWork.vue';

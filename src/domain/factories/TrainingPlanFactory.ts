@@ -4,7 +4,7 @@ import { DEFAULT_WEEK_THEMES } from '../constants/weekThemes';
 import { Sport } from '../types/Sport';
 import { TrainingDay, TrainingPlan, TrainingWeek } from '../types/TrainingPlan';
 import { WeekTheme } from '../types/WeekTheme';
-import { createWorkout } from './WorkoutFactory';
+import { createRunWorkout } from './RunWorkoutFactory';
 
 export function createTrainingPlan(data?: Partial<TrainingPlan>): TrainingPlan {
   const plan: TrainingPlan = {
@@ -16,7 +16,7 @@ export function createTrainingPlan(data?: Partial<TrainingPlan>): TrainingPlan {
     weeks: data?.weeks ?? [createTrainingWeek({ weekNumber: 1 })],
     weekThemes: createWeekThemes(data?.weekThemes || DEFAULT_WEEK_THEMES),
     sports: createSports(DEFAULT_SPORTS),
-    workoutModels: data?.workoutModels?.map((el) => createWorkout(el)) || [],
+    workoutModels: data?.workoutModels?.map((el) => createRunWorkout(el)) || [],
   };
   return plan;
 }

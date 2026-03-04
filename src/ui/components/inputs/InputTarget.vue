@@ -25,14 +25,14 @@
 
 <script setup lang="ts">
 import { Pace } from '@/domain/types/Pace';
-import { PhaseTarget, PhaseTargetType } from '@/domain/types/Workout';
+import { RunPhaseTarget, RunPhaseTargetType } from '@/domain/types/workout/RunWorkoutStructure';
 import { Zone } from '@/domain/types/Zone';
 import SelectZone from '@/ui/components/inputs/SelectZone.vue';
 import { InputGroup, InputGroupAddon, InputMask } from 'primevue';
 import { computed, ref, watch } from 'vue';
 import Icon from '../Icon.vue';
 
-const props = defineProps<{ target?: PhaseTarget }>();
+const props = defineProps<{ target?: RunPhaseTarget }>();
 
 const initialZoneValue = computed(() => {
   return props.target?.type === 'zone' && props.target.value?.length > 0 ? props.target.value : null;
@@ -42,11 +42,11 @@ const initialPaceValue = computed(() => {
   return props.target?.type === 'pace' && props.target.value?.length > 0 ? props.target.value : null;
 })
 
-const targetTypes: { type: PhaseTargetType, label: string, icon: string }[] = [
+const targetTypes: { type: RunPhaseTargetType, label: string, icon: string }[] = [
   { type: "zone", label: "Zone", icon: "fa-solid fa-heart-pulse" },
   { type: "pace", label: "Allure", icon: "pi pi-bolt" },
 ]
-const selectedTargetType = ref<PhaseTargetType>(props.target?.type || 'zone');
+const selectedTargetType = ref<RunPhaseTargetType>(props.target?.type || 'zone');
 const paceValue = ref<Pace>(initialPaceValue.value);
 const zoneValue = ref<Zone>(initialZoneValue.value);
 const targetValue = ref<Pace | Zone>(props.target?.value || null)

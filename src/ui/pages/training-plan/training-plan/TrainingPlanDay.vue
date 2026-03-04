@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { TrainingDay } from '@/domain/types/TrainingPlan';
-import { Workout } from '@/domain/types/Workout';
+import type { Workout } from '@/domain/types/workout/Workout';
 import Icon from '@/ui/components/Icon.vue';
 import CardTag from '@/ui/components/card/CardTag.vue';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';

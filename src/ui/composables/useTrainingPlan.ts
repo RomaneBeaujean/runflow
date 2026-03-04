@@ -11,7 +11,7 @@ import {
   TrainingWeek,
 } from '@/domain/types/TrainingPlan';
 import { WeekTheme } from '@/domain/types/WeekTheme';
-import { Workout } from '@/domain/types/Workout';
+import type { Workout } from '@/domain/types/workout/Workout';
 import { computed, ref } from 'vue';
 import { useTrainingPlanWatchers } from './useTrainingPlanWatchers';
 

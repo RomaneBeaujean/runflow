@@ -1,5 +1,5 @@
 import { TrainingDay } from '@/domain/types/TrainingPlan';
-import { Workout } from '@/domain/types/Workout';
+import type { Workout } from '@/domain/types/workout/Workout';
 import { ref } from 'vue';
 
 const editableMode = ref<boolean>(true);

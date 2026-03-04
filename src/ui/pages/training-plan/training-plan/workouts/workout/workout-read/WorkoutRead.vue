@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { Workout } from '@/domain/types/Workout';
+import type { Workout } from '@/domain/types/workout/Workout';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
 import { useTrainingPlanHelper } from '@/ui/composables/useTrainingPlanHelper';
 import WorkoutReadBasic from '@/ui/pages/training-plan/training-plan/workouts/workout/workout-read/WorkoutReadBasic.vue';

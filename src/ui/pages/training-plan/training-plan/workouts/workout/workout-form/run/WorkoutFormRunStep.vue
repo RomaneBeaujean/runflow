@@ -52,8 +52,10 @@
               <ToggleSwitch v-model="showCounterEffort" />
               <div @click="showCounterEffort = !showCounterEffort" :class="[
                 'cursor-pointer font-bold text-sm',
-                showCounterEffort ? 'text-neutral-900' : 'text-neutral-300'
-              ]">Contre-effort</div>
+                showCounterEffort ? 'text-neutral-900' : 'text-neutral-300',
+              ]">
+                Contre-effort
+              </div>
             </div>
           </div>
           <InputMetric v-if="showCounterEffort && workoutWorkStep.phases.counterEffort"
@@ -88,8 +90,8 @@
 </template>
 
 <script setup lang="ts">
-import { createStepPhase } from '@/domain/factories/WorkoutFactory';
-import { WorkoutWorkStep } from '@/domain/types/Workout';
+import { createStepPhase } from '@/domain/factories/RunWorkoutFactory';
+import { RunWorkoutStep, RunWorkoutWorkStep } from '@/domain/types/workout/RunWorkoutStructure';
 import CardColor from '@/ui/components/card/CardColor.vue';
 import Icon from '@/ui/components/Icon.vue';
 import InputMetric from '@/ui/components/inputs/InputMetric.vue';
@@ -98,26 +100,28 @@ import { Divider, InputNumber, Textarea, ToggleSwitch } from 'primevue';
 import { computed, ref, watch } from 'vue';
 
 interface Props {
-  step: WorkoutWorkStep,
+  step: RunWorkoutWorkStep;
 }
 
 const props = defineProps<Props>();
 
-const emit = defineEmits(["update:step"]);
+const emit = defineEmits<{
+  'update:step': [step: RunWorkoutStep];
+}>();
 
-const workoutWorkStep = ref<WorkoutWorkStep>(props.step);
+const workoutWorkStep = ref<RunWorkoutWorkStep>(props.step);
 const showCounterEffort = ref(!!workoutWorkStep.value.phases.counterEffort);
 const showEffortTarget = ref<boolean>(!!workoutWorkStep.value.phases.effort.target);
 const showCounterEffortTarget = ref<boolean>(!!workoutWorkStep.value.phases.counterEffort?.target);
 const showComment = ref(!!props.step.comment);
 
 const primaryBgColor = computed(() => {
-  return 'bg-primary-500'
+  return 'bg-primary-500';
 });
 
 const effortPhase = computed(() => {
   return workoutWorkStep.value.phases.effort;
-})
+});
 
 watch(showCounterEffort, () => {
   workoutWorkStep.value = {
@@ -125,8 +129,8 @@ watch(showCounterEffort, () => {
     phases: {
       effort: effortPhase.value,
       counterEffort: showCounterEffort.value ? createStepPhase() : null,
-    }
-  }
+    },
+  };
 
   if (!showCounterEffort.value) showCounterEffortTarget.value = false;
 });
@@ -135,9 +139,13 @@ watch(showComment, () => {
   if (!showComment.value) {
     workoutWorkStep.value.comment = null;
   }
-})
+});
 
-watch(workoutWorkStep, () => {
-  emit('update:step', workoutWorkStep.value);
-}, { deep: true });
+watch(
+  workoutWorkStep,
+  () => {
+    emit('update:step', workoutWorkStep.value);
+  },
+  { deep: true }
+);
 </script>

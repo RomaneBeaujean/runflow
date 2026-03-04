@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { WorkoutRecoveryStep } from '@/domain/types/Workout';
+import { RunWorkoutRecoveryStep } from '@/domain/types/workout/RunWorkoutStructure';
 import CardColor from '@/ui/components/card/CardColor.vue';
 import Icon from '@/ui/components/Icon.vue';
 import InputMetric from '@/ui/components/inputs/InputMetric.vue';
@@ -57,30 +57,32 @@ import { Divider, Textarea } from 'primevue';
 import { computed, ref, watch } from 'vue';
 
 interface Props {
-  step: WorkoutRecoveryStep,
+  step: RunWorkoutRecoveryStep;
 }
 
 const props = defineProps<Props>();
 
+const emit = defineEmits<{ 'update:step': [step: RunWorkoutRecoveryStep] }>();
 
-const emit = defineEmits(["update:step"]);
-
-const workoutRecoveryStep = ref<WorkoutRecoveryStep>(props.step);
+const workoutRecoveryStep = ref<RunWorkoutRecoveryStep>(props.step);
 const showRecoveryTarget = ref(!!workoutRecoveryStep.value.phase.target);
 const showComment = ref(!!props.step.comment);
 
 const primaryBgColor = computed(() => {
-  return 'bg-emerald-500'
+  return 'bg-emerald-500';
 });
-
 
 watch(showComment, () => {
   if (!showComment.value) {
     workoutRecoveryStep.value.comment = null;
   }
-})
+});
 
-watch(workoutRecoveryStep, () => {
-  emit('update:step', workoutRecoveryStep.value);
-}, { deep: true });
+watch(
+  workoutRecoveryStep,
+  () => {
+    emit('update:step', workoutRecoveryStep.value);
+  },
+  { deep: true }
+);
 </script>

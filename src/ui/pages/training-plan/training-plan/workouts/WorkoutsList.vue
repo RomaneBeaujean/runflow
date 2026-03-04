@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { getTagColor } from '@/domain/services/TagColors';
-import { Workout } from '@/domain/types/Workout';
+import type { Workout } from '@/domain/types/workout/Workout';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
 import {
   Button

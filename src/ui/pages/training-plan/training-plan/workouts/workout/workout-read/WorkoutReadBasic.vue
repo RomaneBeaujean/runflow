@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { minutesToFormattedDuration } from '@/domain/helpers/time';
-import { WorkoutBasic } from '@/domain/types/Workout';
+import type { WorkoutBasic } from '@/domain/types/workout/Workout';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
 
 const props = defineProps<{

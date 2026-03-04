@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { WorkoutRecoveryStep } from '@/domain/types/Workout';
+import type { WorkoutRecoveryStep } from '@/domain/types/workout/Workout';
 import CardColor from '@/ui/components/card/CardColor.vue';
 import Icon from '@/ui/components/Icon.vue';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';

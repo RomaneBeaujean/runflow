@@ -3,7 +3,7 @@ import { areStepsValid } from '@/domain/helpers/workout-form';
 import { Sport } from '@/domain/types/Sport';
 import { TrainingWeek } from '@/domain/types/TrainingPlan';
 import { WeekTheme } from '@/domain/types/WeekTheme';
-import { Workout } from '@/domain/types/Workout';
+import type { Workout } from '@/domain/types/workout/Workout';
 import { useTrainingPlan } from './useTrainingPlan';
 
 const { weekThemes, sports, workoutModels } = useTrainingPlan();

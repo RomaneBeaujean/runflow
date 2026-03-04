@@ -1,4 +1,3 @@
-<!-- AddWorkout.vue -->
 <template>
   <Drawer v-model:opened="showAddWorkout" position="right" overlay showCloseButton id="addWorkout" width="564px">
     <template #header v-if="showAddWorkout">
@@ -12,44 +11,6 @@
     </template>
 
     <div class="flex flex-col h-full" v-if="showAddWorkout">
-
-      <!-- <div class="flex flex-col h-full items-center justify-center gap-2">
-        <div
-          class="w-[200px] h-[100px] p-2 border-1 border-gray-200 flex items-center justify-center rounded-lg shadow-lg cursor-pointer gap-3 hover:shadow-2xl hover:bg-gray-50">
-          <div alass=" h-full flex items-center justify-center flex-0">
-            <Icon size="large" icon="pi pi-plus" class="" />
-          </div>
-          <div>
-            <div class="font-bold text-sm">
-              Nouvelle séance
-            </div>
-            <div class="text-gray-600 text-sm">Créer une nouvelle séance</div>
-          </div>
-        </div>
-        <div>
-          ou
-        </div>
-        <div
-          class="w-[200px] h-[100px] p-2 border-1 border-gray-200 flex items-center justify-center rounded-lg shadow-lg cursor-pointer gap-3 hover:shadow-2xl hover:bg-gray-50">
-          <div alass="h-full flex items-center justify-center flex-0">
-            <Icon size="large" icon="pi pi-book" class="" />
-          </div>
-          <div>
-            <div class="font-bold text-sm">
-              Depuis la bibliothèque
-            </div>
-            <div class="text-gray-600 text-sm">Copier ou planifier une séance existante </div>
-          </div>
-        </div>
-      </div> -->
-
-      <!-- <div>
-        <div class="font-semibold">
-          Depuis la bibliothèque
-        </div>
-        <SelectWorkoutTemplate v-model:selectedModelId="workoutModelId" />
-      </div>
-      <Divider /> -->
       <WorkoutForm v-model:workout="workout" :titleMessage="titleMessage" />
     </div>
 
@@ -75,8 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { createWorkout } from '@/domain/factories/WorkoutFactory';
-import { Workout } from '@/domain/types/Workout';
+import { createRunWorkout } from '@/domain/factories/RunWorkoutFactory';
+import type { Workout } from '@/domain/types/workout/Workout';
 import Drawer from '@/ui/components/drawer/Drawer.vue';
 import ColorTag from '@/ui/components/tags/ColorTag.vue';
 import { useTrainingPlan } from '@/ui/composables/useTrainingPlan';
@@ -96,7 +57,7 @@ const { planifyWorkout, addWorkoutModel, workoutModels } = useTrainingPlan();
 const { isFormValid, isTitleExist } = useTrainingPlanHelper();
 
 const workoutModelId = ref<string>(null);
-const workout = ref<Workout>(createWorkout({ sportId: 'course-a-pied' }));
+const workout = ref<Workout>(createRunWorkout({ sportId: 'course-a-pied' }));
 const saveModelOnLibrary = ref<boolean>(true);
 
 /**
@@ -135,12 +96,12 @@ const validateButtonLabel = computed(() => {
  */
 
 const initForm = (data: Partial<Workout> | null) => {
-  workout.value = createWorkout(data);
+  workout.value = createRunWorkout(data);
   saveModelOnLibrary.value = true;
 }
 
 const handleAddWorkout = () => {
-  const newWorkout: Workout = createWorkout({
+  const newWorkout: Workout = createRunWorkout({
     id: workoutModelId.value,
     ...workout.value
   });
@@ -172,7 +133,7 @@ watch(
     const model = workoutFromModelId.value;
     if (!model) return;
 
-    const isSame = createWorkout(newWorkout) == createWorkout(model)
+    const isSame = createRunWorkout(newWorkout) == createRunWorkout(model)
     if (!isSame) {
       workoutModelId.value = null;
     }

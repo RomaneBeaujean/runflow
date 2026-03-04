@@ -91,8 +91,8 @@
 </template>
 
 <script setup lang="ts">
-import { createStepPhase, createWorkoutRecoveryStep, createWorkoutWorkStep } from '@/domain/factories/WorkoutFactory';
-import { WorkoutRecoveryStep, WorkoutStep, WorkoutStepType, WorkoutWorkStep } from '@/domain/types/Workout';
+import { createRunWorkoutWorkStep, createStepPhase, createWorkoutRecoveryStep } from '@/domain/factories/RunWorkoutFactory';
+import { RunWorkoutRecoveryStep, RunWorkoutStep, RunWorkoutStepType, RunWorkoutWorkStep } from '@/domain/types/workout/RunWorkoutStructure';
 import CardColor from '@/ui/components/card/CardColor.vue';
 import Icon from '@/ui/components/Icon.vue';
 import InputMetric from '@/ui/components/inputs/InputMetric.vue';
@@ -101,12 +101,12 @@ import { Divider, InputNumber, Textarea, ToggleSwitch } from 'primevue';
 import { computed, ref, watch } from 'vue';
 
 interface Props {
-  step: WorkoutStep,
+  step: RunWorkoutStep,
 }
 
 const props = defineProps<Props>();
 
-const stepTypeOptions: { type: WorkoutStepType, label: string }[] = [{
+const stepTypeOptions: { type: RunWorkoutStepType, label: string }[] = [{
   type: "work",
   label: "Exercice",
 }, {
@@ -115,12 +115,12 @@ const stepTypeOptions: { type: WorkoutStepType, label: string }[] = [{
 }];
 
 
-const getStepWork = (step: WorkoutStep): WorkoutWorkStep => {
-  if (step.type === 'work') return createWorkoutWorkStep({ ...step });
-  return createWorkoutWorkStep();
+const getStepWork = (step: RunWorkoutStep): RunWorkoutWorkStep => {
+  if (step.type === 'work') return createRunWorkoutWorkStep({ ...step });
+  return createRunWorkoutWorkStep();
 }
 
-const getStepRecovery = (step: WorkoutStep): WorkoutRecoveryStep => {
+const getStepRecovery = (step: RunWorkoutStep): RunWorkoutRecoveryStep => {
   if (step.type === 'recovery') return createWorkoutRecoveryStep({ ...step });
   return createWorkoutRecoveryStep();
 }
@@ -128,9 +128,9 @@ const getStepRecovery = (step: WorkoutStep): WorkoutRecoveryStep => {
 const emit = defineEmits(["update:step"]);
 
 const internalStep = ref(props.step);
-const stepType = ref<WorkoutStepType>(props.step.type);
-const workoutWorkStep = ref<WorkoutWorkStep>(getStepWork(props.step));
-const workoutRecoveryStep = ref<WorkoutRecoveryStep>(getStepRecovery(props.step));
+const stepType = ref<RunWorkoutStepType>(props.step.type);
+const workoutWorkStep = ref<RunWorkoutWorkStep>(getStepWork(props.step));
+const workoutRecoveryStep = ref<RunWorkoutRecoveryStep>(getStepRecovery(props.step));
 
 const showCounterEffort = ref(!!workoutWorkStep.value.phases.counterEffort);
 const showEffortTarget = ref<boolean>(!!workoutWorkStep.value.phases.effort.target);

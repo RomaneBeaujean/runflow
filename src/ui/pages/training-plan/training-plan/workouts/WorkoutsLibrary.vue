@@ -68,8 +68,8 @@ import {
 } from 'primevue';
 import { computed, ref } from 'vue';
 
-import { createWorkout } from '@/domain/factories/WorkoutFactory';
-import { Workout } from '@/domain/types/Workout';
+import { createRunWorkout } from '@/domain/factories/RunWorkoutFactory';
+import type { Workout } from '@/domain/types/workout/Workout';
 import { useTrainingPlanHelper } from '@/ui/composables/useTrainingPlanHelper';
 import WorkoutsList from './WorkoutsList.vue';
 import WorkoutForm from './workout/workout-form/WorkoutForm.vue';
@@ -111,7 +111,7 @@ const handleClose = () => {
 const handleShowAddWorkout = () => {
   showAddModel.value = false;
   showAddModel.value = true;
-  editedWorkout.value = createWorkout();
+  editedWorkout.value = createRunWorkout();
 }
 
 const handleShowEditModel = (model: Workout) => {

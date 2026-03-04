@@ -1,39 +1,39 @@
 import { createDefaultMetricValue } from '@/domain/helpers/metrics';
 import { TagColor } from '@/domain/types/TagColor';
 import {
-  StepPhase,
-  Workout,
-  WorkoutRecoveryStep,
-  WorkoutStep,
-  WorkoutStructure,
-  WorkoutWarmupStep,
-  WorkoutWithSteps,
-  WorkoutWorkStep,
-} from '@/domain/types/Workout';
+  RunStepPhase,
+  RunWorkoutRecoveryStep,
+  RunWorkoutStep,
+  RunWorkoutStructure,
+  RunWorkoutStructureWithSteps,
+  RunWorkoutWarmupStep,
+  RunWorkoutWorkStep,
+} from '@/domain/types/workout/RunWorkoutStructure';
+import { Workout, WorkoutStructure } from '@/domain/types/workout/Workout';
 import { nanoid } from 'nanoid';
 
 export function createSportTagColor(color: string): TagColor {
   return color as TagColor;
 }
 
-export function createWorkout(data?: Partial<Workout>): Workout {
+export function createRunWorkout(data?: Partial<Workout>): Workout {
   const workout: Workout = {
     id: data?.id || nanoid(),
     title: data?.title || null,
     sportId: data?.sportId || null,
-    structure: createWorkoutStructure(data?.structure),
+    structure: createWorkoutStructure(data?.structure as RunWorkoutStructure),
   };
   return workout;
 }
 
 export function createWorkoutStructure(
-  data?: Partial<WorkoutStructure>
+  data?: Partial<RunWorkoutStructure>
 ): WorkoutStructure {
   if (!data || data.type === 'steps') {
-    const stepsData = (data as WorkoutWithSteps)?.steps ?? [];
+    const stepsData = (data as RunWorkoutStructureWithSteps)?.steps ?? [];
     return {
       type: 'steps',
-      steps: createWorkoutSteps(stepsData),
+      steps: createRunWorkoutSteps(stepsData),
     };
   }
   return {
@@ -44,24 +44,26 @@ export function createWorkoutStructure(
   };
 }
 
-export function createWorkoutSteps(
-  data?: Partial<WorkoutStep[]>
-): WorkoutStep[] {
+export function createRunWorkoutSteps(
+  data?: Partial<RunWorkoutStep[]>
+): RunWorkoutStep[] {
   if (!data || data?.length === 0) return [createWorkoutStep()];
   return data.map((s) => createWorkoutStep(s));
 }
 
-export function createWorkoutStep(data?: Partial<WorkoutStep>): WorkoutStep {
+export function createWorkoutStep(
+  data?: Partial<RunWorkoutStep>
+): RunWorkoutStep {
   if (!data || data.type === 'work')
-    return createWorkoutWorkStep(data as Partial<WorkoutWorkStep>);
+    return createRunWorkoutWorkStep(data as Partial<RunWorkoutWorkStep>);
   if (data.type === 'warmup')
-    return createWorkoutWarmupStep(data as Partial<WorkoutWarmupStep>);
-  return createWorkoutRecoveryStep(data as Partial<WorkoutRecoveryStep>);
+    return createWorkoutWarmupStep(data as Partial<RunWorkoutWarmupStep>);
+  return createWorkoutRecoveryStep(data as Partial<RunWorkoutRecoveryStep>);
 }
 
-export function createWorkoutWorkStep(
-  data?: Partial<WorkoutWorkStep>
-): WorkoutWorkStep {
+export function createRunWorkoutWorkStep(
+  data?: Partial<RunWorkoutWorkStep>
+): RunWorkoutWorkStep {
   return {
     type: 'work',
     repeat: data?.repeat ?? 1,
@@ -75,8 +77,8 @@ export function createWorkoutWorkStep(
   };
 }
 export function createWorkoutWarmupStep(
-  data?: Partial<WorkoutWarmupStep>
-): WorkoutWarmupStep {
+  data?: Partial<RunWorkoutWarmupStep>
+): RunWorkoutWarmupStep {
   return {
     type: 'warmup',
     phase: createStepPhase(data?.phase),
@@ -85,8 +87,8 @@ export function createWorkoutWarmupStep(
 }
 
 export function createWorkoutRecoveryStep(
-  data?: Partial<WorkoutRecoveryStep>
-): WorkoutRecoveryStep {
+  data?: Partial<RunWorkoutRecoveryStep>
+): RunWorkoutRecoveryStep {
   return {
     type: 'recovery',
     phase: createStepPhase(data?.phase),
@@ -94,7 +96,7 @@ export function createWorkoutRecoveryStep(
   };
 }
 
-export function createStepPhase(data?: Partial<StepPhase>): StepPhase {
+export function createStepPhase(data?: Partial<RunStepPhase>): RunStepPhase {
   return {
     metricValue: data?.metricValue ?? createDefaultMetricValue(),
     target: data?.target,
