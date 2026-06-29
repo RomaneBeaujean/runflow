@@ -1,8 +1,10 @@
 <template>
-  <InputMask v-model="currentPace" mask="99:99 (min/km)" placeholder="Allure (min/km)" class="input-pace mr-2"
-    :size="props.size || 'small'" style="width: 125px" />
-  <InputMask v-model="currentDuration" mask="99h99" placeholder="__h__" class="input-duration"
-    :size="props.size || 'small'" style="width: 75px" />
+  <div class="flex items-center gap-2">
+    <InputMask v-model="currentPace" mask="99:99 (min/km)" placeholder="Allure (min/km)" class="input-pace"
+      :size="props.size || 'small'" style="width: 125px" />
+    <InputMask v-model="currentDuration" mask="99h99" placeholder="__h__" class="input-duration"
+      :size="props.size || 'small'" style="width: 75px" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -32,6 +34,12 @@ const currentDurationMinutes = ref<number>(
 const currentDuration = ref<string>(
   minutesToFormattedDuration(currentDurationMinutes.value)
 );
+
+watch(() => props.pace, (newPace) => {
+  if (!newPace) return;
+  const displayed = currentPace.value?.slice(0, 5);
+  if (newPace !== displayed) currentPace.value = newPace;
+});
 
 watch(currentPace, (newPace, oldPace) => {
   if (!newPace?.match(/^\d{1,2}:\d{2}/) || newPace === oldPace) return;

@@ -32,7 +32,7 @@
         <div class="flex justify-between">
           <div>Tableau des splits</div>
           <div>
-            <SwitchToggle label="Mode édition" value="editableMode" />
+            <SwitchToggle label="Mode édition" v-model:value="editableMode" />
           </div>
         </div>
       </template>

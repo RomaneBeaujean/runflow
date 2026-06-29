@@ -1,40 +1,37 @@
 <template>
   <template v-if="!onlyAveragePace">
     <Fieldset legend="Allures ajustées à la pente">
-      <div class="flex flex-col md:gap-10 gap-3 md:p-5">
-        <div class="flex justify-center">
-          <div class="flex flex-col gap-2 md:w-[70%] md:p-3">
-            <div class="font-semibold text-center">
-              Quelle est votre allure la plus rapide, sur une pente parfaite
-              (environ -3%) ?
-            </div>
-            <div class="w-full">
-              <PaceSlider :min="2" :max="18" :step="1 / 60" :hideGraduation="isMobile" v-model="maxPace" />
-            </div>
+      <div class="flex flex-col md:flex-row gap-6 md:p-4">
+        <div class="flex flex-col gap-2 items-center flex-1">
+          <div class="text-sm font-semibold text-center text-gray-700">
+            Allure la plus rapide<br class="hidden md:block" />
+            <span class="text-gray-400 font-normal">(pente ~-3%)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <InputMask v-model="maxPaceStr" mask="99:99" placeholder="MM:SS" size="small" style="width: 72px" />
+            <span class="text-xs text-gray-400">min/km</span>
           </div>
         </div>
-        <div class="flex flex-col md:flex-row gap-3">
-          <div class="flex flex-col gap-2 md:w-[50%]">
-            <div class="font-semibold text-center">
-              Quelle est votre allure la plus lente en montée, sur la portion la
-              plus pentue ({{ Math.round(parsedFile.slopeMax) }}
-              %) ?
-            </div>
-            <div class="w-full">
-              <PaceSlider :min="Math.floor(maxPace)" :max="30" :step="1 / 60" v-model="minUpPace"
-                :hideGraduation="isMobile" />
-            </div>
+        <div class="hidden md:block w-px bg-gray-200 self-stretch" />
+        <div class="flex flex-col gap-2 items-center flex-1">
+          <div class="text-sm font-semibold text-center text-gray-700">
+            Allure montée max<br class="hidden md:block" />
+            <span class="text-gray-400 font-normal">({{ Math.round(parsedFile.slopeMax) }}%)</span>
           </div>
-          <div class="flex flex-col gap-2 md:w-[50%]">
-            <div class="font-semibold text-center">
-              Quelle est votre allure la plus lente en descente, sur la portion
-              la plus négative ({{ Math.round(parsedFile.slopeMin) }}
-              %) ?
-            </div>
-            <div class="w-full">
-              <PaceSlider :min="Math.floor(maxPace)" :max="30" :step="1 / 60" v-model="minDownPace"
-                :hideGraduation="isMobile" />
-            </div>
+          <div class="flex items-center gap-2">
+            <InputMask v-model="minUpPaceStr" mask="99:99" placeholder="MM:SS" size="small" style="width: 72px" />
+            <span class="text-xs text-gray-400">min/km</span>
+          </div>
+        </div>
+        <div class="hidden md:block w-px bg-gray-200 self-stretch" />
+        <div class="flex flex-col gap-2 items-center flex-1">
+          <div class="text-sm font-semibold text-center text-gray-700">
+            Allure descente max<br class="hidden md:block" />
+            <span class="text-gray-400 font-normal">({{ Math.round(parsedFile.slopeMin) }}%)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <InputMask v-model="minDownPaceStr" mask="99:99" placeholder="MM:SS" size="small" style="width: 72px" />
+            <span class="text-xs text-gray-400">min/km</span>
           </div>
         </div>
       </div>
@@ -53,15 +50,14 @@
     </Fieldset>
     <Fieldset legend="Graphique des allures calculées">
       <div>
-        <div class="flex flex-col md:flex-row gap-3">
-          <div class="md:w-[50%]">
-            <div class="text-center font-bold p-2">Allure moyenne</div>
-            <PaceSlider v-model="averagePace" :min="Math.floor(maxPace)" :max="Math.floor(minUpPace)" :step="1 / 60"
-              :hideGraduation="isMobile" />
-          </div>
-          <div class="md:w-[50%]">
-            <div class="text-center font-bold p-2">Durée totale</div>
-            <DurationSlider v-model="totalDuration" :step="1" :min="minDuration" :max="maxDuration" />
+        <div class="flex justify-center mb-4">
+          <div class="flex flex-col items-center gap-1">
+            <div class="text-center font-bold p-2">Allure / Durée totale</div>
+            <InputPaceDuration
+              :pace="numberToPace(averagePace)"
+              :distance="parsedFile.totalDistance"
+              @update="onPaceUpdate"
+            />
           </div>
         </div>
         <div class="h-[250px] md:h-[400px]">
@@ -72,15 +68,14 @@
   </template>
   <template v-else>
     <div>
-      <div class="flex flex-col md:flex-row gap-3">
-        <div class="md:w-[50%]">
-          <div class="text-center font-bold p-2">Allure moyenne</div>
-          <PaceSlider v-model="averagePace" :min="Math.floor(maxPace)" :max="Math.floor(minUpPace)" :step="1 / 60"
-            :hideGraduation="isMobile" />
-        </div>
-        <div class="md:w-[50%]">
-          <div class="text-center font-bold p-2">Durée totale</div>
-          <DurationSlider v-model="totalDuration" :step="1" :min="minDuration" :max="maxDuration" />
+      <div class="flex justify-center mb-4">
+        <div class="flex flex-col items-center gap-1">
+          <div class="text-center font-bold p-2">Allure / Durée totale</div>
+          <InputPaceDuration
+            :pace="numberToPace(averagePace)"
+            :distance="parsedFile.totalDistance"
+            @update="onPaceUpdate"
+          />
         </div>
       </div>
       <div class="h-[250px] md:h-[400px]">
@@ -95,7 +90,8 @@ import {
   roundOneNumber,
   roundThreeNumber,
 } from '@/domain/helpers/round-number';
-import { paceToNumber } from '@/domain/helpers/time';
+import { numberToPace, paceToNumber } from '@/domain/helpers/time';
+import InputPaceDuration from '@/ui/components/inputs/InputPaceDuration.vue';
 import { GpxParse } from '@/domain/lib/gpx/GpxParse';
 import { ClimbDetector } from '@/domain/services/ClimbDetector';
 import { PaceCalculator } from '@/domain/services/PaceCalculator';
@@ -103,10 +99,7 @@ import { computeSlidingSlopeKm } from '@/domain/services/Slopes';
 import { computeSplits } from '@/domain/services/Splits';
 import { Split } from '@/domain/types/Split';
 import DifficultiesSlider from '@/ui/components/sliders/DifficultiesSlider.vue';
-import DurationSlider from '@/ui/components/sliders/DurationSlider.vue';
-import PaceSlider from '@/ui/components/sliders/PaceSlider.vue';
-import { useViewport } from '@/ui/composables/useViewport';
-import { Fieldset } from 'primevue';
+import { Fieldset, InputMask } from 'primevue';
 import { computed, onMounted, ref, watch } from 'vue';
 import PaceSimulatorChart from './pace-simulator/PaceSimulatorChart.vue';
 
@@ -116,7 +109,6 @@ const props = defineProps<{
   onlyAveragePace?: boolean;
 }>();
 
-const { isMobile } = useViewport();
 const calculator = ref<PaceCalculator>(null);
 const points = ref([]);
 const slidingSlopesPoints = ref([]);
@@ -127,6 +119,21 @@ const separators = ref<number[]>();
 const maxPace = ref<number>(5);
 const minUpPace = ref<number>(16);
 const minDownPace = ref<number>(7);
+
+// Pace string refs for InputMask (MM:SS)
+const toPaceStr = (n: number) => numberToPace(n).slice(0, 5);
+const parsePaceStr = (s: string) => (s?.match(/^\d{1,2}:\d{2}$/) ? paceToNumber(s) : null);
+
+const maxPaceStr = ref(toPaceStr(maxPace.value));
+const minUpPaceStr = ref(toPaceStr(minUpPace.value));
+const minDownPaceStr = ref(toPaceStr(minDownPace.value));
+
+watch(maxPaceStr, (v) => { const p = parsePaceStr(v); if (p !== null) maxPace.value = p; });
+watch(minUpPaceStr, (v) => { const p = parsePaceStr(v); if (p !== null) minUpPace.value = p; });
+watch(minDownPaceStr, (v) => { const p = parsePaceStr(v); if (p !== null) minDownPace.value = p; });
+watch(maxPace, (v) => { maxPaceStr.value = toPaceStr(v); });
+watch(minUpPace, (v) => { minUpPaceStr.value = toPaceStr(v); });
+watch(minDownPace, (v) => { minDownPaceStr.value = toPaceStr(v); });
 const totalDuration = ref<number>(0);
 const pUp = ref<number>(0.5);
 const pDown = ref<number>(2);
@@ -214,14 +221,11 @@ watch([averagePace], () => {
   calculateSplits();
 });
 
-watch([totalDuration], () => {
-  if (Math.round(totalDuration.value) == Math.round(calculatedDuration.value))
-    return;
-  const newPace = totalDuration.value / props.parsedFile.totalDistance;
-  if (roundThreeNumber(averagePace.value) !== roundThreeNumber(newPace)) {
-    averagePace.value = newPace;
+const onPaceUpdate = (data: { pace: string }) => {
+  if (data.pace?.match(/^\d{1,2}:\d{2}/)) {
+    averagePace.value = paceToNumber(data.pace.slice(0, 5));
   }
-});
+};
 
 const emit = defineEmits<{
   (e: 'update:modelValue', v: Split[]): void;

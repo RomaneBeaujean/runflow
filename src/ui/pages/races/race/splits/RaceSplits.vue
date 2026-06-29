@@ -7,11 +7,11 @@
         <div class="header"></div>
         <div class="header border-l-1 border-gray-200">Distance totale</div>
         <div class="header">Dénivelé total</div>
-        <div class="header border-l-1 border-gray-200">Split</div>
+        <div class="header border-l-1 border-gray-200">Longueur split</div>
         <div class="header">Dénivelé split</div>
         <div class="header">Pente split</div>
         <div class="header">Allure / durée du split</div>
-        <!-- <div class="header border-l-1 border-gray-200">Nutrition</div> -->
+        <div class="header border-l-1 border-gray-200">Nutrition</div>
         <div class="header border-l-1 border-gray-200">Temps d'arrêt</div>
         <div class="header border-l-1 border-gray-200">Temps écoulé</div>
         <div class="header">Heure</div>
@@ -23,7 +23,7 @@
       </div>
 
       <!-- Table Body -->
-      <template v-for="split in splitItems" :key="split.id">
+      <template v-for="(split, index) in splitItems" :key="split.id">
         <div
           class="row relative"
           :data-hovered="hoveredSplitItem?.id == split.id ? true : null"
@@ -32,7 +32,7 @@
         >
           <RaceSplitDesktop :split="split" />
         </div>
-        <AddSeparator v-if="editableMode" />
+        <AddSeparator v-if="editableMode && index < splitItems.length - 1" />
       </template>
     </template>
     <template v-else>

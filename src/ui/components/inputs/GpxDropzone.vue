@@ -23,14 +23,10 @@
         <div class="flex flex-col items-center justify-center gap-3 w-full h-full">
           <div class="text-sm mb-2 font-medium">Fichier sélectionné :</div>
           <ColorTag color="neutral">
-            <div>
-              <div class="max-w-[250px] min-w-0 truncate">
-                {{ files[0].name }}
-              </div>
-              <button type="button" class="m-1 text-grey-600 hover:text-grey-900 font-bold cursor-pointer"
-                @click="removeFile(files[0], $event)">
-                ×
-              </button>
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="truncate max-w-[280px]">{{ files[0].name }}</span>
+              <button type="button" class="flex-shrink-0 opacity-60 hover:opacity-100 font-bold cursor-pointer leading-none"
+                @click="removeFile(files[0], $event)">×</button>
             </div>
           </ColorTag>
         </div>
