@@ -69,7 +69,7 @@ export class RacesStore {
     const text = await file.text();
 
     try {
-      const raceObj = JSON.parse(text);
+      const { nutritionProducts: _products, ...raceObj } = JSON.parse(text);
       const existing = this.getById(raceObj.id);
       if (!existing) {
         await db.races.put(raceObj);

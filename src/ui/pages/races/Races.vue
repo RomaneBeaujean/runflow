@@ -23,12 +23,14 @@
 </template>
 
 <script setup lang="ts">
+import { useNutrition } from '@/ui/composables/useNutrition';
 import { useStores } from '@/ui/composables/useStores';
 import AddNewRace from '@/ui/pages/races/race/AddNewRace.vue';
 import RacesList from '@/ui/pages/races/races-list/RacesList.vue';
 import { Button } from 'primevue';
 
 const stores = useStores();
+const { importProducts } = useNutrition();
 
 const importFile = () => {
   const input = document.createElement('input');
@@ -37,6 +39,15 @@ const importFile = () => {
   input.onchange = async (event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+
+    try {
+      const parsed = JSON.parse(await file.text());
+      if (parsed.nutritionProducts?.length) {
+        importProducts(parsed.nutritionProducts);
+      }
+    } catch {
+      // store's import will handle validation errors
+    }
 
     await stores.races_store.import(file);
   };

@@ -39,5 +39,13 @@ export function useNutrition() {
   const getProduct = (id: string): NutritionProduct | null =>
     products.value.find((p) => p.id === id) ?? null;
 
-  return { products, addProduct, removeProduct, updateProduct, getProduct };
+  const importProducts = (incoming: NutritionProduct[]) => {
+    const existingIds = new Set(products.value.map((p) => p.id));
+    const toAdd = incoming.filter((p) => !existingIds.has(p.id));
+    if (toAdd.length > 0) {
+      products.value = [...products.value, ...toAdd];
+    }
+  };
+
+  return { products, addProduct, removeProduct, updateProduct, getProduct, importProducts };
 }

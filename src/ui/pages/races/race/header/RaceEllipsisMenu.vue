@@ -5,6 +5,7 @@
 
 <script setup lang="ts">
 import { Race } from '@/domain/types/Race';
+import { useNutrition } from '@/ui/composables/useNutrition';
 import { useRaceRecap } from '@/ui/composables/useRaceRecap';
 import { useStores } from '@/ui/composables/useStores';
 import { Button, Menu } from 'primevue';
@@ -15,6 +16,7 @@ const stores = useStores();
 const props = defineProps<{ race: Race; edit: () => void }>();
 const menu = ref(null);
 const { showTableModal, showChartModal } = useRaceRecap();
+const { getProduct } = useNutrition();
 
 const items: MenuItem[] = [
   {
@@ -51,7 +53,14 @@ const downloadRace = () => {
   const race = stores.races_store.getById(props.race.id);
   if (!race) return;
 
-  const json = JSON.stringify(race, null, 2);
+  const referencedIds = new Set<string>();
+  (race.separators || []).forEach((sep: any) => {
+    (sep.nutrition?.products || []).forEach((p: any) => referencedIds.add(p.productId));
+  });
+  const nutritionProducts = [...referencedIds].map((id) => getProduct(id)).filter(Boolean);
+
+  const exportData = nutritionProducts.length ? { ...race, nutritionProducts } : race;
+  const json = JSON.stringify(exportData, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
 
